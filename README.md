@@ -331,7 +331,7 @@ $ curl -X POST -u admin "https://<APPLIANCE>/api/backup/"|jq
 Once it is ready, get the "location" from the response and download the database dump.
 
 ```console
-$ curl -o backup.pgdump.tar -u admin "http://10.112.14.193/api/backup/appliance-NNNNN.pgdump"
+$ curl -o backup.pgdump.tar -u admin "http://<APPLIANCE>/api/backup/appliance-NNNNN.pgdump"
 ```
 
 Backup is in fact a tar archive, containing just backup.pgdump. Extract it.
