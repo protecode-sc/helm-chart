@@ -8,15 +8,16 @@ using the Helm package manager.
 Before starting, you will need:
 
   * A Kubernetes cluster with:
-    * storageClass configured that allows persistent volumes.
-    * NGINX Ingress Controller
-    * Cluster should have enough memory, preferably at least 16 gigabytes.
-      A good entry level deployment would be 2 n1-standard nodes on GCP.
+    * storageClass that allows persistent volumes configured.
+    * NGINX Ingress Controller.
+    * The cluster should have enough memory, preferably at least 16 gigabytes.
+      A good entry level deployment, for example, would be two n1-standard
+      nodes on GCP.
   * Helm 3
 
 ## Download chart dependencies
 
-To download the chart dependencies, which include **postgresql**, **minio**, **memcached** and **rabbitmq**, first run:
+To download the chart dependencies, which include **postgresql**, **minio**, **memcached**, and **rabbitmq**:
 
 ```console
 $ helm dependency update
@@ -56,8 +57,9 @@ sections for clarity.
 
 ### Secrets for services
 
-Black Duck Binary Analysis Helm chart uses PostgreSQL. Secrets for other services
-are automatically provisioned, but for PostgreSQL you need to enter password manually.
+Black Duck Binary Analysis Helm chart uses PostgreSQL. Secrets for other services are automatically provisioned,
+but for PostgreSQL you need to enter the password manually.
+
 
 #### PostgreSQL secrets
 
@@ -66,14 +68,14 @@ for PostgreSQL. During the initial installation, a PostgreSQL database is create
 password, and you cannot change it afterward.
 
 You can configure a password either with the `--set postgresql.postgresqlPassword="PASSWORD"` parameter or by using
-existing secrets. To create a random password and use that, do the following before installing.
+existing secrets. To create a random password and use that, do the following before installing:
 
 ```console
 $ kubectl create secret generic bdba-postgresql-secret -n NAMESPACE --from-literal=postgresql-password=<12 randon characters>
 secret/bdba-postgresql-secret created
 ```
 
-Next,  the created secret to Helm:
+Next, add the created secret to Helm
 
 `--set global.postgresql.existingSecret="bdba-postgresql-secret"`
 
@@ -88,7 +90,7 @@ Parameter                                  | Description                        
 
 ### Storage
 
-Black Duck Binary Analysis needs storage. It can support either existing PVC claims or automatically
+Black Duck Binary Analysis requires storage. It can support either existing PVC claims or automatically
 provision volumes if `storageClass` is provided.
 
 Parameter                              | Description                          | Default
@@ -105,7 +107,7 @@ Parameter                              | Description                          | 
 
 ### Licensing
 
-To access the data that Black Duck Binary Analysis needs, username and password for the licensing server are needed.
+To access the data that Black Duck Binary Analysis needs a username and password for the licensing server are required.
 Without these, the installation will not function.
 
 Parameter                     | Description                      | Default
@@ -117,7 +119,7 @@ Parameter                     | Description                      | Default
 ### RabbitMQ configuration
 
 RabbitMQ requires to know the cluster's domain name. If it is not `cluster.local`,
-it needs to be given.
+you need to provide it.
 
 Parameter                                 | Description                 | Default
 ----------------------------------------- | --------------------------- | ----------------
@@ -125,7 +127,7 @@ Parameter                                 | Description                 | Defaul
 
 ### Web frontend configuration
 
-Generic configuration options customization of frontend behaviour.
+Generic configuration options for customization of frontend behavior.
 
 Parameter                       | Description                             | Default
 ------------------------------- | --------------------------------------- |------------------------
@@ -140,7 +142,7 @@ Parameter                       | Description                             | Defa
 
 ### SMTP configuration
 
-Black Duck Binary Analysis can send emails, for example, to inviting new users or send vulnerability
+Black Duck Binary Analysis can send emails, for example, to invite new users or to send vulnerability
 notifications.
 
 Parameter                     | Description                                       | Default
@@ -286,7 +288,7 @@ Examples, with inline documentation, are provided in the `examples` directory.
 
 ## Secrets
 
-Key material can be saved to Kubernetes using kubectl. To setup additional root certificates,
+Key material can be saved to Kubernetes using kubectl. To set up additional root certificates,
 you can set them as Kubernetes secrets. PEM encoding is assumed.
 
 ```console
@@ -341,7 +343,7 @@ $ tar xvf backup.pgdump
 x database.pgdump
 ```
 
-### Stopping services accessing the database.
+### Stopping services accessing the database
 
 Next, you need to stop deployments that access the database. These deployments are:
 
@@ -372,7 +374,7 @@ $ kubectl cp database.pgdump dev/NS-postgresql-0:/tmp
 As Black Duck Binary Analysis populates the database, it is required to clean up tables found in the
 database before it can be restored.
 
-Kubectl into databasebase container and run:
+Kubectl into the database container and run:
 
 ```console
 $ kubectl exec -it -n dev hayrynen1-postgresql-0 bash
