@@ -1,0 +1,15 @@
+dependencies:
+- name: postgresql
+  repository: https://kubernetes-charts.storage.googleapis.com/
+  version: 6.5.8
+- name: minio
+  repository: https://kubernetes-charts.storage.googleapis.com/
+  version: 5.0.16
+- name: memcached
+  repository: https://kubernetes-charts.storage.googleapis.com/
+  version: 3.1.0
+- name: rabbitmq
+  repository: https://kubernetes-charts.storage.googleapis.com/
+  version: 6.17.0
+digest: sha256:09db6238ff7b8db705a378591d360364b4f5e3101725592585bc075ca8327331
+generated: "2020-03-16T15:44:14.138097+02:00"

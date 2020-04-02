@@ -1,0 +1,96 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "bdba.fullname" . }}-user-configmap
+  labels:
+    app: {{ template "bdba.name" . }}
+    chart: {{ template "bdba.chart" . }}
+    release: {{ .Release.Name }}
+data:
+  {{- if .Values.httpProxy }}
+  HTTP_PROXY: {{ .Values.httpProxy | quote }}
+  {{- end }}
+  {{- if .Values.httpNoProxy }}
+  NO_PROXY: {{ .Values.httpNoProxy | quote }}
+  {{- end }}
+  SESSION_COOKIE_AGE: {{ .Values.frontend.web.sessionCookieAge | quote }}
+  {{- if .Values.ingress.tls.enabled }}
+  TLS_INGRESS: "true"
+  {{- else }}
+  TLS_INGRESS: "false"
+  {{- end }}
+  HIDE_LICENSES: {{ .Values.frontend.web.hideLicenses | quote }}
+  DATA_UPDATE_UPSTREAM: {{ .Values.frontend.licensing.upstream | quote }}
+  ROOTURL: {{ .Values.frontend.web.rootURL | quote }}
+  {{- if .Values.frontend.applicationLogging.enabled }}
+  APP_LOG_FILE: "/app-log/app.log"
+  {{- end }}
+  {{- if .Values.frontend.web.admin}}
+  ADMIN_EMAIL: {{ .Values.frontend.web.admin | quote }}
+  {{- end }}
+  {{- if .Values.frontend.web.offlineMode }}
+  OFFLINE_MODE: {{ .Values.frontend.web.offlineMode | quote }}
+  {{- end }}
+  {{- if .Values.frontend.web.erroradmin}}
+  EMAIL_ADMIN_ADDRESS: {{ .Values.frontend.web.erroradmin | quote }}
+  {{- end }}
+  ENABLE_EMAIL: {{ .Values.frontend.email.enabled | quote }}
+  {{- if .Values.frontend.email.enabled }}
+  {{- if .Values.frontend.email.smtpHost }}
+  EMAIL_HOST: {{ .Values.frontend.email.smtpHost | quote }}
+  {{- end }}
+  {{- if .Values.frontend.email.smtpPort }}
+  EMAIL_PORT: {{ .Values.frontend.email.smtpPort | quote }}
+  {{- end }}
+  {{- if .Values.frontend.email.from }}
+  EMAIL_FROM: {{ .Values.frontend.email.from | quote }}
+  {{- end }}
+  {{- if .Values.frontend.email.smtpUser}}
+  EMAIL_HOST_USER: {{ .Values.frontend.email.smtpUser | quote }}
+  {{- end }}
+  {{- if .Values.frontend.email.security}}
+  EMAIL_SECURITY: {{ .Values.frontend.email.security | quote }}
+  {{- end }}
+  {{- if .Values.frontend.email.verify}}
+  EMAIL_VERIFY_CERTIFICATE: {{ .Values.frontend.email.verify | quote }}
+  {{- end }}
+  {{- end }}
+  ENABLE_LDAP: {{ .Values.frontend.ldap.enabled | quote }}
+  {{- if .Values.frontend.ldap.enabled }}
+  {{- if .Values.frontend.ldap.serverUri }}
+  LDAP_SERVER_URI: {{ .Values.frontend.ldap.serverUri | quote }}
+  {{- end }}
+  {{- if .Values.frontend.ldap.userDNTemplate }}
+  LDAP_USER_DN_TEMPLATE: {{ .Values.frontend.ldap.userDNTemplate | quote }}
+  {{- end }}
+  {{- if .Values.frontend.ldap.bindDN }}
+  LDAP_BIND_DN: {{ .Values.frontend.ldap.bindDN | quote }}
+  {{- end }}
+  {{- if .Values.frontend.ldap.bindAsAuthenticating }}
+  LDAP_BIND_AS_AUTHENTICATING_USER: {{ .Values.frontend.ldap.bindAsAuthenticating | quote }}
+  {{- end }}
+  {{- if .Values.frontend.ldap.startTLS }}
+  LDAP_STARTTLS: {{ .Values.frontend.ldap.startTLS | quote }}
+  {{- end }}
+  {{- if .Values.frontend.ldap.verify}}
+  LDAP_VERIFY_CERTIFICATE: {{ .Values.frontend.ldap.verify | quote }}
+  {{- end }}
+  {{- if .Values.frontend.ldap.requireGroup }}
+  LDAP_REQUIRE_GROUP: {{ .Values.frontend.ldap.requireGroup | quote }}
+  {{- end }}
+  {{- if .Values.frontend.ldap.userSearch }}
+  LDAP_USER_SEARCH: {{ .Values.frontend.ldap.userSearch | quote }}
+  {{- end }}
+  {{- if .Values.frontend.ldap.userSearchScope }}
+  LDAP_USER_SEARCH_SCOPE: {{ .Values.frontend.ldap.userSearchScope | quote }}
+  {{- end }}
+  {{- if .Values.frontend.ldap.groupSearch }}
+  LDAP_GROUP_SEARCH: {{ .Values.frontend.ldap.groupSearch | quote }}
+  {{- end }}
+  {{- if .Values.frontend.ldap.groupSearchScope }}
+  LDAP_GROUP_SEARCH_SCOPE: {{ .Values.frontend.ldap.groupSearchScope | quote }}
+  {{- end }}
+  {{- if .Values.frontend.ldap.nestedSearch }}
+  LDAP_NESTED_SEARCH: {{ .Values.frontend.ldap.nestedSearch | quote }}
+  {{- end }}
+  {{- end }}

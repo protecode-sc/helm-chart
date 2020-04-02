@@ -1,0 +1,138 @@
+{{- if .Values.frontend.applicationLogging.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "bdba.fullname" . }}-tasks-long-fluentbit-config
+  labels:
+{{ include "bdba.labels" . | indent 4 }}
+data:
+  fluent-bit.conf: |
+    [SERVICE]
+        Daemon       Off
+        Flush        5
+        Log_Level    info
+        Parsers_File /bdba-fluentbit/parsers.conf
+        HTTP_Server  Off
+
+    [INPUT]
+        Name         tail
+        Tag          longjobs
+        Path         /app-log/app.log
+        Parser       celery
+        DB           /app-log/app.db
+
+    [OUTPUT]
+        Name         forward
+        Match        *
+        Host         {{ template "bdba.fluentd.fullname" . }}
+  parsers.conf: |
+    [PARSER]
+        Name         celery
+        Format       regex
+        Regex        ^\[(?<logtime>[^\]]*)\] (?<level>[^\/]+)\/(?<process>[^ ]+) (?<message>.*)$
+        Time_Key     logtime
+        Time_Format  %Y-%m-%d %H:%M:%S,%L
+
+---
+{{- end }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "bdba.fullname" . }}-tasks-long
+  labels:
+{{ include "bdba.labels" . | indent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "bdba.name" . }}-tasks-long
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      name: {{ include "bdba.name" . }}-tasks-long
+      labels:
+        app.kubernetes.io/name: {{ include "bdba.name" . }}-tasks-long
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        release: {{ .Release.Name | quote }}
+      annotations:
+        {{- include "bdba.configchecksum" . | nindent 8 }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      initContainers:
+        - name: {{ .Chart.Name }}-tasks-long-wait
+          image: "{{ .Values.frontend.repository }}:{{ .Values.frontend.tag }}"
+          imagePullPolicy: {{ .Values.frontend.pullPolicy }}
+          args: [ "wait"]
+          {{- include "bdba.frontendenv" . | nindent 10 }}
+          volumeMounts:
+          {{- include "bdba.frontendmounts" . | indent 12 }}
+            - name: {{ include "bdba.fullname" . }}-tasks-long-applog
+              mountPath: /app-log
+      containers:
+        - name: {{ .Chart.Name }}-tasks-long
+          image: "{{ .Values.frontend.repository }}:{{ .Values.frontend.tag }}"
+          imagePullPolicy: {{ .Values.frontend.pullPolicy }}
+          args: [ "long" ]
+          readinessProbe:
+            exec:
+              command: ["sh", "-c", "/srv/venv/appcheck-frontend/bin/celery inspect -b $(printf $BROKER_URL $BROKER_PASSWORD) -q -d celery@frontend-long.$(hostname) --timeout 10 ping", ]
+            initialDelaySeconds: 15
+            periodSeconds: 30
+            successThreshold: 1
+            failureThreshold: 3
+          livenessProbe:
+            exec:
+              command: ["sh", "-c", "/srv/venv/appcheck-frontend/bin/celery inspect -b $(printf $BROKER_URL $BROKER_PASSWORD) -q -d celery@frontend-long.$(hostname) --timeout 10 ping", ]
+            initialDelaySeconds: 15
+            periodSeconds: 30
+            successThreshold: 1
+            failureThreshold: 3
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          {{- include "bdba.frontendenv" . | nindent 10 }}
+          volumeMounts:
+          {{- include "bdba.frontendmounts" . | indent 12 }}
+            - name: {{ include "bdba.fullname" . }}-tasks-long-applog
+              mountPath: /app-log
+          resources:
+            {{- toYaml .Values.taskslong.resources | nindent 12 }}
+        {{- if .Values.frontend.applicationLogging.enabled }}
+        - name: {{ .Chart.Name }}-tasks-long-fluentbit
+          image: "{{ .Values.fluentbit.repository }}:{{ .Values.fluentbit.tag }}"
+          imagePullPolicy: {{ .Values.fluentbit.pullPolicy }}
+          command: ["/fluent-bit/bin/fluent-bit", "-c", "/bdba-fluentbit/fluent-bit.conf"]
+          volumeMounts:
+            - name:  {{ include "bdba.fullname" . }}-tasks-long-applog
+              mountPath: /app-log
+            - name: {{ include "bdba.fullname" . }}-tasks-long-fluentbit-config
+              mountPath: /bdba-fluentbit/
+          {{- end }}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 101
+        runAsGroup: 101
+        fsGroup: 101
+      volumes:
+      {{- include "bdba.frontendvolumes" . | indent 6 }}
+      - name: {{ include "bdba.fullname" . }}-tasks-long-applog
+        emptyDir: {}
+      {{- if .Values.frontend.applicationLogging.enabled }}
+      - name: {{ include "bdba.fullname" . }}-tasks-long-fluentbit-config
+        configMap:
+          name: {{ include "bdba.fullname" . }}-tasks-long-fluentbit-config
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}

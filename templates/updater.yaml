@@ -1,0 +1,137 @@
+{{- if .Values.frontend.applicationLogging.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "bdba.fullname" . }}-updater-fluentbit-config
+  labels:
+{{ include "bdba.labels" . | indent 4 }}
+data:
+  fluent-bit.conf: |
+    [SERVICE]
+        Daemon       Off
+        Flush        5
+        Log_Level    info
+        Parsers_File /bdba-fluentbit/parsers.conf
+        HTTP_Server  Off
+
+    [INPUT]
+        Name         tail
+        Tag          updater
+        Path         /app-log/app.log
+        Parser       celery
+        DB           /app-log/app.db
+
+    [OUTPUT]
+        Name         forward
+        Match        *
+        Host         {{ template "bdba.fluentd.fullname" . }}
+  parsers.conf: |
+    [PARSER]
+        Name         celery
+        Format       regex
+        Regex        ^\[(?<logtime>[^\]]*)\] (?<level>[^\/]+)\/(?<process>[^ ]+) (?<message>.*)$
+        Time_Key     logtime
+        Time_Format  %Y-%m-%d %H:%M:%S,%L
+
+---
+{{- end }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "bdba.fullname" . }}-updater
+  labels:
+{{ include "bdba.labels" . | indent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "bdba.name" . }}-updater
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      name: {{ include "bdba.name" . }}-updater
+      labels:
+        app.kubernetes.io/name: {{ include "bdba.name" . }}-updater
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        release: {{ .Release.Name | quote }}
+      annotations:
+        {{- include "bdba.configchecksum" . | nindent 8 }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      initContainers:
+        - name: {{ .Chart.Name }}-updater-init
+          image: "{{ .Values.frontend.repository }}:{{ .Values.frontend.tag }}"
+          imagePullPolicy: {{ .Values.frontend.pullPolicy }}
+          args: [ "init"]
+          {{- include "bdba.frontendenv" . | nindent 10 }}
+          volumeMounts:
+          {{- include "bdba.frontendmounts" . | indent 12 }}
+            - name: {{ include "bdba.fullname" . }}-updater-applog
+              mountPath: /app-log
+      containers:
+        - name: {{ .Chart.Name }}-updater
+          image: "{{ .Values.frontend.repository }}:{{ .Values.frontend.tag }}"
+          imagePullPolicy: {{ .Values.frontend.pullPolicy }}
+          args: [ "update" ]
+          readinessProbe:
+            exec:
+              command: ["/scripts/probe-updater"]
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            successThreshold: 1
+            failureThreshold: 5
+          livenessProbe:
+            exec:
+              command: ["/scripts/probe-updater"]
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            successThreshold: 1
+            failureThreshold: 5
+          resources:
+            {{- toYaml .Values.updater.resources | nindent 12 }}
+          {{- include "bdba.frontendenv" . | nindent 10 }}
+          volumeMounts:
+          {{- include "bdba.frontendmounts" . | indent 12 }}
+            - name: {{ include "bdba.fullname" . }}-updater-applog
+              mountPath: /app-log
+        {{- if .Values.frontend.applicationLogging.enabled }}
+        - name: {{ .Chart.Name }}-updater-fluentbit
+          image: "{{ .Values.fluentbit.repository }}:{{ .Values.fluentbit.tag }}"
+          imagePullPolicy: {{ .Values.fluentbit.pullPolicy }}
+          command: ["/fluent-bit/bin/fluent-bit", "-c", "/bdba-fluentbit/fluent-bit.conf"]
+          volumeMounts:
+            - name:  {{ include "bdba.fullname" . }}-updater-applog
+              mountPath: /app-log
+            - name: {{ include "bdba.fullname" . }}-updater-fluentbit-config
+              mountPath: /bdba-fluentbit/
+        {{- end }}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 101
+        runAsGroup: 101
+        fsGroup: 101
+      volumes:
+      {{- include "bdba.frontendvolumes" . | indent 6 }}
+      - name: {{ include "bdba.fullname" . }}-updater-applog
+        emptyDir: {}
+      {{- if .Values.frontend.applicationLogging.enabled }}
+      - name: {{ include "bdba.fullname" . }}-updater-fluentbit-config
+        configMap:
+          name: {{ include "bdba.fullname" . }}-updater-fluentbit-config
+      {{- end }}
+
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}

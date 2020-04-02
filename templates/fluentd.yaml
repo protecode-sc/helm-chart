@@ -1,0 +1,184 @@
+{{- if or .Values.frontend.applicationLogging.enabled .Values.worker.applicationLogging.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "bdba.fullname" . }}-fluentd-config
+  labels:
+{{ include "bdba.labels" . | indent 4 }}
+data:
+  fluentd.conf: |
+    <source>
+      @type  forward
+      port  24224
+      bind 0.0.0.0
+    </source>
+
+    <match webapp>
+      @type copy
+      <store>
+        @type s3
+        s3_bucket bdba-logs
+        s3_endpoint "http://{{ template "bdba.minio.fullname" . }}:{{ .Values.minio.service.port }}"
+        path webapp/
+        force_path_style true
+        <buffer time>
+          @type file
+          timekey_wait 1
+          timekey 1h
+          timekey_use_utc true
+          path /logs/webapp
+        </buffer>
+      </store>
+    </match>
+
+    <match updater>
+      @type copy
+      <store>
+        @type s3
+        s3_bucket bdba-logs
+        s3_endpoint "http://{{ template "bdba.minio.fullname" . }}:{{ .Values.minio.service.port }}"
+        path updater/
+        force_path_style true
+        <buffer time>
+          @type file
+          timekey_wait 1
+          timekey 1h
+          timekey_use_utc true
+          path /logs/updater
+        </buffer>
+      </store>
+    </match>
+    
+    <match tasks>
+      @type copy
+      <store>
+        @type s3
+        s3_bucket bdba-logs
+        s3_endpoint "http://{{ template "bdba.minio.fullname" . }}:{{ .Values.minio.service.port }}"
+        path tasks/
+        force_path_style true
+        <buffer time>
+          @type file
+          timekey_wait 1
+          timekey 1h
+          timekey_use_utc true
+          path /logs/tasks
+        </buffer>
+      </store>
+    </match>
+    
+    <match longjobs>
+      @type copy
+      <store>
+        @type s3
+        s3_bucket bdba-logs
+        s3_endpoint "http://{{ template "bdba.minio.fullname" . }}:{{ .Values.minio.service.port }}"
+        path longjobs/
+        force_path_style true
+        <buffer time>
+          @type file
+          timekey_wait 1
+          timekey 1h
+          timekey_use_utc true
+          path /logs/longjobs
+        </buffer>
+      </store>
+    </match>
+    
+    <match worker>
+      @type copy
+      <store>
+        @type s3
+        s3_bucket bdba-logs
+        s3_endpoint "http://{{ template "bdba.minio.fullname" . }}:{{ .Values.minio.service.port }}"
+        path worker/
+        force_path_style true
+        <buffer time>
+          @type file
+          timekey_wait 1
+          timekey 1h
+          timekey_use_utc true
+          path /logs/worker
+        </buffer>
+      </store>
+    </match>
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "bdba.fluentd.fullname" . }}
+  labels:
+{{ include "bdba.labels" . | indent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "bdba.name" . }}-fluentd
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      name: {{ include "bdba.name" . }}-fluentd
+      labels:
+        app.kubernetes.io/name: {{ include "bdba.name" . }}-fluentd
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        release: {{ .Release.Name | quote }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}-fluentd
+          image: "{{ .Values.fluentd.repository }}:{{ .Values.fluentd.tag }}"
+          imagePullPolicy: {{ .Values.fluentd.pullPolicy }}
+          args: ["-c", "/bdba-fluentd/fluentd.conf"]
+          env:
+          - name: S3_ENDPOINT
+            valueFrom:
+              configMapKeyRef:
+                name: {{ include "bdba.fullname" . }}-services-configmap
+                key: S3_ENDPOINT
+          - name: AWS_ACCESS_KEY_ID
+            valueFrom:
+              secretKeyRef:
+                name: {{ include "bdba.minio.secretName" . }}
+                key: accesskey
+          - name: AWS_SECRET_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: {{ include "bdba.minio.secretName" . }}
+                key: secretkey
+          volumeMounts:
+            - name: {{ include "bdba.fullname" . }}-fluentd-logs
+              mountPath: /logs
+            - name: {{ include "bdba.fullname" . }}-fluentd-config
+              mountPath: /bdba-fluentd/
+          resources:
+            {{- toYaml .Values.fluentd.resources | nindent 12 }}
+
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 999
+        runAsGroup: 999
+        fsGroup: 999
+      volumes:
+      - name: {{ include "bdba.fullname" . }}-fluentd-logs
+        emptyDir: {}
+      - name: {{ include "bdba.fullname" . }}-fluentd-config
+        configMap:
+          name: {{ include "bdba.fullname" . }}-fluentd-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "bdba.fluentd.fullname" . }}
+  labels:
+{{ include "bdba.labels" . | indent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: 24224
+      targetPort: 24224
+      protocol: TCP
+      name: fluentd
+  selector:
+    app.kubernetes.io/name: {{ include "bdba.name" . }}-fluentd
+    app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}

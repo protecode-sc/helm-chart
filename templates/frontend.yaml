@@ -1,0 +1,156 @@
+{{- if .Values.frontend.applicationLogging.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "bdba.fullname" . }}-webapp-fluentbit-config
+  labels:
+{{ include "bdba.labels" . | indent 4 }}
+data:
+  fluent-bit.conf: |
+    [SERVICE]
+        Daemon       Off
+        Flush        5
+        Log_Level    info
+        Parsers_File /bdba-fluentbit/parsers.conf
+        HTTP_Server  Off
+
+    [INPUT]
+        Name         tail
+        Tag          webapp
+        Path         /app-log/app.log
+        Parser       python
+        DB           /app-log/app.db
+
+    [FILTER]
+        Name record_modifier
+        Match *
+        Record hostname ${HOSTNAME}
+
+    [OUTPUT]
+        Name         forward
+        Match        *
+        Host         {{ template "bdba.fluentd.fullname" . }}
+  parsers.conf: |
+    [PARSER]
+        Name         python
+        Format       regex
+        Regex        ^\[(?<logtime>[^\]]*)\] (?<level>[^ ]+) (?<module>[^ ]+) (?<message>.*)$
+        Time_Key     logtime
+        Time_Format  %Y-%m-%d %H:%M:%S,%L
+---
+{{- end }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "bdba.fullname" . }}-webapp
+  labels:
+{{ include "bdba.labels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.frontend.web.replicas }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "bdba.name" . }}-webapp
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      name: {{ include "bdba.name" . }}-webapp
+      labels:
+        app.kubernetes.io/name: {{ include "bdba.name" . }}-webapp
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        release: {{ .Release.Name | quote }}
+      annotations:
+        {{- include "bdba.configchecksum" . | nindent 8 }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}-webapp
+          image: "{{ .Values.frontend.repository }}:{{ .Values.frontend.tag }}"
+          imagePullPolicy: {{ .Values.frontend.pullPolicy }}
+          args: [ "web" ]
+          readinessProbe:
+            httpGet:
+              port: 8000
+              path: /healthz
+            timeoutSeconds: 3
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            failureThreshold: 3
+            successThreshold: 1
+          livenessProbe:
+            httpGet:
+              port: 8000
+              path: /healthz
+            timeoutSeconds: 3
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            failureThreshold: 3
+            successThreshold: 1
+          resources:
+            {{- toYaml .Values.frontend.resources | nindent 12 }}
+          {{- include "bdba.frontendenv" . | nindent 10 }}
+          volumeMounts:
+          {{- include "bdba.frontendmounts" . | indent 12 }}
+            - name: {{ include "bdba.fullname" . }}-webapp-applog
+              mountPath: /app-log
+        {{- if .Values.frontend.applicationLogging.enabled }}
+        - name: {{ .Chart.Name }}-webapp-fluentbit
+          image: "{{ .Values.fluentbit.repository }}:{{ .Values.fluentbit.tag }}"
+          imagePullPolicy: {{ .Values.fluentbit.pullPolicy }}
+          command: ["/fluent-bit/bin/fluent-bit", "-c", "/bdba-fluentbit/fluent-bit.conf"]
+          volumeMounts:
+            - name:  {{ include "bdba.fullname" . }}-webapp-applog
+              mountPath: /app-log
+            - name: {{ include "bdba.fullname" . }}-webapp-fluentbit-config
+              mountPath: /bdba-fluentbit/
+        {{- end }}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 101
+        runAsGroup: 101
+        fsGroup: 101
+      volumes:
+      {{- include "bdba.frontendvolumes" . | indent 6 }}
+      - name: {{ include "bdba.fullname" . }}-webapp-applog
+        emptyDir: {}
+      {{- if .Values.frontend.applicationLogging.enabled }}
+      - name: {{ include "bdba.fullname" . }}-webapp-fluentbit-config
+        configMap:
+          name: {{ include "bdba.fullname" . }}-webapp-fluentbit-config
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 50
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: {{ include "bdba.name" . }}-webapp
+              topologyKey: "kubernetes.io/hostname"
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "bdba.fullname" . }}
+  labels:
+{{ include "bdba.labels" . | indent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+      name: gunicorn
+  selector:
+    app.kubernetes.io/name: {{ include "bdba.name" . }}-webapp
+    app.kubernetes.io/instance: {{ .Release.Name }}
