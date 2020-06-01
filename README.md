@@ -107,7 +107,7 @@ Parameter                              | Description                          | 
 
 ### Licensing
 
-To access the data that Black Duck Binary Analysis needs a username and password for the licensing server are required.
+To access the data that Black Duck Binary Analysis needs a username and password for the licensing server are required. These are credentials needed for accessing onprem updates from Synopsys Community.
 Without these, the installation will not function.
 
 Parameter                     | Description                      | Default
