@@ -192,10 +192,11 @@ To use this as the root certificate, add `--set frontend.ldap.rootCASecret=bdba-
 Black Duck Binary Analysis uses Fluentd to centrally log. Relevant application pods are joined by
 a Fluent Bit sidecar.
 
-Parameter                     | Description                                | Default
------------------------------ | ------------------------------------------ | ---------------
-`frontend.applicationLogging` | Enable application logging for webapp pods.| true
-`worker.applicationLogging`   | Enable application logging for worker pods.| true
+Parameter                     | Description                                      | Default
+----------------------------- | ------------------------------------------------ | ---------------
+`frontend.applicationLogging` | Enable application logging for webapp pods.      | true
+`worker.applicationLogging`   | Enable application logging for worker pods.      | true
+`logRetention`                | Days to keep the application logs (0 to disable) | "0"
 
 ### Worker scaling
 
