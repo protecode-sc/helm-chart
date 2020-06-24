@@ -1,15 +1,15 @@
 dependencies:
 - name: postgresql
-  repository: https://kubernetes-charts.storage.googleapis.com/
-  version: 6.5.8
+  repository: https://charts.bitnami.com/bitnami/
+  version: 8.10.7
 - name: minio
   repository: https://kubernetes-charts.storage.googleapis.com/
   version: 5.0.16
 - name: memcached
-  repository: https://kubernetes-charts.storage.googleapis.com/
-  version: 3.1.0
+  repository: https://charts.bitnami.com/bitnami/
+  version: 4.2.19
 - name: rabbitmq
-  repository: https://kubernetes-charts.storage.googleapis.com/
-  version: 6.17.0
-digest: sha256:09db6238ff7b8db705a378591d360364b4f5e3101725592585bc075ca8327331
-generated: "2020-03-16T15:44:14.138097+02:00"
+  repository: https://charts.bitnami.com/bitnami/
+  version: 6.18.2
+digest: sha256:ea9ef2dab274a8da0f24d03e64ab26d4d28de76bb040d7d6850b8dd700ebf4ee
+generated: "2020-06-24T13:54:06.776218+03:00"
