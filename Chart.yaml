@@ -1,8 +1,8 @@
 apiVersion: v2
-appVersion: "2020.5.0"
+appVersion: "2020.6.0"
 description: BDBA Helm chart
 name: bdba
-version: 2.0
+version: "2020.6.0"
 dependencies:
 - name: postgresql
   version: "8.10.7"
