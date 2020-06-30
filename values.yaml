@@ -211,7 +211,7 @@ ingress:
 
 httpProxy: ""
 httpNoProxy: ""
-logRetention: "0"  # Days to keep application logs
+logRetention: "30"  # Days to keep application logs
 
 resources: {}
 

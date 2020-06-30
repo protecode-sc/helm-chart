@@ -196,7 +196,7 @@ Parameter                     | Description                                     
 ----------------------------- | ------------------------------------------------ | ---------------
 `frontend.applicationLogging` | Enable application logging for webapp pods.      | true
 `worker.applicationLogging`   | Enable application logging for worker pods.      | true
-`logRetention`                | Days to keep the application logs (0 to disable) | "0"
+`logRetention`                | Days to keep the application logs (0 to disable) | "30"
 
 ### Worker scaling
 
