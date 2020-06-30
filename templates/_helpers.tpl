@@ -270,6 +270,14 @@ Create chart name and version as used by the chart label.
 {{- end -}}
 
 {{/*
+Create release name and version as used by the chart label.
+*/}}
+{{- define "bdba.releaseversion" -}}
+{{ $fullname := include "bdba.fullname" . }}
+{{- printf "%s-%s" $fullname .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{/*
 Common labels
 */}}
 {{- define "bdba.labels" -}}
