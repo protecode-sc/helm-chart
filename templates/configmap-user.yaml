@@ -13,6 +13,9 @@ data:
   {{- if .Values.httpNoProxy }}
   NO_PROXY: {{ .Values.httpNoProxy | quote }}
   {{- end }}
+  {{- if .Values.logRetention }}
+  LOG_RETENTION_DAYS: {{ .Values.logRetention | quote }}
+  {{- end }}
   SESSION_COOKIE_AGE: {{ .Values.frontend.web.sessionCookieAge | quote }}
   {{- if .Values.ingress.tls.enabled }}
   TLS_INGRESS: "true"

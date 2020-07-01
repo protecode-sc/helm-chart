@@ -1,19 +1,19 @@
 apiVersion: v2
-appVersion: "2020.03"
+appVersion: "2020.6.0"
 description: BDBA Helm chart
 name: bdba
-version: 1.0
+version: "2020.6.0"
 dependencies:
 - name: postgresql
-  version: "6.5.8"
-  repository: https://kubernetes-charts.storage.googleapis.com/
+  version: "8.10.7"
+  repository: https://charts.bitnami.com/bitnami/
   condition: postgresql.enabled
 - name: minio
   version: "5.0.16"
   repository: https://kubernetes-charts.storage.googleapis.com/
 - name: memcached
-  repository: https://kubernetes-charts.storage.googleapis.com/
-  version: "3.1.0"
+  repository: https://charts.bitnami.com/bitnami/
+  version: "4.2.19"
 - name: rabbitmq
-  repository: https://kubernetes-charts.storage.googleapis.com/
-  version: "6.17.0"
+  repository: https://charts.bitnami.com/bitnami/
+  version: "6.18.2"
