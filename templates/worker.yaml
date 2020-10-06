@@ -13,13 +13,17 @@ data:
         Log_Level    info
         HTTP_Server  Off
 
+    [PARSER]
+        Name        json
+        Format      json
+        Time_Key    timestamp
+        Time_Format %Y-%m-%dT%H:%M:%S %z
+
     [INPUT]
         Name         tail
         Tag          worker
         Path         /app-log/celery.log
         Parser       json
-        Time_Key     timestamp
-        Time_Format  %Y-%m-%dT%H:%M:%S %z
         DB           /app-log/celery.db
 
     [FILTER]
