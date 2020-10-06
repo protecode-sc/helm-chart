@@ -13,12 +13,6 @@ data:
         Log_Level    info
         HTTP_Server  Off
 
-    [PARSER]
-        Name        json
-        Format      json
-        Time_Key    timestamp
-        Time_Format %Y-%m-%dT%H:%M:%S %z
-
     [INPUT]
         Name         tail
         Tag          worker
@@ -35,6 +29,13 @@ data:
         Name         forward
         Match        *
         Host         {{ template "bdba.fluentd.fullname" . }}
+
+  parsers.conf: |
+    [PARSER]
+        Name        json
+        Format      json
+        Time_Key    timestamp
+        Time_Format %Y-%m-%dT%H:%M:%S %z
 
 ---
 {{- end }}
