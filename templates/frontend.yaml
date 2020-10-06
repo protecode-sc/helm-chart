@@ -12,14 +12,13 @@ data:
         Flush        5
         Log_Level    info
         HTTP_Server  Off
+        Parsers_File /bdba-fluentbit/parsers.conf
 
     [INPUT]
         Name         tail
         Tag          webapp
         Path         /app-log/app.log
         Parser       json
-        Time_Key     timestamp
-        Time_Format  %Y-%m-%dT%H:%M:%S %z
         DB           /app-log/app.db
 
     [FILTER]
@@ -31,6 +30,14 @@ data:
         Name         forward
         Match        *
         Host         {{ template "bdba.fluentd.fullname" . }}
+
+  parsers.conf: |
+    [PARSER]
+        Name        json
+        Format      json
+        Time_Key    timestamp
+        Time_Format %Y-%m-%dT%H:%M:%S %z
+
 ---
 {{- end }}
 apiVersion: apps/v1
