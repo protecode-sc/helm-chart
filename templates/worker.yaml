@@ -12,6 +12,7 @@ data:
         Flush        5
         Log_Level    info
         HTTP_Server  Off
+        Parsers_File /bdba-fluentbit/parsers.conf
 
     [INPUT]
         Name         tail
