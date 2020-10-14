@@ -11,14 +11,14 @@ data:
         Daemon       Off
         Flush        5
         Log_Level    info
-        Parsers_File /bdba-fluentbit/parsers.conf
         HTTP_Server  Off
+        Parsers_File /bdba-fluentbit/parsers.conf
 
     [INPUT]
         Name         tail
         Tag          worker
         Path         /app-log/celery.log
-        Parser       celery
+        Parser       json
         DB           /app-log/celery.db
 
     [FILTER]
@@ -30,13 +30,13 @@ data:
         Name         forward
         Match        *
         Host         {{ template "bdba.fluentd.fullname" . }}
+
   parsers.conf: |
     [PARSER]
-        Name         celery
-        Format       regex
-        Regex        ^\[(?<logtime>[^\]]*)\] (?<level>[^\/]+)\/(?<process>[^ ]+) (?<message>.*)$
-        Time_Key     logtime
-        Time_Format  %Y-%m-%d %H:%M:%S,%L
+        Name        json
+        Format      json
+        Time_Key    timestamp
+        Time_Format %Y-%m-%dT%H:%M:%S %z
 
 ---
 {{- end }}
