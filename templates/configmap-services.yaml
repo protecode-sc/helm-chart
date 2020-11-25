@@ -35,3 +35,4 @@ data:
   S3_ENDPOINT: "http://{{ template "bdba.minio.fullname" . }}:{{ .Values.minio.service.port }}"
   MEMCACHED: "{{ template "bdba.memcached.fullname" . }}:11211"
   BROKER_URL: "{{ template "bdba.rabbitmq.brokerUrl" . }}"
+  INTERNAL_FRONTEND_URL: "http://{{ template "bdba.fullname" . }}-webapp:8000"
