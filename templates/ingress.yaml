@@ -23,6 +23,6 @@ spec:
         paths:
           - path: "/"
             backend:
-              serviceName: {{ $fullName }}
+              serviceName: {{ $fullName }}-webapp
               servicePort: 8000
 {{- end }}
