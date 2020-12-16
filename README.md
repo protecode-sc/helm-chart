@@ -5,7 +5,7 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by usin
 
 Additionally, we support deploying Black Duck Binary Analysis on Azure Kubernetes Service (AKS).
 
-Minimum requirements for AWS deployment:
+Minimum requirements for AKS deployment:
 
   * 3 Standard_DS2_v2 nodes
 
