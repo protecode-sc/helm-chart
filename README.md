@@ -1,9 +1,28 @@
-# Black Duck Binary Analysis Helm chart
+# Black Duck Binary Analysis on Kubernetes
+
+You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by using the synopsysctl CLI
+(command-line interface) or by using the Helm package manager.
+
+Additionally, we support deploying Black Duck Binary Analysis on Azure Kubernetes Service (AKS).
+
+Minimum requirements for AWS deployment:
+
+  * 3 Standard_DS2_v2 nodes
+
+## Deploying Black Duck Binary Analysis using the synopsysctl
+
+The following steps describe a high-level overview of the steps required to install BDBA in a Kubernetes cluster.
+
+1. Ensure that you fulfill the [prerequisites](https://synopsys.atlassian.net/wiki/spaces/BDLM/pages/417234960/Prerequisites+for+BDBA) to install BDBA.
+2. Create and configure the [Kubernetes cluster](https://synopsys.atlassian.net/wiki/spaces/BDLM/pages/414089277/Preparing+the+Environment), and prepare your environment to install BDBA.
+3. Download [synopsysctl](https://synopsys.atlassian.net/wiki/spaces/BDLM/pages/417234971/Getting+Started+with+Synopsysctl+CLI) and install BDBA.
+
+## Deploying Black Duck Binary Analysis using the Helm package manager
 
 This chart bootstraps Black Duck Binary Analysis deployment on a Kubernetes cluster
 using the Helm package manager.
 
-## Prerequisites
+### Prerequisites
 
 Before starting, you will need:
 
@@ -15,7 +34,7 @@ Before starting, you will need:
       nodes on GCP.
   * Helm 3
 
-## Download chart dependencies
+### Download chart dependencies
 
 To download the chart dependencies, which include **postgresql**, **minio**, **memcached**, and **rabbitmq**:
 
@@ -32,7 +51,7 @@ Downloading rabbitmq from repo https://kubernetes-charts.storage.googleapis.com/
 Deleting outdated charts
 ```
 
-## Installing the chart
+### Installing the chart
 
 To install the chart with the release name `testing`:
 
@@ -50,18 +69,18 @@ NOTES:
 ```
 
 
-## Configuration
+### Configuration
 
 This section shows an example of how you can configure a Black Duck Binary Analysis instance. It's split into multiple
 sections for clarity.
 
-### Secrets for services
+#### Secrets for services
 
 Black Duck Binary Analysis Helm chart uses PostgreSQL. Secrets for other services are automatically provisioned,
 but for PostgreSQL you need to enter the password manually.
 
 
-#### PostgreSQL secrets
+##### PostgreSQL secrets
 
 If you use a bundled PostgreSQL database, it is recommended to configure a password
 for PostgreSQL. During the initial installation, a PostgreSQL database is created with that specific
@@ -81,14 +100,14 @@ Next, add the created secret to Helm
 
 This ensures that the PostgreSQL secret survives upgrades.
 
-#### Summary
+##### Summary
 
 Parameter                                  | Description                                           | Default
 ------------------------------------------ | ----------------------------------------------------- | -----------------
 `postgresql.postgresqlPassword`            | Password for PostgreSQL.                              | "CHANGEME"
 `global.postgresql.existingSecret`         | Existing secret name that holds `postgresql-password`.| nil
 
-### Storage
+#### Storage
 
 Black Duck Binary Analysis requires storage. It can support either existing PVC claims or automatically
 provision volumes if `storageClass` is provided.
@@ -105,7 +124,7 @@ Parameter                              | Description                          | 
 `rabbitmq.persistence.size`            | Size of RabbitMQ claim.              | 8Gi
 `rabbitmq.persistence.existingClaim`   | Existing claim to use for RabbitMQ.  | ""
 
-### Licensing
+#### Licensing
 
 To access the data that Black Duck Binary Analysis needs a username and password for the licensing server are required. These are credentials needed for accessing onprem updates from Synopsys Community.
 Without these, the installation will not function.
@@ -116,7 +135,7 @@ Parameter                     | Description                      | Default
 `frontend.licensing.password` | Password for licensing server.   | ""
 `frontend.licensing.upstream` | Upstream server for data updates.| "https://protecode-sc.com"
 
-### RabbitMQ configuration
+#### RabbitMQ configuration
 
 RabbitMQ requires to know the cluster's domain name. If it is not `cluster.local`,
 you need to provide it.
@@ -125,7 +144,7 @@ Parameter                                 | Description                 | Defaul
 ----------------------------------------- | --------------------------- | ----------------
 `rabbitmq.rabbitmq.clustering.k8s_domain` | Internal k8s cluster domain.| cluster.local
 
-### Web frontend configuration
+#### Web frontend configuration
 
 Generic configuration options for customization of frontend behavior.
 
@@ -140,7 +159,7 @@ Parameter                       | Description                             | Defa
 `frontend.web.erroradmin`       | Error report email receiver.            | ""
 `frontend.web.rootURL`          | Root URL of web service for emails.     | "http://bdba.local"
 
-### SMTP configuration
+#### SMTP configuration
 
 Black Duck Binary Analysis can send emails, for example, to invite new users or to send vulnerability
 notifications.
@@ -156,7 +175,7 @@ Parameter                     | Description                                     
 `frontend.email.security`     | Email security mode. "none", "ssl", or "starttls".| "none"
 `frontend.email.verify`       | Verify email certificate.                         | "false"
 
-### LDAP Authentication
+#### LDAP Authentication
 
 Black Duck Binary Analysis can authenticate against LDAP servers.
 
@@ -187,7 +206,7 @@ secret/bdba-ldap-root created
 
 To use this as the root certificate, add `--set frontend.ldap.rootCASecret=bdba-ldap-root` to the Helm command line.
 
-### Logging
+#### Logging
 
 Black Duck Binary Analysis uses Fluentd to centrally log. Relevant application pods are joined by
 a Fluent Bit sidecar.
@@ -198,14 +217,14 @@ Parameter                     | Description                                     
 `worker.applicationLogging`   | Enable application logging for worker pods.      | true
 `logRetention`                | Days to keep the application logs (0 to disable) | 30
 
-### Worker scaling
+#### Worker scaling
 
 Parameter            | Description                                   | Default
 -------------------- | ----------------------------------------------|------------------------
 `worker.replicas`    | Number of scanner instances.                  | 1
 `worker.concurrency` | Number of concurrent scanners in scanner pods.| 1
 
-### Networking and security
+#### Networking and security
 
 Parameter       | Description                   | Default
 --------------- | ----------------------------- | -----------------------
@@ -213,7 +232,7 @@ Parameter       | Description                   | Default
 `httpProxy`     | Proxy URL.                    | nil
 `httpNoProxy`   | No proxy list.                | nil
 
-### External PostgreSQL
+#### External PostgreSQL
 
 Black Duck Binary Analysis supports external PostgreSQL. Black Duck Binary Analysis is tested against PostgreSQL 9.6 and 11. There
 are no specific version restrictions as long as it is 9.6 or newer.
@@ -250,7 +269,7 @@ secret/bdba-pgclient created
 
 Possible values from postgresqlSslMode are specified in https://www.postgresql.org/docs/11/libpq-ssl.html.
 
-### Ingress
+#### Ingress
 
 Parameter                | Description                  | Default
 ------------------------ | ---------------------------- | --------------------
@@ -266,7 +285,7 @@ $ kubectl create secret tls bdba-tls --key key.pem --cert cert.pem
 secret/bdba-tls created
 ```
 
-### Configuring
+#### Configuring
 
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example:
 
@@ -283,11 +302,11 @@ $ helm upgrade testing . --install -f my-values.yaml
 #
 ```
 
-### Examples
+#### Examples
 
 Examples, with inline documentation, are provided in the `examples` directory.
 
-## Secrets
+### Secrets
 
 Key material can be saved to Kubernetes using kubectl. To set up additional root certificates,
 you can set them as Kubernetes secrets. PEM encoding is assumed.
@@ -299,12 +318,12 @@ secret/bdba-root created
 
 To use this as the root certificate, add `--set rootCASecret=bdba-root` to the Helm command line.
 
-## Migration from an existing appliance
+### Migration from an existing appliance
 
 To migrate data from an existing VM-based appliance, backup API of the appliance
 can be used to perform data acquisition.
 
-### Acquiring backup
+#### Acquiring backup
 
 First, run:
 
@@ -344,7 +363,7 @@ $ tar xvf backup.pgdump
 x database.pgdump
 ```
 
-### Stopping services accessing the database
+#### Stopping services accessing the database
 
 Next, you need to stop deployments that access the database. These deployments are:
 
@@ -362,7 +381,7 @@ $ kubectl scale --replicas=0 deployment/NAME-bdba-updater
 $ kubectl scale --replicas=0 deployment/NAME-bdba-webapp
 ```
 
-### Overwriting the database with a backup
+#### Overwriting the database with a backup
 
 Copy the database dump to the PostgreSQL pod.
 
@@ -370,7 +389,7 @@ Copy the database dump to the PostgreSQL pod.
 $ kubectl cp database.pgdump dev/NS-postgresql-0:/tmp
 ```
 
-### Preparing the database for pg_restore
+#### Preparing the database for pg_restore
 
 As Black Duck Binary Analysis populates the database, it is required to clean up tables found in the
 database before it can be restored.
@@ -403,7 +422,7 @@ This will empty the database, but authentication credentials are kept intact.
 
 Exit the db shell with `^D` to proceed.
 
-### Restoring the database
+#### Restoring the database
 
 Next, restore the database. In the PostgreSQL pod, execute:
 
@@ -411,7 +430,7 @@ Next, restore the database. In the PostgreSQL pod, execute:
 $ pg_restore -c -C -Fc -h localhost -U <database-username> -d <database-name> -n public </tmp/database.pgdump
 ```
 
-### Restoring the services
+#### Restoring the services
 
 Next, restore the services:
 
