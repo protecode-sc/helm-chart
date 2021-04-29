@@ -78,14 +78,14 @@ spec:
           args: [ "long" ]
           readinessProbe:
             exec:
-              command: ["sh", "-c", "/srv/venv/appcheck-frontend/bin/celery inspect -b $(printf $BROKER_URL $BROKER_PASSWORD) -q -d celery@frontend-long.$(hostname) --timeout 10 ping", ]
+              command: ["sh", "-c", "/srv/venv/appcheck-frontend/bin/celery -b $(printf $BROKER_URL $BROKER_PASSWORD) -q inspect -d celery@frontend-long.$(hostname) --timeout 10 ping", ]
             initialDelaySeconds: 15
             periodSeconds: 30
             successThreshold: 1
             failureThreshold: 3
           livenessProbe:
             exec:
-              command: ["sh", "-c", "/srv/venv/appcheck-frontend/bin/celery inspect -b $(printf $BROKER_URL $BROKER_PASSWORD) -q -d celery@frontend-long.$(hostname) --timeout 10 ping", ]
+              command: ["sh", "-c", "/srv/venv/appcheck-frontend/bin/celery -b $(printf $BROKER_URL $BROKER_PASSWORD) -q inspect -d celery@frontend-long.$(hostname) --timeout 10 ping", ]
             initialDelaySeconds: 15
             periodSeconds: 30
             successThreshold: 1
