@@ -127,7 +127,8 @@ Parameter                              | Description                          | 
 #### Licensing
 
 To access the data that Black Duck Binary Analysis needs a username and password for the licensing server are required. These are credentials needed for accessing onprem updates from Synopsys Community.
-Without these, the installation will not function.
+Without these, automatic data updates will not function. In case you are operating airgapped installation,
+you can omit these.
 
 Parameter                     | Description                      | Default
 ----------------------------- | -------------------------------- |------------------------
@@ -442,3 +443,39 @@ $ kubectl scale --replicas=N deployment/NAME-bdba-webapp
 ```
 
 Now, you should be all set.
+
+### Airgapped installation
+
+BDBA Kubernetes can operate in airgapped mode. However, it needs manual work to be kept up-to-date.
+
+#### Populating database
+
+By default, when BDBA is given licensing username and password, it is able to fetch
+data updates from https://protecode-sc.com/. However, when installation is airgapped, this
+option is not possible. However, it is still possible to manually populate the internal
+vulnerability database and keep it up-to-date.
+
+To populate the database, you can download dataset from `https://protecode-sc.com/updates/vulndata/`.
+This requires the same credential that are used for Synopsys community. You will receive "vulndata.tar.xz"
+which is roughly 500MB.
+
+This can be brought to airgapped network, and inserted into running BDBA kubernetes deployment by
+uploading it to
+
+`http(s)://<ingress-host-name>/api/bootstrap/`, for example using curl:
+
+```
+$ curl -T vulndata.tar.xz -u admin:<adminpw> https://<bdba-k8s-ingress>/api/bootstrap/
+```
+
+#### Keeping database up-to-date
+
+Similarly, to keep database up-to-date, you can download data from
+`https://protecode-sc.com/updates/`. It will return `appcheck-dataupdate-YYYYMMDD-hhmmss.dat`.
+
+To update database, push it to `http(s)://<ingress-host-name>/api/nvd/`, for example using curl:
+
+```
+$ curl -T appcheck-dataupdate-20210601-145434.dat -u admin:<adminpw> https://<bdba-k8s-ingress>/api/nvd/
+```
+
