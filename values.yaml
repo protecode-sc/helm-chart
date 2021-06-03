@@ -132,6 +132,8 @@ global:
     existingSecret: ""
 
 postgresql:
+  image:
+    tag: 11.12.0-debian-10-r19
   enabled: true
   postgresqlUsername: bdba
   postgresqlPassword: CHANGEME
