@@ -146,6 +146,8 @@ postgresql:
       memory: "1Gi"
 
 memcached:
+  image:
+    tag: 1.6.9-debian-10-r176 release
   replicaCount: 1
   pdbMinAvailable: 1
 
@@ -169,6 +171,8 @@ minio:
     enabled: false
 
 rabbitmq:
+  image:
+    tag: 3.8.16-debian-10-r25
   rabbitmq:
     username: bdba
     existingPasswordSecret: bdba-rabbitmq-password-secret
