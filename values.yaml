@@ -147,7 +147,7 @@ postgresql:
 
 memcached:
   image:
-    tag: 1.6.9-debian-10-r176 release
+    tag: 1.6.9-debian-10-r176
   replicaCount: 1
   pdbMinAvailable: 1
 
