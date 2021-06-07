@@ -72,7 +72,7 @@ spec:
           imagePullPolicy: {{ .Values.worker.pullPolicy }}
           readinessProbe:
             exec:
-              command: ["/docker-healthchech.sh" ]
+              command: ["/docker-healthcheck.sh" ]
             initialDelaySeconds: 15
             periodSeconds: 30
             successThreshold: 1
