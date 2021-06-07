@@ -72,14 +72,14 @@ spec:
           imagePullPolicy: {{ .Values.worker.pullPolicy }}
           readinessProbe:
             exec:
-              command: ["sh", "-c", "/srv/venv/appcheck-client/bin/celery -b $(printf $BROKER_URL $BROKER_PASSWORD) -q inspect -d celery@appcheck-worker.$(hostname) --timeout 10 ping" ]
+              command: ["/docker-healthchech.sh" ]
             initialDelaySeconds: 15
             periodSeconds: 30
             successThreshold: 1
             failureThreshold: 3
           livenessProbe:
             exec:
-              command: ["sh", "-c", "/srv/venv/appcheck-client/bin/celery -b $(printf $BROKER_URL $BROKER_PASSWORD) -q inspect -d celery@appcheck-worker.$(hostname) --timeout 10 ping" ]
+              command: ["/docker-healthcheck.sh" ]
             initialDelaySeconds: 15
             periodSeconds: 30
             successThreshold: 1
