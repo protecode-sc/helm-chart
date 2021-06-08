@@ -99,6 +99,8 @@ spec:
               mountPath: /app-log
             - name:  {{ include "bdba.fullname" . }}-worker-tmp
               mountPath: /tmp
+            - name:  {{ include "bdba.fullname" . }}-worker-var-tmp
+              mountPath: /var/tmp
           securityContext:
             readOnlyRootFilesystem: true
         {{- if .Values.worker.applicationLogging.enabled }}
@@ -119,6 +121,8 @@ spec:
       - name: {{ include "bdba.fullname" . }}-worker-applog
         emptyDir: {}
       - name: {{ include "bdba.fullname" . }}-worker-tmp
+        emptyDir: {}
+      - name: {{ include "bdba.fullname" . }}-worker-var-tmp
         emptyDir: {}
       {{- if .Values.worker.applicationLogging.enabled }}
       - name: {{ include "bdba.fullname" . }}-worker-fluentbit-config
