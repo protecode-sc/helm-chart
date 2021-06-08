@@ -97,6 +97,10 @@ spec:
           volumeMounts:
             - name: {{ include "bdba.fullname" . }}-worker-applog
               mountPath: /app-log
+            - name:  {{ include "bdba.fullname" . }}-worker-tmp
+              mountPath: /tmp
+          securityContext:
+            readOnlyRootFilesystem: true
         {{- if .Values.worker.applicationLogging.enabled }}
         - name: {{ .Chart.Name }}-worker-fluentbit
           image: "{{ .Values.fluentbit.repository }}:{{ .Values.fluentbit.tag }}"
@@ -113,6 +117,8 @@ spec:
         runAsUser: 101
       volumes:
       - name: {{ include "bdba.fullname" . }}-worker-applog
+        emptyDir: {}
+      - name: {{ include "bdba.fullname" . }}-worker-tmp
         emptyDir: {}
       {{- if .Values.worker.applicationLogging.enabled }}
       - name: {{ include "bdba.fullname" . }}-worker-fluentbit-config
