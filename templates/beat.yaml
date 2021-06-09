@@ -43,6 +43,7 @@ spec:
               - /tmp/celerybeat.pid
             initialDelaySeconds: 5
             periodSeconds: 5
+            timeoutSeconds: 10
           resources:
             {{- toYaml .Values.beat.resources | nindent 12 }}
           {{- include "bdba.frontendenv" . | nindent 10 }}

@@ -84,6 +84,7 @@ spec:
             periodSeconds: 30
             successThreshold: 1
             failureThreshold: 3
+            timeoutSeconds: 10
           resources:
             requests:
               cpu: {{ mul .Values.worker.concurrency 250 }}m
@@ -97,9 +98,9 @@ spec:
           volumeMounts:
             - name: {{ include "bdba.fullname" . }}-worker-applog
               mountPath: /app-log
-            - name:  {{ include "bdba.fullname" . }}-worker-tmp
+            - name: {{ include "bdba.fullname" . }}-worker-tmp
               mountPath: /tmp
-            - name:  {{ include "bdba.fullname" . }}-worker-var-tmp
+            - name: {{ include "bdba.fullname" . }}-worker-var-tmp
               mountPath: /var/tmp
           securityContext:
             readOnlyRootFilesystem: true
@@ -109,7 +110,7 @@ spec:
           imagePullPolicy: {{ .Values.fluentbit.pullPolicy }}
           command: ["/fluent-bit/bin/fluent-bit", "-c", "/bdba-fluentbit/fluent-bit.conf"]
           volumeMounts:
-            - name:  {{ include "bdba.fullname" . }}-worker-applog
+            - name: {{ include "bdba.fullname" . }}-worker-applog
               mountPath: /app-log
             - name: {{ include "bdba.fullname" . }}-worker-fluentbit-config
               mountPath: /bdba-fluentbit/
