@@ -44,13 +44,13 @@ spec:
             initialDelaySeconds: 5
             periodSeconds: 5
             timeoutSeconds: 10
-          resources:
-            {{- toYaml .Values.beat.resources | nindent 12 }}
           {{- include "bdba.frontendenv" . | nindent 10 }}
           volumeMounts:
           {{- include "bdba.frontendmounts" . | indent 12 }}
           securityContext:
             readOnlyRootFilesystem: true
+          resources:
+            {{- toYaml .Values.beat.resources | nindent 12 }}
       securityContext:
         runAsNonRoot: true
         runAsUser: 101

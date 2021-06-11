@@ -201,8 +201,6 @@ env:
 {{- end -}}
 
 {{- define "bdba.frontendmounts" -}}
-- name: tmpdir
-  mountPath: /tmp
 {{- if .Values.rootCASecret }}
 - name: ca-store
   mountPath: /usr/local/share/ca-certificates/appcheck/
@@ -223,11 +221,11 @@ env:
   mountPath: /postgresql/ca/
   readOnly: true
 {{- end }}
+- name: tmpdir
+  mountPath: /tmp
 {{- end -}}
 
 {{- define "bdba.frontendvolumes" -}}
-- name: tmpdir
-  emptyDir: {}
 {{- if .Values.rootCASecret }}
 - name: ca-store
   secret:
@@ -248,6 +246,8 @@ env:
   secret:
     secretName: {{ .Values.frontend.database.rootCASecretName }}
 {{- end }}
+- name: tmpdir
+  emptyDir: {}
 {{- end -}}
 
 {{/*

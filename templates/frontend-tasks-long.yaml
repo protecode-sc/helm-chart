@@ -91,8 +91,6 @@ spec:
             successThreshold: 1
             failureThreshold: 3
             timeoutSeconds: 10
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
           {{- include "bdba.frontendenv" . | nindent 10 }}
           volumeMounts:
           {{- include "bdba.frontendmounts" . | indent 12 }}
