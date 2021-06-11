@@ -49,6 +49,8 @@ spec:
           {{- include "bdba.frontendenv" . | nindent 10 }}
           volumeMounts:
           {{- include "bdba.frontendmounts" . | indent 12 }}
+          securityContext:
+            readOnlyRootFilesystem: true
       securityContext:
         runAsNonRoot: true
         runAsUser: 101

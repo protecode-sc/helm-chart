@@ -98,6 +98,8 @@ spec:
           {{- include "bdba.frontendmounts" . | indent 12 }}
             - name: {{ include "bdba.fullname" . }}-tasks-long-applog
               mountPath: /app-log
+          securityContext:
+            readOnlyRootFilesystem: true
           resources:
             {{- toYaml .Values.taskslong.resources | nindent 12 }}
         {{- if .Values.frontend.applicationLogging.enabled }}

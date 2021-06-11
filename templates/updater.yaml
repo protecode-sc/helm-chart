@@ -91,6 +91,8 @@ spec:
             successThreshold: 1
             failureThreshold: 5
             timeoutSeconds: 10
+          securityContext:
+            readOnlyRootFilesystem: true
           resources:
             {{- toYaml .Values.updater.resources | nindent 12 }}
           {{- include "bdba.frontendenv" . | nindent 10 }}

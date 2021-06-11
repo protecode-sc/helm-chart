@@ -201,6 +201,8 @@ env:
 {{- end -}}
 
 {{- define "bdba.frontendmounts" -}}
+- name: tmpdir
+  mountPath: /tmp
 {{- if .Values.rootCASecret }}
 - name: ca-store
   mountPath: /usr/local/share/ca-certificates/appcheck/
@@ -224,6 +226,8 @@ env:
 {{- end -}}
 
 {{- define "bdba.frontendvolumes" -}}
+- name: tmpdir
+  emptyDir: {}
 {{- if .Values.rootCASecret }}
 - name: ca-store
   secret:

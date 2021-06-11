@@ -98,6 +98,8 @@ spec:
           {{- include "bdba.frontendmounts" . | indent 12 }}
             - name: {{ include "bdba.fullname" . }}-tasks-applog
               mountPath: /app-log
+          securityContext:
+            readOnlyRootFilesystem: true
         {{- if .Values.frontend.applicationLogging.enabled }}
         - name: {{ .Chart.Name }}-tasks-fluentbit
           image: "{{ .Values.fluentbit.repository }}:{{ .Values.fluentbit.tag }}"
