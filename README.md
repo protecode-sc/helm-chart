@@ -3,11 +3,25 @@
 You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by using the synopsysctl CLI
 (command-line interface) or by using the Helm package manager.
 
-Additionally, we support deploying Black Duck Binary Analysis on Azure Kubernetes Service (AKS).
+## Changes
 
-Minimum requirements for AKS deployment:
+### 2016.03 -> 2021.06
 
-  * 3 Standard_DS2_v2 nodes
+* Changed Ingress networking API to networking.k8s.io/v1beta1.
+* Pods are now run with readOnlyRootFilesystem, improving security
+* Proper `emptyDir:` is now specified for temporary spaces
+* Updated rabbitmq, postgresql and memcached images
+* Added instructions for populating the database in airgapped deployment
+
+## Requirements
+
+BDBA should run on fine on any public cloud provider supporting Kubernetes. Nodes should have 7 gigabytes of memory at minimum, and preferably there should be 3 nodes. Examples of minimum suitable nodes are
+
+  * AWS: m5.large
+  * Azure: Standard_DS2_v2
+  * GCP: n2-standard-2
+
+BDBA also has been tested on local Kubernetes deployment deployed with kubespray.
 
 ## Deploying Black Duck Binary Analysis using the synopsysctl
 
