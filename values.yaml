@@ -191,6 +191,7 @@ rabbitmq:
       queue_master_locator=min-masters
       # enable guest user
       loopback_users.guest = false
+      consumer_timeout = 86400000
     plugins: rabbitmq_management
   persistence:
     size: 8Gi
