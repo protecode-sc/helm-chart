@@ -96,6 +96,8 @@ spec:
           {{- include "bdba.frontendmounts" . | indent 12 }}
             - name: {{ include "bdba.fullname" . }}-webapp-applog
               mountPath: /app-log
+            - name: {{ include "bdba.fullname" . }}-webapp-home
+              mountPath: /home/appcheck
           securityContext:
             readOnlyRootFilesystem: true
         {{- if .Values.frontend.applicationLogging.enabled }}
@@ -117,6 +119,8 @@ spec:
       volumes:
       {{- include "bdba.frontendvolumes" . | indent 6 }}
       - name: {{ include "bdba.fullname" . }}-webapp-applog
+        emptyDir: {}
+      - name: {{ include "bdba.fullname" . }}-webapp-home
         emptyDir: {}
       {{- if .Values.frontend.applicationLogging.enabled }}
       - name: {{ include "bdba.fullname" . }}-webapp-fluentbit-config
