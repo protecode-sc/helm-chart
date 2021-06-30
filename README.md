@@ -12,7 +12,7 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by usin
 * Proper `emptyDir:` is now specified for temporary spaces
 * Updated rabbitmq, postgresql and memcached images
 * Added instructions for populating the database in airgapped deployment
-* Added frontend.web.tlsProxy parameter for use with L7 TLS-terminating load balancers
+* `frontend.web.rootUrl` is now used for SSO endpoints as well, instead of guessing from HTTP request.
 
 ## Requirements
 
@@ -174,7 +174,6 @@ Parameter                       | Description                             | Defa
 `frontend.web.admin`            | Administrator user's email address.     | "admin@bdba.local"
 `frontend.web.erroradmin`       | Error report email receiver.            | ""
 `frontend.web.rootURL`          | Root URL of web service for emails.     | "http://bdba.local"
-`frontend.web.tlsProxy`         | BDBA is behind TLS terminating L7 proxy | false
 
 #### SMTP configuration
 

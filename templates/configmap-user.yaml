@@ -17,7 +17,7 @@ data:
   LOG_RETENTION_DAYS: {{ .Values.logRetention | quote }}
   {{- end }}
   SESSION_COOKIE_AGE: {{ .Values.frontend.web.sessionCookieAge | quote }}
-  {{- if or .Values.ingress.tls.enabled .Values.frontend.web.tlsProxy }}
+  {{- if .Values.ingress.tls.enabled }}
   TLS_INGRESS: "true"
   {{- else }}
   TLS_INGRESS: "false"
