@@ -4,7 +4,7 @@
 
 frontend:
   repository: docker.io/sigsynopsys/bdba-frontend
-  tag: 2021.06
+  tag: 2021.06-1
   pullPolicy: IfNotPresent
   database:
     {}
@@ -89,7 +89,7 @@ worker:
   pullPolicy: IfNotPresent
   applicationLogging:
     enabled: true
-  memoryPerScanner: 2  # Gigabytes, must be integer
+  memoryPerScanner: 4  # Gigabytes, must be integer
   storagePerScanner: 30  # Gigabytes, must be integer
 
 fluentd:
