@@ -133,7 +133,7 @@ global:
 
 postgresql:
   image:
-    tag: 11.12.0-debian-10-r19
+    tag: 11.13.0-debian-10-r0
   enabled: true
   postgresqlUsername: bdba
   postgresqlPassword: CHANGEME
