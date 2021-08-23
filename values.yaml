@@ -144,12 +144,21 @@ postgresql:
     requests:
       cpu: "250m"
       memory: "1Gi"
+    limits:
+      memory: "6Gi"
+      cpu: 4
 
 memcached:
   image:
     tag: 1.6.9-debian-10-r176
   replicaCount: 1
   pdbMinAvailable: 1
+  resources:
+    requests:
+      cpu: "250m"
+      memory: "256Mi"
+    limits:
+      memory: "1Gi"
 
 minio:
   mode: standalone
@@ -195,6 +204,12 @@ rabbitmq:
     plugins: rabbitmq_management
   persistence:
     size: 8Gi
+  resources:
+    requests:
+      memory: "1Gi"
+    limits:
+      memory: "2Gi"
+
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
