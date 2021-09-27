@@ -19,10 +19,18 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by usin
 BDBA should run on fine on any public cloud provider supporting Kubernetes. Nodes should have 7 gigabytes of memory at minimum, and preferably there should be 3 nodes. Examples of minimum suitable nodes are
 
   * AWS: m5.large
-  * Azure: Standard_DS2_v2
+  * Azure: Standard_DS2_v2 (See notes below)
   * GCP: n2-standard-2
 
 BDBA also has been tested on local Kubernetes deployment deployed with kubespray.
+
+### Azure Notes
+
+In Azure, if monitoring addons are enabled with `--enable-addons monitoring`, 
+Standard_DS2_v2 instances do not have enough free memory available for BDBA.
+
+If monitoring is needed, minimum instance size is Standard_DS3_v2. In that
+case node count can be decreased to 2.
 
 ## Deploying Black Duck Binary Analysis using the synopsysctl
 
