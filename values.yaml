@@ -91,6 +91,7 @@ worker:
     enabled: true
   memoryPerScanner: 4  # Gigabytes, must be integer
   storagePerScanner: 30  # Gigabytes, must be integer
+  storageClass: ""
 
 fluentd:
   repository: docker.io/sigsynopsys/bdba-fluentd

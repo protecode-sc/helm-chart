@@ -243,10 +243,19 @@ Parameter                     | Description                                     
 
 #### Worker scaling
 
-Parameter            | Description                                   | Default
--------------------- | ----------------------------------------------|------------------------
-`worker.replicas`    | Number of scanner instances.                  | 1
-`worker.concurrency` | Number of concurrent scanners in scanner pods.| 1
+Parameter             | Description                                   | Default
+--------------------- | ----------------------------------------------|------------------------
+`worker.replicas`     | Number of scanner instances.                  | 1
+`worker.concurrency`  | Number of concurrent scanners in scanner pods.| 1
+`worker.storageClass` | storageClass for worker's work space.         | ""
+
+If `worker.storageClass` is left empty, scanners will be deployed as Kubernetes
+Deployment and use ephemeral storage for work space. 
+
+However, if nodes have limited ephemeral storage available (i.e. nodes contain
+small root disks), `worker.storageClass` allows reserving work space for
+scanners from persistent volumes. This also makes the workers run as Kubernetes
+StatefulSets. Each worker pod reserves it's own workspace from persistent volume.
 
 #### Networking and security
 

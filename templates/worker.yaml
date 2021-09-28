@@ -41,13 +41,22 @@ data:
 ---
 {{- end }}
 apiVersion: apps/v1
+{{- if .Values.worker.storageClass }}
+kind: StatefulSet
+{{- else }}
 kind: Deployment
+{{- end }}
 metadata:
   name: {{ include "bdba.fullname" . }}-worker
   labels:
 {{ include "bdba.labels" . | indent 4 }}
 spec:
   replicas: {{ .Values.worker.replicas }}
+  {{- if .Values.worker.storageClass }}
+  serviceName: {{ include "bdba.fullname" . }}-worker-svc
+  updateStrategy:
+    type: RollingUpdate
+  {{- end }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ include "bdba.name" . }}-worker
@@ -89,17 +98,26 @@ spec:
             requests:
               cpu: {{ mul .Values.worker.concurrency 250 }}m
               memory: {{ mul .Values.worker.concurrency .Values.worker.memoryPerScanner }}Gi
+              {{- if not .Values.worker.storageClass }}
               ephemeral-storage: {{ mul .Values.worker.concurrency .Values.worker.storagePerScanner}}Gi
+              {{- end }}
             limits:
               cpu: {{ mul .Values.worker.concurrency 2 }}
               memory: {{ mul .Values.worker.concurrency 6}}Gi
+              {{- if not .Values.worker.storageClass }}
               ephemeral-storage: {{ mul .Values.worker.concurrency 100}}Gi
+              {{- end }}
           {{- include "bdba.workerenv" . | nindent 10 }}
           volumeMounts:
             - name: {{ include "bdba.fullname" . }}-worker-applog
               mountPath: /app-log
+            {{- if .Values.worker.storageClass }}
+            - name: {{ include "bdba.name" . }}-worker-pvc
+              mountPath: /tmp
+            {{- else }}
             - name: {{ include "bdba.fullname" . }}-worker-tmp
               mountPath: /tmp
+            {{- end }}
             - name: {{ include "bdba.fullname" . }}-worker-var-tmp
               mountPath: /var/tmp
           securityContext:
@@ -121,8 +139,10 @@ spec:
       volumes:
       - name: {{ include "bdba.fullname" . }}-worker-applog
         emptyDir: {}
+      {{- if not .Values.worker.storageClass }}
       - name: {{ include "bdba.fullname" . }}-worker-tmp
         emptyDir: {}
+      {{- end }}
       - name: {{ include "bdba.fullname" . }}-worker-var-tmp
         emptyDir: {}
       {{- if .Values.worker.applicationLogging.enabled }}
@@ -165,3 +185,15 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
     {{- end }}
+  {{- if .Values.worker.storageClass }}
+  volumeClaimTemplates:
+    - metadata:
+        name: {{ include "bdba.name" . }}-worker-pvc
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: {{ .Values.worker.storageClass }}
+        resources:
+          requests:
+            storage: {{ mul .Values.worker.concurrency .Values.worker.storagePerScanner}}Gi
+  {{- end }}
