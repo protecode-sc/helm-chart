@@ -5,6 +5,12 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by usin
 
 ## Changes
 
+### 2021.06 -> 2021.9.0
+
+* Added possibility to specify storageClass for scanner work space instead of
+  using ephemeral storage.
+* Added requests and limits for containers that were missing them.
+
 ### 2016.03 -> 2021.06
 
 * Changed Ingress networking API to networking.k8s.io/v1beta1.
@@ -252,7 +258,7 @@ Parameter             | Description                                   | Default
 If `worker.storageClass` is left empty, scanners will be deployed as Kubernetes
 Deployment and use ephemeral storage for work space. 
 
-However, if nodes have limited ephemeral storage available (i.e. nodes contain
+However, if nodes have limited ephemeral storage available (that is, nodes contain
 small root disks), `worker.storageClass` allows reserving work space for
 scanners from persistent volumes. This also makes the workers run as Kubernetes
 StatefulSets. Each worker pod reserves it's own workspace from persistent volume.
