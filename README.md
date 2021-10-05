@@ -7,6 +7,7 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by usin
 
 ### 2021.06 -> 2021.9.0
 
+* Added support for Kubernetes v1.22 and higher
 * Added possibility to specify storageClass for scanner work space instead of
   using ephemeral storage.
 * Added requests and limits for containers that were missing them.
