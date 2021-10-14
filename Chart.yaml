@@ -11,6 +11,7 @@ dependencies:
 - name: minio
   version: "8.0.8"
   repository: https://helm.min.io/
+  condition: minio.enabled
 - name: memcached
   repository: https://charts.bitnami.com/bitnami/
   version: "4.2.19"

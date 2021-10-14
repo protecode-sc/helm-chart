@@ -32,7 +32,13 @@ data:
   PGSSLROOTCERT: "/postgresql/ca/ca.pem"
   {{- end }}
   {{- end }}
+  {{- if .Values.minio.enabled }}
   S3_ENDPOINT: "http://{{ template "bdba.minio.fullname" . }}:{{ .Values.minio.service.port }}"
+  {{- else if .Values.s3Endpoint }}
+  S3_ENDPOINT: {{ .Values.s3Endpoint | quote }}
+  {{- end }}
+  INTERNAL_BUCKET: {{ .Values.frontend.internalBucket | quote }}
+  UPLOAD_BUCKET: {{ .Values.frontend.uploadBucket | quote }}
   MEMCACHED: "{{ template "bdba.memcached.fullname" . }}:11211"
   BROKER_URL: "{{ template "bdba.rabbitmq.brokerUrl" . }}"
   INTERNAL_FRONTEND_URL: "http://{{ template "bdba.fullname" . }}-webapp:8000"

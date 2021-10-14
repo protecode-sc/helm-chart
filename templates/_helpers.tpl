@@ -105,6 +105,14 @@ checksum/config: {{ include (print $.Template.BasePath "/configmap-user.yaml") .
 checksum/secrets: {{ include (print $.Template.BasePath "/secrets-user.yaml") . | sha256sum }}
 {{- end }}
 
+{{- define "bdba.s3endpoint" -}}
+  {{- if .Values.minio.enabled -}}
+    {{- printf "http://%s:%s" ( include "bdba.minio.fullname" . ) .Values.minio.service.port -}}
+  {{- else -}}
+    {{- printf "%s" .Values.s3Endpoint -}}
+  {{- end -}}
+{{- end -}}
+
 {{- define "bdba.frontendenv" }}
 envFrom:
   - configMapRef:
@@ -113,14 +121,17 @@ envFrom:
       name: {{ include "bdba.fullname" . }}-user-configmap
   - secretRef:
       name: {{ include "bdba.fullname" . }}-user-secrets
+  {{- if not .Values.minio.enabled }}
+  - secretRef:
+      name: {{ include "bdba.fullname" . }}-s3-secrets
+  {{- end }}
   - secretRef:
       {{- if .Values.frontend.web.djangoSecretKey }}
       name: {{ include "bdba.fullname" . }}-django-secrets
       {{- else }}
       name: {{ include "bdba.fullname" . }}-django-secrets-generated
       {{- end }}
-  {{- if and .Values.postgresql.enabled }}
-  {{- else }}
+  {{- if not .Values.postgresql.enabled }}
   - secretRef:
       name: {{ include "bdba.fullname" . }}-postgresql-secrets
   {{- end }}
@@ -137,68 +148,45 @@ env:
         name: {{ include "bdba.postgresql.passwordSecretName" . }}
         key: postgresql-password
   {{- end }}
-  - name: AWS_ACCESS_KEY_ID
-    valueFrom:
-      secretKeyRef:
-        name: {{ include "bdba.minio.secretName" . }}
-        key: accesskey
-  - name: AWS_SECRET_ACCESS_KEY
-    valueFrom:
-      secretKeyRef:
-        name: {{ include "bdba.minio.secretName" . }}
-        key: secretkey
 {{- end }}
 
-{{- define "bdba.workerenv" -}}
-env:
-  - name: SKIP_FRONTEND_ANNOUNCE
-    value: "no"
-  - name: SCANNER_CONCURRENCY
-    value: {{ .Values.worker.concurrency | quote }}
-  - name: S3_ENDPOINT
-    valueFrom:
-      configMapKeyRef:
-        name: {{ include "bdba.fullname" . }}-services-configmap
-        key: S3_ENDPOINT
-  - name: AWS_ACCESS_KEY_ID
-    valueFrom:
-      secretKeyRef:
-        name: {{ include "bdba.minio.secretName" . }}
-        key: accesskey
-  - name: AWS_SECRET_ACCESS_KEY
-    valueFrom:
-      secretKeyRef:
-        name: {{ include "bdba.minio.secretName" . }}
-        key: secretkey
-  - name: BROKER_URL
-    valueFrom:
-      configMapKeyRef:
-        name: {{ include "bdba.fullname" . }}-services-configmap
-        key: BROKER_URL
-  - name: BROKER_PASSWORD
-    valueFrom:
-      secretKeyRef:
-        name: {{ include "bdba.rabbitmq.passwordSecretName" . }}
-        key: rabbitmq-password
-  {{- if .Values.httpProxy }}
-  - name: HTTP_PROXY
-    valueFrom:
-      configMapKeyRef:
-        name: {{ include "bdba.fullname" . }}-user-configmap
-        key: HTTP_PROXY
-  {{- end }}
-  {{- if .Values.httpNoProxy }}
-  - name: NO_PROXY
-    valueFrom:
-      configMapKeyRef:
-        name: {{ include "bdba.fullname" . }}-user-configmap
-        key: NO_PROXY
-  {{- end }}
-{{- if .Values.worker.applicationLogging }}
-  - name: TASKS_LOG_FILE
-    value: /app-log/celery.log
+{{- define "bdba.s3env" -}}
+{{- if .Values.s3Endpoint }}
+- name: S3_ENDPOINT
+  valueFrom:
+    configMapKeyRef:
+      name: {{ include "bdba.fullname" . }}-services-configmap
+      key: S3_ENDPOINT
+{{- end }}
+{{- if .Values.minio.enabled }}
+- name: AWS_ACCESS_KEY_ID
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "bdba.minio.secretName" . }}
+      key: accesskey
+- name: AWS_SECRET_ACCESS_KEY
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "bdba.minio.secretName" . }}
+      key: secretkey
+{{- else }}
+{{- if .Values.s3AccessKeyId }}
+- name: AWS_ACCESS_KEY_ID
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "bdba.fullname" . }}-s3-secrets
+      key: AWS_ACCESS_KEY_ID
+{{- end }}
+{{- if .Values.s3SecretAccessKey }}
+- name: AWS_SECRET_ACCESS_KEY
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "bdba.fullname" . }}-s3-secrets
+      key: AWS_SECRET_ACCESS_KEY
+{{- end }}
 {{- end }}
 {{- end -}}
+
 
 {{- define "bdba.frontendmounts" -}}
 {{- if .Values.rootCASecret }}

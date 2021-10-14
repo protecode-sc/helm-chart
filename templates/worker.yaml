@@ -107,7 +107,40 @@ spec:
               {{- if not .Values.worker.storageClass }}
               ephemeral-storage: {{ mul .Values.worker.concurrency 100}}Gi
               {{- end }}
-          {{- include "bdba.workerenv" . | nindent 10 }}
+          env:
+            - name: SKIP_FRONTEND_ANNOUNCE
+              value: "no"
+            - name: SCANNER_CONCURRENCY
+              value: {{ .Values.worker.concurrency | quote }}
+            - name: BROKER_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "bdba.fullname" . }}-services-configmap
+                  key: BROKER_URL
+            - name: BROKER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "bdba.rabbitmq.passwordSecretName" . }}
+                  key: rabbitmq-password
+            {{- if .Values.httpProxy }}
+            - name: HTTP_PROXY
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "bdba.fullname" . }}-user-configmap
+                  key: HTTP_PROXY
+            {{- end }}
+            {{- if .Values.httpNoProxy }}
+            - name: NO_PROXY
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "bdba.fullname" . }}-user-configmap
+                  key: NO_PROXY
+            {{- end }}
+            {{- if .Values.worker.applicationLogging }}
+            - name: TASKS_LOG_FILE
+              value: /app-log/celery.log
+            {{- end }}
+            {{- include "bdba.s3env" . | nindent 12 }}
           volumeMounts:
             - name: {{ include "bdba.fullname" . }}-worker-applog
               mountPath: /app-log

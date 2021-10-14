@@ -5,6 +5,11 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by usin
 
 ## Changes
 
+### 2021.9.0 -> XXXX
+
+* Minio is now optional, and there is support for native S3 support or any other
+  S3 compatible object storage.
+
 ### 2021.06 -> 2021.9.0
 
 * Added support for Kubernetes v1.22 and higher
@@ -109,7 +114,6 @@ sections for clarity.
 Black Duck Binary Analysis Helm chart uses PostgreSQL. Secrets for other services are automatically provisioned,
 but for PostgreSQL you need to enter the password manually.
 
-
 ##### PostgreSQL secrets
 
 If you use a bundled PostgreSQL database, it is recommended to configure a password
@@ -153,6 +157,37 @@ Parameter                              | Description                          | 
 `rabbitmq.persistence.storageClass`    | storageClass for RabbitMQ.           | ""
 `rabbitmq.persistence.size`            | Size of RabbitMQ claim.              | 8Gi
 `rabbitmq.persistence.existingClaim`   | Existing claim to use for RabbitMQ.  | ""
+
+#### Alternative object storages
+
+Black Duck Binary Analysis by default uses minio for storing data to persistent
+volumes. However, Minio can be replaced with any S3-compatible object storage,
+including native S3 from AWS.
+
+Parameter                   | Description                     | Default
+--------------------------- | ------------------------------- | ---------------
+`minio.enabled`             | Use bundled minio.              | true
+`frontend.internalBucket`   | Bucket for BDBAs internal use.  | "bdba-internal"
+`frontend.uploadBucket`     | Bucket for storing uploads.     | "bdba-uploads"
+`fluentd.logsBucket`        | Bucket for storing logs.        | "bdba-logs"
+`s3Endpoint`                | S3 endpoint.                    | ""
+`s3AccessKeyId`             | S3 Access Key Id.               | ""
+`s3SecretAccessKey`         | S3 Secret Access Key.           | ""
+`s3Region`                  | S3 Region.                      | ""
+
+To use alternative object storage, minio needs to be disabled. 
+
+If using native S3, you need to consider the following:
+
+* Bucket names need to be unique (globally).
+* S3 Region is needed.
+* To grant permissions, you can either all role for Kubernetes nodes that BDBA,
+  or create AWS user that that can access the buckets and use `s3AccessKeyId`
+  and `s3SecretAccessKey` parameters. BDBA is able to use Instance Metadata
+  Service, and access keys are optional if IDMS is available.
+
+For other object storage options (like external Minio), `s3Endpoint`,
+`s3AccessKeyId` and `s3SecretAccessKey` are needed.
 
 #### Licensing
 

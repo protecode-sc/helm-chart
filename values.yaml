@@ -60,6 +60,8 @@ frontend:
     limits:
       memory: "4Gi"
       cpu: 4
+  internalBucket: "bdba-internal"
+  uploadBucket: "bdba-uploads"
 
 # rootCASecret:
 
@@ -104,6 +106,7 @@ fluentd:
     limits:
       memory: "1Gi"
       cpu: 2
+  logsBucket: bdba-logs
 
 taskslong:
   resources:
@@ -162,6 +165,7 @@ memcached:
       memory: "1Gi"
 
 minio:
+  enabled: true
   mode: standalone
   persistence:
     enabled: true
@@ -225,7 +229,7 @@ ingress:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
     nginx.ingress.kubernetes.io/proxy-body-size: "0"
-    # kubernetes.io/tls-acme: "true"
+
   host: "bdba.local"
 
   tls:
@@ -235,6 +239,11 @@ ingress:
 httpProxy: ""
 httpNoProxy: ""
 logRetention: 30  # Days to keep application logs
+
+s3Endpoint: ""
+s3AccessKeyId: ""
+s3SecretAccessKey: ""
+s3Region: ""
 
 resources: {}
 
