@@ -514,15 +514,15 @@ $ kubectl cp database.pgdump dev/NS-postgresql-0:/tmp
 Next, restore the database. In the PostgreSQL pod, execute:
 
 ```console
-$ pg_restore -c -C -Fc -h localhost -U <database-username> -d <database-name> -n public </tmp/database.pgdump
+$ pg_restore -c -C -Fc -h localhost -U <database-username> -d <database-name> -n public -O </tmp/database.pgdump
 ```
 
-##### Restoring the database on hosted Postgresql
+##### Restoring the database on hosted PostgreSQL
 
 When using hosted PostgreSQL, database can be restored by piping the database dump to pg_restore.
 
 ```console
-kubectl run -i --env="PGPASSWORD=<database-password>" --rm --image=postgres --restart=Never --command=true psqlshell -- pg_restore -h <database-host> -U <database-username> -c -C -Fc -n public -d <database-name> <database.pgdump
+kubectl run -i --env="PGPASSWORD=<database-password>" --rm --image=postgres --restart=Never --command=true psqlshell -- pg_restore -h <database-host> -U <database-username> -c -C -Fc -n public -O -d <database-name> <database.pgdump
 ```
 
 #### Restoring the services
