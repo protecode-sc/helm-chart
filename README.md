@@ -456,18 +456,13 @@ $ kubectl scale --replicas=0 deployment/NAME-bdba-updater
 $ kubectl scale --replicas=0 deployment/NAME-bdba-webapp
 ```
 
-#### Overwriting the database with a backup
-
-Copy the database dump to the PostgreSQL pod.
-
-```console
-$ kubectl cp database.pgdump dev/NS-postgresql-0:/tmp
-```
 
 #### Preparing the database for pg_restore
 
-As Black Duck Binary Analysis populates the database, it is required to clean up tables found in the
-database before it can be restored.
+Before Black Duck Binary Analysis database can be restored, it is required to clean up tables found in the
+database.
+
+##### Internal postgresql
 
 Kubectl into the database container and run:
 
@@ -480,6 +475,17 @@ In the PostgreSQL pod, enter the interactive PostgreSQL shell and execute:
 ```console
 $ psql -h localhost -U <database-username> -W -d <database-name>
 ```
+
+##### Hosted PostgreSQL
+
+With hosted PostgreSQL, like AWS RDS, you can access the database by launching
+a pod that can access the database.
+
+```console
+kubectl run -it --env="PGPASSWORD=<database-password>" --rm --image=postgres --restart=Never --command=true psqlshell -- psql -h <database-host> -U <database-username>
+```
+
+#### DB Shell
 
 In the interactive db shell, run:
 
@@ -497,12 +503,26 @@ This will empty the database, but authentication credentials are kept intact.
 
 Exit the db shell with `^D` to proceed.
 
-#### Restoring the database
+#### Overwriting the database with a backup
+
+Copy the database dump to the PostgreSQL pod.
+
+```console
+$ kubectl cp database.pgdump dev/NS-postgresql-0:/tmp
+```
 
 Next, restore the database. In the PostgreSQL pod, execute:
 
 ```console
 $ pg_restore -c -C -Fc -h localhost -U <database-username> -d <database-name> -n public </tmp/database.pgdump
+```
+
+##### Restoring the database on hosted Postgresql
+
+When using hosted PostgreSQL, database can be restored by piping the database dump to pg_restore.
+
+```console
+kubectl run -i --env="PGPASSWORD=<database-password>" --rm --image=postgres --restart=Never --command=true psqlshell -- pg_restore -h <database-host> -U <database-username> -c -C -Fc -n public -d <database-name> <database.pgdump
 ```
 
 #### Restoring the services
