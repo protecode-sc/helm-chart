@@ -148,6 +148,18 @@ env:
         name: {{ include "bdba.postgresql.passwordSecretName" . }}
         key: postgresql-password
   {{- end }}
+  {{- if .Values.minio.enabled }}
+  - name: AWS_ACCESS_KEY_ID
+    valueFrom:
+      secretKeyRef:
+        name: {{ include "bdba.minio.secretName" . }}
+        key: accesskey
+  - name: AWS_SECRET_ACCESS_KEY
+    valueFrom:
+      secretKeyRef:
+        name: {{ include "bdba.minio.secretName" . }}
+        key: secretkey
+{{- end }}
 {{- end }}
 
 {{- define "bdba.s3env" -}}
