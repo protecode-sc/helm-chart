@@ -163,7 +163,7 @@ env:
 {{- end }}
 
 {{- define "bdba.s3env" -}}
-{{- if .Values.s3Endpoint }}
+{{- if or (.Values.s3Endpoint) (.Values.minio.enabled) }}
 - name: S3_ENDPOINT
   valueFrom:
     configMapKeyRef:
