@@ -107,7 +107,8 @@ checksum/secrets: {{ include (print $.Template.BasePath "/secrets-user.yaml") . 
 
 {{- define "bdba.s3endpoint" -}}
   {{- if .Values.minio.enabled -}}
-    {{- printf "http://%s:%s" ( include "bdba.minio.fullname" . ) .Values.minio.service.port -}}
+    {{ $miniohost := include "bdba.minio.fullname" . }}
+    {{- printf "http://%s:%s" $miniohost (.Values.minio.service.port | toString) -}}
   {{- else -}}
     {{- printf "%s" .Values.s3Endpoint -}}
   {{- end -}}
