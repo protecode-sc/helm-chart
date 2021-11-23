@@ -431,7 +431,13 @@ Once it is ready, get the "location" from the response and download the database
 $ curl -o backup.pgdump.tar -u admin "http://<APPLIANCE>/api/backup/appliance-NNNNN.pgdump"
 ```
 
-Backup is in fact a tar archive, containing just backup.pgdump. Extract it.
+##### BDBA < 2021.12.0
+
+BDBA before 2021.12.0 wrapped the pgdump inside tarball. If backup is taken
+from BDBA before 2021.12.0, this step is necessary. If it is 2021.12.0 or later,
+this step can be omitted.
+
+Extract it backup file if it is made by BDBA before 2021.12.0:
 
 ```console
 $ tar xvf backup.pgdump
@@ -522,7 +528,7 @@ $ pg_restore -c -C -Fc -h localhost -U <database-username> -d <database-name> -n
 When using hosted PostgreSQL, database can be restored by piping the database dump to pg_restore.
 
 ```console
-kubectl run -i --env="PGPASSWORD=<database-password>" --rm --image=postgres --restart=Never --command=true psqlshell -- pg_restore -h <database-host> -U <database-username> -c -C -Fc -n public -O -d <database-name> <database.pgdump
+kubectl run -i --env="PGPASSWORD=<database-password>" --rm --image=postgres --restart=Never --command=true psqlshell -- pg_restore -h <database-host> -U <database-username> --verbose -j 1 -Fc -n public -O -d <database-name> <database.pgdump
 ```
 
 #### Restoring the services
