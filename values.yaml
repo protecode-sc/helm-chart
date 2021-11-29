@@ -4,7 +4,7 @@
 
 frontend:
   repository: docker.io/sigsynopsys/bdba-frontend
-  tag: 2021.9.0
+  tag: 2021.9.1
   pullPolicy: IfNotPresent
   database:
     {}
@@ -87,7 +87,7 @@ worker:
   replicas: 1
   concurrency: 1
   repository: docker.io/sigsynopsys/bdba-worker
-  tag: 2021.9.0
+  tag: 2021.9.1
   pullPolicy: IfNotPresent
   applicationLogging:
     enabled: true
@@ -97,7 +97,7 @@ worker:
 
 fluentd:
   repository: docker.io/sigsynopsys/bdba-fluentd
-  tag: 2021.9.0
+  tag: 2021.9.1
   pullPolicy: IfNotPresent
   resources:
     requests:
@@ -166,23 +166,19 @@ memcached:
 
 minio:
   enabled: true
+  image:
+    repository: minio/minio
+    tag: RELEASE.2021-04-22T15-44-28Z
+    pullPolicy: IfNotPresent
+  service:
+    port: 9000
   mode: standalone
   persistence:
     enabled: true
     size: 300Gi
-  configPath: "/minio-config/"
-  configPathmc: "/mc-config/"
   securityContext:
     enabled: true
   existingSecret: bdba-minio-secret
-  gcsgateway:
-    enabled: false
-  azuregateway:
-    enabled: false
-  s3gateway:
-    enabled: false
-  b2gateway:
-    enabled: false
 
 rabbitmq:
   image:

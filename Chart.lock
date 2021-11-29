@@ -2,14 +2,11 @@ dependencies:
 - name: postgresql
   repository: https://charts.bitnami.com/bitnami/
   version: 8.10.7
-- name: minio
-  repository: https://helm.min.io/
-  version: 8.0.8
 - name: memcached
   repository: https://charts.bitnami.com/bitnami/
   version: 4.2.19
 - name: rabbitmq
   repository: https://charts.bitnami.com/bitnami/
   version: 6.18.2
-digest: sha256:b632ffe1af6ef8ba944403cb225bcb558aa3e3a6782bc4344dfca9a714dc0af1
-generated: "2020-12-17T11:43:11.100845+02:00"
+digest: sha256:92284f9116b434aba08047b9e10921329cf4c7d480b694805c4775ab8688acfb
+generated: "2021-11-29T12:00:18.390827+02:00"
