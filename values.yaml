@@ -164,7 +164,7 @@ memcached:
 minio:
   image:
     repository: minio/minio
-    tag: RELEASE.2020-03-06T22-23-56Z
+    tag: RELEASE.2021-04-22T15-44-28Z
     pullPolicy: IfNotPresent
   enabled: true
   service:
@@ -173,8 +173,6 @@ minio:
   persistence:
     enabled: true
     size: 300Gi
-  configPath: "/minio-config/"
-  configPathmc: "/mc-config/"
   securityContext:
     enabled: true
   existingSecret: bdba-minio-secret
