@@ -1,0 +1,113 @@
+{{- if .Values.minio.enabled }}
+{{- if not .Values.minio.persistence.existingClaim }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ template "bdba.minio.fullname" . }}
+  labels:
+{{ include "bdba.labels" . | indent 4 }}
+spec:
+  accessModes:
+    - "ReadWriteOnce"
+  resources:
+    requests:
+      storage: {{ .Values.minio.persistence.size | quote }}    
+{{- if .Values.minio.persistence.storageClass }}
+  storageClassName: "{{ .Values.minio.persistence.storageClass }}"
+{{- end }}
+---
+{{- end }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "bdba.minio.fullname" . }}
+  labels:
+{{ include "bdba.labels" . | indent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: 9000
+      targetPort: 9000
+      protocol: TCP
+      name: minio
+  selector:
+    app.kubernetes.io/name: {{ include "bdba.name" . }}-fluentd
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app: "minio"
+    release: {{ .Release.Name }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "bdba.minio.fullname" . }}
+  labels:
+{{ include "bdba.labels" . | indent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "minio"
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      name: {{ template "bdba.minio.fullname" . }}
+      labels:
+        app: "minio"
+        release: {{ .Release.Name }}
+    spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      containers:
+        - name: "minio"
+          image: "{{ .Values.minio.image.repository }}:{{ .Values.minio.image.tag }}"
+          imagePullPolicy: {{ .Values.minio.image.pullPolicy }}
+          command: [ "/bin/sh", "-ce", "/usr/bin/docker-entrypoint.sh minio server /export" ]
+          env:
+          - name: MINIO_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.minio.existingSecret }}
+                key: accesskey
+          - name: MINIO_SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.minio.existingSecret }}
+                key: secretkey
+          volumeMounts:
+          - name: export
+            mountPath: "/export"
+          livenessProbe:
+            httpGet:
+              path: /minio/health/live
+              port: {{ .Values.minio.service.port }}
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 30
+            timeoutSeconds: 1
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /minio/health/ready
+              port: {{ .Values.minio.service.port }}
+              scheme: HTTP
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            timeoutSeconds: 1
+            successThreshold: 1
+            failureThreshold: 3
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+      volumes:
+        - name: export
+        {{- if .Values.minio.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.minio.persistence.existingClaim | default (include "bdba.minio.fullname" .) }}
+        {{- else }}
+          emptyDir: {}
+        {{- end }}
+{{- end }}

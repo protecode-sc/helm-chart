@@ -162,6 +162,13 @@ memcached:
       memory: "1Gi"
 
 minio:
+  image:
+    repository: minio/minio
+    tag: RELEASE.2020-03-06T22-23-56Z
+    pullPolicy: IfNotPresent
+  enabled: true
+  service:
+    port: 9000
   mode: standalone
   persistence:
     enabled: true
@@ -171,14 +178,6 @@ minio:
   securityContext:
     enabled: true
   existingSecret: bdba-minio-secret
-  gcsgateway:
-    enabled: false
-  azuregateway:
-    enabled: false
-  s3gateway:
-    enabled: false
-  b2gateway:
-    enabled: false
 
 rabbitmq:
   image:

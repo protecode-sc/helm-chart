@@ -1,16 +1,13 @@
 apiVersion: v2
-appVersion: "2021.9.1"
+appVersion: "2021.9.2"
 description: BDBA Helm chart
 name: bdba
-version: "2021.9.1"
+version: "2021.9.2"
 dependencies:
 - name: postgresql
   version: "8.10.7"
   repository: https://charts.bitnami.com/bitnami/
   condition: postgresql.enabled
-- name: minio
-  version: "8.0.8"
-  repository: https://helm.min.io/
 - name: memcached
   repository: https://charts.bitnami.com/bitnami/
   version: "4.2.19"
