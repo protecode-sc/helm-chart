@@ -31,8 +31,6 @@ spec:
       protocol: TCP
       name: minio
   selector:
-    app.kubernetes.io/name: {{ include "bdba.name" . }}-fluentd
-    app.kubernetes.io/instance: {{ .Release.Name }}
     app: "minio"
     release: {{ .Release.Name }}
 ---
