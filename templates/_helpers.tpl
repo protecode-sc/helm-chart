@@ -101,6 +101,7 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- end -}}
 
 {{- define "bdba.configchecksum" -}}
+checksum/services: {{ include (print $.Template.BasePath "/configmap-services.yaml") . | sha256sum }}
 checksum/config: {{ include (print $.Template.BasePath "/configmap-user.yaml") . | sha256sum }}
 checksum/secrets: {{ include (print $.Template.BasePath "/secrets-user.yaml") . | sha256sum }}
 {{- end }}

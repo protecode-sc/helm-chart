@@ -70,6 +70,7 @@ spec:
         release: {{ .Release.Name | quote }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmap-user.yaml") . | sha256sum }}
+        checksum/services: {{ include (print $.Template.BasePath "/configmap-services.yaml") . | sha256sum }}
     spec:
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
