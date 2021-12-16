@@ -5,11 +5,13 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by usin
 
 ## Changes
 
-### 2021.9.0 -> XXXX
+### 2021.9.0 -> 2021.12.0
 
 * Minio is now optional, and there is support for native S3 support or any other
-  S3 compatible object storage.
-* Helm chart no longer depends on helm.min.io -chart, which was deprecated and archived.
+  S3 compatible object storage. See below for more information.
+* Helm chart no longer depends on helm.min.io -chart, which was deprecated and archived. Supplied
+  minio installation is bare bones, and if you require more advanced minio features,
+  use official chart and use minio as external S3 compatible object storage.
 
 ### 2021.06 -> 2021.9.0
 

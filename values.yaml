@@ -4,7 +4,7 @@
 
 frontend:
   repository: docker.io/sigsynopsys/bdba-frontend
-  tag: 2021.9.1
+  tag: 2021.12.0
   pullPolicy: IfNotPresent
   database:
     {}
@@ -87,7 +87,7 @@ worker:
   replicas: 1
   concurrency: 1
   repository: docker.io/sigsynopsys/bdba-worker
-  tag: 2021.9.1
+  tag: 2021.12.0
   pullPolicy: IfNotPresent
   applicationLogging:
     enabled: true
@@ -97,7 +97,7 @@ worker:
 
 fluentd:
   repository: docker.io/sigsynopsys/bdba-fluentd
-  tag: 2021.9.1
+  tag: 2021.12.0
   pullPolicy: IfNotPresent
   resources:
     requests:
