@@ -138,6 +138,8 @@ envFrom:
       name: {{ include "bdba.fullname" . }}-postgresql-secrets
   {{- end }}
 env:
+  - name: HOME
+    value: "/home/appcheck"
   - name: BROKER_PASSWORD
     valueFrom:
       secretKeyRef:
