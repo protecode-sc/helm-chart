@@ -96,6 +96,8 @@ worker:
   memoryPerScanner: 4  # Gigabytes, must be integer
   storagePerScanner: 30  # Gigabytes, must be integer
   storageClass: ""
+  securityContext:
+    enabled: true
 
 fluentd:
   repository: docker.io/sigsynopsys/bdba-fluentd
@@ -153,6 +155,8 @@ postgresql:
     limits:
       memory: "6Gi"
       cpu: 4
+  securityContext:
+    enabled: true
 
 memcached:
   image:
@@ -165,6 +169,8 @@ memcached:
       memory: "256Mi"
     limits:
       memory: "1Gi"
+  securityContext:
+    enabled: true
 
 minio:
   enabled: true
@@ -181,6 +187,8 @@ minio:
   securityContext:
     enabled: true
   existingSecret: bdba-minio-secret
+  securityContext:
+    enabled: true
 
 rabbitmq:
   image:
@@ -212,6 +220,8 @@ rabbitmq:
       memory: "1Gi"
     limits:
       memory: "2Gi"
+  securityContext:
+    enabled: true
 
 imagePullSecrets: []
 nameOverride: ""
