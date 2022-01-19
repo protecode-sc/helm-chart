@@ -128,7 +128,7 @@ envFrom:
       name: {{ include "bdba.fullname" . }}-s3-secrets
   {{- end }}
   - secretRef:
-      {{- if .Values.frontend.web.djangoSecretKey }}
+      {{- if .Values.frontend.web.secretKey }}
       name: {{ include "bdba.fullname" . }}-django-secrets
       {{- else }}
       name: {{ include "bdba.fullname" . }}-django-secrets-generated

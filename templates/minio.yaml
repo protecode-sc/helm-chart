@@ -1,4 +1,5 @@
 {{- if .Values.minio.enabled }}
+{{- if .Values.minio.persistence.enabled }}
 {{- if not .Values.minio.persistence.existingClaim }}
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -14,6 +15,7 @@ spec:
       storage: {{ .Values.minio.persistence.size | quote }}    
 {{- if .Values.minio.persistence.storageClass }}
   storageClassName: "{{ .Values.minio.persistence.storageClass }}"
+{{- end }}
 {{- end }}
 ---
 {{- end }}
@@ -53,10 +55,12 @@ spec:
         app: "minio"
         release: {{ .Release.Name }}
     spec:
+      {{- if .Values.minio.securityContext.enabled }}
       securityContext:
         runAsUser: 1000
         runAsGroup: 1000
         fsGroup: 1000
+      {{- end }}
       containers:
         - name: "minio"
           image: "{{ .Values.minio.image.repository }}:{{ .Values.minio.image.tag }}"

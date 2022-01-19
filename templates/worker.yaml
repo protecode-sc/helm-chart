@@ -168,9 +168,11 @@ spec:
             - name: {{ include "bdba.fullname" . }}-worker-fluentbit-config
               mountPath: /bdba-fluentbit/
         {{- end }}
+      {{- if .Values.worker.securityContext.enabled }}
       securityContext:
         runAsNonRoot: true
         runAsUser: 101
+      {{- end }}
       volumes:
       - name: {{ include "bdba.fullname" . }}-worker-applog
         emptyDir: {}

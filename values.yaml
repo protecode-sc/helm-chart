@@ -62,6 +62,8 @@ frontend:
       cpu: 4
   internalBucket: "bdba-internal"
   uploadBucket: "bdba-uploads"
+  securityContext:
+    enabled: true
 
 # rootCASecret:
 

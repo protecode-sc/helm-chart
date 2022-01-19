@@ -51,11 +51,13 @@ spec:
             readOnlyRootFilesystem: true
           resources:
             {{- toYaml .Values.beat.resources | nindent 12 }}
+      {{- if .Values.frontend.securityContext.enabled }}
       securityContext:
         runAsNonRoot: true
         runAsUser: 101
         runAsGroup: 101
         fsGroup: 101
+      {{- end }}
       volumes:
       {{- include "bdba.frontendvolumes" . | indent 8 }}
       {{- with .Values.nodeSelector }}

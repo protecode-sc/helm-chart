@@ -111,11 +111,13 @@ spec:
             - name: {{ include "bdba.fullname" . }}-webapp-fluentbit-config
               mountPath: /bdba-fluentbit/
         {{- end }}
+      {{- if .Values.frontend.securityContext.enabled }}
       securityContext:
         runAsNonRoot: true
         runAsUser: 101
         runAsGroup: 101
         fsGroup: 101
+      {{- end }}
       volumes:
       {{- include "bdba.frontendvolumes" . | indent 6 }}
       - name: {{ include "bdba.fullname" . }}-webapp-applog
