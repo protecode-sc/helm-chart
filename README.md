@@ -5,6 +5,10 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by usin
 
 ## Changes
 
+### 2021.12.0 -> 2021.12.1
+
+* Initial Openshift support
+
 ### 2021.9.0 -> 2021.12.0
 
 * Minio is now optional, and there is support for native S3 support or any other
@@ -546,6 +550,20 @@ $ kubectl scale --replicas=N deployment/NAME-bdba-webapp
 ```
 
 Now, you should be all set.
+
+### Openshift
+
+Since Openshift is incompatible with Security Contexts specified in helm charts, security contexts need to be disabled and have openshift manage them.
+
+To disable security context declarations in helm charts, add the following to helm cmd line or your values.yaml.
+
+```
+--set postgresql.securityContext.enabled=false \
+--set rabbitmq.securityContext.enabled=false \
+--set minio.securityContext.enabled=false
+--set frontend.securityContext.enabled=false \
+--set worker.securityContext.enabled=false \
+```
 
 ### Airgapped installation
 
