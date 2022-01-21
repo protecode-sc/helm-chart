@@ -43,6 +43,8 @@ BDBA should run on fine on any public cloud provider supporting Kubernetes. Node
 
 BDBA also has been tested on local Kubernetes deployment deployed with kubespray.
 
+Supported Kubernetes versions are 1.19 and later.
+
 ### Azure Notes
 
 In Azure, if monitoring addons are enabled with `--enable-addons monitoring`, 
