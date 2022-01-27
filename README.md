@@ -555,9 +555,9 @@ Now, you should be all set.
 
 ### Openshift
 
-Since Openshift is incompatible with Security Contexts specified in helm charts, security contexts need to be disabled and have openshift manage them.
+Since Openshift is incompatible with security contexts specified in helm charts, security contexts need to be disabled and have openshift manage them.
 
-To disable security context declarations in helm charts, add the following to helm cmd line or your values.yaml.
+To disable security context declarations in helm charts, add the following to helm command line or your values.yaml.
 
 ```
 --set postgresql.securityContext.enabled=false \
