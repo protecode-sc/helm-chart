@@ -271,6 +271,8 @@ Parameter                            | Description                             |
 `frontend.ldap.groupSearch`          | LDAP group search DN template.          | nil
 `frontend.ldap.groupSearchScope`     | LDAP group search scope.                | nil
 `frontend.ldap.nestedSearch`         | User nested group search.               | "false"
+`frontend.ldap.searchOptReferrals`   | Follow LDAP referrals.                  | "true"
+`frontend.ldap.userEmailMatch`       | Try also email when finding local user. | "false"
 
 To setup root certificate for LDAP, issues:
 

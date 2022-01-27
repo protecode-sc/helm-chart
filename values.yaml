@@ -47,6 +47,8 @@ frontend:
     #  groupSearch: "ou=Groups,dc=example,dc=com"
     #  groupSearchScope: "(objectClass=groupOfNames)"
     #  nestedSearch: "true"
+    #  searchOptReferrals: "true"
+    #  userEmailMatch: "false"
   licensing:
     username: ""
     password: ""

@@ -96,4 +96,10 @@ data:
   {{- if .Values.frontend.ldap.nestedSearch }}
   LDAP_NESTED_SEARCH: {{ .Values.frontend.ldap.nestedSearch | quote }}
   {{- end }}
+  {{- if .Values.frontend.ldap.searchOptReferrals }}
+  LDAP_OPT_REFERRALS: {{ .Values.frontend.ldap.searchOptReferrals | quote }}
+  {{- end }}
+  {{- if .Values.frontend.ldap.userEmailMatch }}
+  LDAP_USER_EMAIL_MATCH: {{ .Values.frontend.ldap.userEmailMatch | quote }}
+  {{- end }}
   {{- end }}
