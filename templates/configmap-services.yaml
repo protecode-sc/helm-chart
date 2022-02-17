@@ -40,5 +40,4 @@ data:
   INTERNAL_BUCKET: {{ .Values.frontend.internalBucket | quote }}
   UPLOAD_BUCKET: {{ .Values.frontend.uploadBucket | quote }}
   MEMCACHED: "{{ template "bdba.memcached.fullname" . }}:11211"
-  BROKER_URL: "{{ template "bdba.rabbitmq.brokerUrl" . }}"
   INTERNAL_FRONTEND_URL: "http://{{ template "bdba.fullname" . }}-webapp:8000"

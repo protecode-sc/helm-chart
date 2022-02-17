@@ -1,0 +1,23 @@
+{{- if .Values.worker.keda.enabled }}
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: {{ include "bdba.fullname" . }}-worker-scaledobject
+  labels:
+{{ include "bdba.labels" . | indent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "bdba.fullname" . }}-worker
+  minReplicaCount: 1
+  maxReplicaCount: {{ .Values.worker.keda.maxReplicaCount }}
+  triggers:
+  - type: rabbitmq
+    metadata:
+      protocol: "amqp"
+      queueName: "appcheck"
+      mode: "QueueLength"
+      value: {{ .Values.worker.keda.queueLength | quote }}
+      hostFromEnv: BROKER_URL
+{{- end }}

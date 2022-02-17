@@ -116,9 +116,9 @@ spec:
               value: {{ .Values.worker.concurrency | quote }}
             - name: BROKER_URL
               valueFrom:
-                configMapKeyRef:
-                  name: {{ include "bdba.fullname" . }}-services-configmap
-                  key: BROKER_URL
+                secretKeyRef:
+                  name: bdba-rabbitmq-broker-url
+                  key: host
             - name: BROKER_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -168,6 +168,8 @@ spec:
             - name: {{ include "bdba.fullname" . }}-worker-fluentbit-config
               mountPath: /bdba-fluentbit/
         {{- end }}
+      # Termination graceperiod needs to be long for worker to be able to finish
+      terminationGracePeriodSeconds: {{ .Values.worker.terminationGracePeriodSeconds }}
       {{- if .Values.worker.securityContext.enabled }}
       securityContext:
         runAsNonRoot: true

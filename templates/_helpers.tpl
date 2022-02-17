@@ -81,7 +81,7 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 
 {{- define "bdba.rabbitmq.brokerUrl" -}}
 {{ $rabbithost := include "bdba.rabbitmq.fullname" . }}
-{{- printf "amqp://%s:%%s@%s/" .Values.rabbitmq.rabbitmq.username $rabbithost }}
+{{- printf "amqp://%s:%%s@%s.%s/" .Values.rabbitmq.rabbitmq.username $rabbithost .Release.Namespace }}
 {{- end -}}
 
 {{- define "bdba.rabbitmq.passwordSecretName" -}}
@@ -140,11 +140,11 @@ envFrom:
 env:
   - name: HOME
     value: "/home/appcheck"
-  - name: BROKER_PASSWORD
+  - name: BROKER_URL
     valueFrom:
       secretKeyRef:
-        name: {{ include "bdba.rabbitmq.passwordSecretName" . }}
-        key: rabbitmq-password
+        name: bdba-rabbitmq-broker-url
+        key: host
   {{- if and .Values.postgresql.enabled }}
   - name: PGPASSWORD
     valueFrom:

@@ -100,6 +100,11 @@ worker:
   storageClass: ""
   securityContext:
     enabled: true
+  terminationGracePeriodSeconds: 21600
+  keda:
+    enabled: false
+    maxReplicaCount: 10
+    queueLength: 2
 
 fluentd:
   repository: docker.io/sigsynopsys/bdba-fluentd
