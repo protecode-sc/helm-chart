@@ -5,9 +5,12 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by usin
 
 ## Changes
 
+### 2021.12.1 -> 2022.3.0
+* Added support for KEDA autoscaler.
+
 ### 2021.12.0 -> 2021.12.1
 
-* Initial Openshift support
+* Initial Openshift support.
 
 ### 2021.9.0 -> 2021.12.0
 
@@ -296,11 +299,11 @@ Parameter                     | Description                                     
 
 #### Worker scaling
 
-Parameter             | Description                                   | Default
---------------------- | ----------------------------------------------|------------------------
-`worker.replicas`     | Number of scanner instances.                  | 1
-`worker.concurrency`  | Number of concurrent scanners in scanner pods.| 1
-`worker.storageClass` | storageClass for worker's work space.         | ""
+Parameter             | Description                                                     | Default
+--------------------- | ----------------------------------------------------------------|------------------------
+`worker.replicas`                      | Number of scanner instances.                   | 1
+`worker.concurrency`                   | Number of concurrent scanners in scanner pods. | 1
+`worker.storageClass`                  | storageClass for worker's work space.          | ""
 
 If `worker.storageClass` is left empty, scanners will be deployed as Kubernetes
 Deployment and use ephemeral storage for work space. 
@@ -309,6 +312,30 @@ However, if nodes have limited ephemeral storage available (that is, nodes conta
 small root disks), `worker.storageClass` allows reserving work space for
 scanners from persistent volumes. This also makes the workers run as Kubernetes
 StatefulSets. Each worker pod reserves it's own workspace from persistent volume.
+
+#### Worker Autoscaling
+
+Parameter                              | Description                                    | Default
+-------------------------------------- | -----------------------------------------------|----------
+`worker.keda.enabled`                  | Use KEDA autoscaler (requires KEDA in cluster) | false
+`worker.keda.maxReplicaCount`          | Maximum number of workers to scale up to       | 10
+`worker.keda.queueLength`              | # of jobs required to be in queue to scale up  | 2
+`worker.terminationGracePeriodSeconds` | Termination grace period of worker             | 21600
+
+To use worker autoscaling, KEDA (https://keda.sh) is required to be installed in cluster.
+See KEDA's deployment instructions how to deploy KEDA.
+
+Use `worker.keda.maxReplicaCount` to specify maximum number of workers to scale up to.
+
+`worker.keda.queueLength` specifies the length of job queue before scaling up. By default, BDBA starts
+scaling up when there are two jobs waiting in the queue. If you have lots of small scans, higher value
+would work better, but if you have mostly large scans, `1` would trigger new worker immediately for new scan.
+
+`worker.terminationGracePeriodSeconds` is required for scaling down. As KEDA starts to scale down when there
+are no jobs in the queue by sending termination signal to workers, BDBA workers receiving the signal will stop
+accepting new scan jobs but finishing their current scans. If scan does not finish in 
+`worker.terminationGracePeriodSeconds` it will be forcefully killed and fail. If scans fail abruptly when
+downscaling, increasing this value will help.
 
 #### Networking and security
 
