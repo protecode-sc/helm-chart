@@ -6,7 +6,10 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by usin
 ## Changes
 
 ### 2021.12.1 -> 2022.3.0
+
 * Added support for KEDA autoscaler.
+* Removed default memory limits from postgresql container to prevent abrupt termination
+  with large transactions on large nodes.
 
 ### 2021.12.0 -> 2021.12.1
 
