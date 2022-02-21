@@ -148,7 +148,7 @@ global:
 
 postgresql:
   image:
-    tag: 11.13.0-debian-10-r52
+    tag: 11.15.0-debian-10-r7
   enabled: true
   postgresqlUsername: bdba
   postgresqlPassword: CHANGEME
@@ -159,9 +159,6 @@ postgresql:
     requests:
       cpu: "250m"
       memory: "1Gi"
-    limits:
-      memory: "6Gi"
-      cpu: 4
   securityContext:
     enabled: true
 
