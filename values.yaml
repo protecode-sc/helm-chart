@@ -222,8 +222,6 @@ rabbitmq:
   resources:
     requests:
       memory: "1Gi"
-    limits:
-      memory: "2Gi"
   securityContext:
     enabled: true
 
