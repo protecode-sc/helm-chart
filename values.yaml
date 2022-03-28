@@ -118,6 +118,8 @@ fluentd:
       memory: "1Gi"
       cpu: 2
   logsBucket: bdba-logs
+  securityContext:
+    enabled: true
 
 taskslong:
   resources:

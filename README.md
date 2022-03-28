@@ -597,7 +597,8 @@ To disable security context declarations in helm charts, add the following to he
 --set minio.securityContext.enabled=false
 --set frontend.securityContext.enabled=false \
 --set worker.securityContext.enabled=false \
---set memcached.securityContext.enabled=false
+--set memcached.securityContext.enabled=false \
+--set fluentd.securityContext.enabled=false
 ```
 
 ### Airgapped installation

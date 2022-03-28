@@ -159,11 +159,13 @@ spec:
           resources:
             {{- toYaml .Values.fluentd.resources | nindent 12 }}
 
+      {{- if .Values.fluentd.securityContext.enabled }
       securityContext:
         runAsNonRoot: true
         runAsUser: 999
         runAsGroup: 999
         fsGroup: 999
+      {{- end }}
       volumes:
       - name: {{ include "bdba.fullname" . }}-fluentd-logs
         emptyDir: {}
