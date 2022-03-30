@@ -10,7 +10,7 @@ frontend:
     {}
     #  postgresqlHost: external-db.local
     #  postgresqlPort: 5432
-    #  postgresqlUser: "dbuser"
+    #  postgresqlUsername: "dbuser"
     #  postgresqlPassword: "dbpassword"
     #  postgresqlDatabase: "bdba-external"
     #  postgresqlSslMode: "require"
