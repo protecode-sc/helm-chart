@@ -8,6 +8,8 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by usin
 ### 2021.12.1 -> 2022.3.0
 
 * Added support for KEDA autoscaler.
+* Added configures ingress.class parameter to specify Ingress class.
+* Fixed fluentd container to honor disabling security contexts.
 * Removed default memory limits from postgresql container to prevent abrupt termination
   with large transactions on large nodes.
 
@@ -78,7 +80,7 @@ Before starting, you will need:
 
   * A Kubernetes cluster with:
     * storageClass that allows persistent volumes configured.
-    * NGINX Ingress Controller.
+    * NGINX Ingress Controller (not needed with OpenShift)
     * The cluster should have enough memory, preferably at least 16 gigabytes.
       A good entry level deployment, for example, would be two n1-standard
       nodes on GCP.
@@ -600,6 +602,21 @@ To disable security context declarations in helm charts, add the following to he
 --set memcached.securityContext.enabled=false \
 --set fluentd.securityContext.enabled=false
 ```
+
+Because BDBA defaults to nginx Ingress class, you also need to specify Ingress class so Openshift can
+create routes properly. To do this, use 
+
+```
+$ kubectl get ingressclass
+```
+
+to figure out proper ingressclass and add the parameter for helm installation command.
+
+```
+--set ingress.class="<ingressclass>"
+```
+
+By default, this is "openshift-default". You can also use `--set ingress.class=""` to use the default as well.
 
 ### Airgapped installation
 
