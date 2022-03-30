@@ -14,12 +14,18 @@ metadata:
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
+    {{- if .Values.ingress.class }}
+    kubernetes.io/ingress.class: {{ .Values.ingress.class }}
+    {{- end }}
+
 spec:
 {{- if .Values.ingress.tls.enabled }}
   tls:
     - hosts:
         - {{ .Values.ingress.host | quote }}
+      {{- if .Values.ingress.tls.secretName }}
       secretName: {{ .Values.ingress.tls.secretName }}
+      {{- end }}
 {{- end }}
   rules:
     - host: {{ .Values.ingress.host | quote }}
@@ -27,7 +33,7 @@ spec:
         {{- if semverCompare ">=1.19-0" .Capabilities.KubeVersion.GitVersion }}
         paths:
           - path: "/"
-            pathType: "ImplementationSpecific"
+            pathType: "Prefix"
             backend:
               service:
                 name: {{ $fullName }}-webapp

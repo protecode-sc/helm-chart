@@ -159,7 +159,7 @@ spec:
           resources:
             {{- toYaml .Values.fluentd.resources | nindent 12 }}
 
-      {{- if .Values.fluentd.securityContext.enabled }
+      {{- if .Values.fluentd.securityContext.enabled }}
       securityContext:
         runAsNonRoot: true
         runAsUser: 999

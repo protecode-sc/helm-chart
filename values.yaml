@@ -237,8 +237,9 @@ service:
 
 ingress:
   enabled: true
+  class: nginx
   annotations:
-    kubernetes.io/ingress.class: nginx
+    route.openshift.io/termination: "edge"
     nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
     nginx.ingress.kubernetes.io/proxy-body-size: "0"
 
