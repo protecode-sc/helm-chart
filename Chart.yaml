@@ -9,8 +9,8 @@ dependencies:
   repository: https://raw.githubusercontent.com/bitnami/charts/eb5f9a9513d987b519f0ecd732e7031241c50328/bitnami
   condition: postgresql.enabled
 - name: memcached
-  repository: https://charts.bitnami.com/bitnami/
-  version: "6.1.0"
+  repository: https://raw.githubusercontent.com/bitnami/charts/eb5f9a9513d987b519f0ecd732e7031241c50328/bitnami
+  version: "4.2.19"
 - name: rabbitmq
   repository: https://raw.githubusercontent.com/bitnami/charts/eb5f9a9513d987b519f0ecd732e7031241c50328/bitnami
   version: "6.18.2"
