@@ -9,6 +9,7 @@ metadata:
 data:
   {{- if .Values.httpProxy }}
   HTTP_PROXY: {{ .Values.httpProxy | quote }}
+  HTTPS_PROXY: {{ .Values.httpProxy | quote }}
   {{- end }}
   {{- if .Values.httpNoProxy }}
   NO_PROXY: {{ .Values.httpNoProxy | quote }}
