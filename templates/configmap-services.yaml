@@ -17,7 +17,7 @@ data:
   {{- else }}
   PGUSER: {{ .Values.frontend.database.postgresqlUsername }}
   {{- if .Values.frontend.database.postgresqlPort }}
-  PGPORT: {{ .Values.frontend.database.postgresqlPort }}
+  PGPORT: {{ .Values.frontend.database.postgresqlPort | quote }}
   {{- end }}
   PGDATABASE: {{ .Values.frontend.database.postgresqlDatabase }}
   PGHOST: {{ .Values.frontend.database.postgresqlHost }}

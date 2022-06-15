@@ -7,7 +7,7 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by usin
 
 ### 2022.3.0 -> 2022.6.0
 * httpProxy configuration value sets also HTTPS proxy.
-
+  
 ### 2021.12.1 -> 2022.3.0
 
 * Added support for KEDA autoscaler.
