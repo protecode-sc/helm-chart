@@ -4,7 +4,7 @@
 
 frontend:
   repository: docker.io/sigsynopsys/bdba-frontend
-  tag: 2022.3.1
+  tag: 2022.6.0
   pullPolicy: IfNotPresent
   database:
     {}
@@ -91,7 +91,7 @@ worker:
   replicas: 1
   concurrency: 1
   repository: docker.io/sigsynopsys/bdba-worker
-  tag: 2022.3.1
+  tag: 2022.6.0
   pullPolicy: IfNotPresent
   applicationLogging:
     enabled: true
@@ -108,7 +108,7 @@ worker:
 
 fluentd:
   repository: docker.io/sigsynopsys/bdba-fluentd
-  tag: 2022.3.0
+  tag: 2022.6.0
   pullPolicy: IfNotPresent
   resources:
     requests:
@@ -150,7 +150,7 @@ global:
 
 postgresql:
   image:
-    tag: 11.15.0-debian-10-r7
+    tag: 11.16.0-debian-10-r19
   enabled: true
   postgresqlUsername: bdba
   postgresqlPassword: CHANGEME
@@ -166,7 +166,7 @@ postgresql:
 
 memcached:
   image:
-    tag: 1.6.12-debian-10-r6
+    tag: 1.6.15-debian-10-r60
   replicaCount: 1
   pdbMinAvailable: 1
   resources:
@@ -198,7 +198,7 @@ minio:
 
 rabbitmq:
   image:
-    tag: 3.8.23-debian-10-r9
+    tag: 3.8.33-debian-10-r1
   rabbitmq:
     username: bdba
     existingPasswordSecret: bdba-rabbitmq-password-secret

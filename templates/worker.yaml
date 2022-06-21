@@ -130,6 +130,11 @@ spec:
                 configMapKeyRef:
                   name: {{ include "bdba.fullname" . }}-user-configmap
                   key: HTTP_PROXY
+            - name: HTTPS_PROXY
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "bdba.fullname" . }}-user-configmap
+                  key: HTTP_PROXY
             {{- end }}
             {{- if .Values.httpNoProxy }}
             - name: NO_PROXY

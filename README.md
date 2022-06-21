@@ -5,6 +5,9 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by usin
 
 ## Changes
 
+### 2022.3.0 -> 2022.6.0
+* httpProxy configuration value sets also HTTPS proxy.
+  
 ### 2021.12.1 -> 2022.3.0
 
 * Added support for KEDA autoscaler.
@@ -86,29 +89,18 @@ Before starting, you will need:
       nodes on GCP.
   * Helm 3
 
-### Download chart dependencies
+### Install Synopsys repo
 
-To download the chart dependencies, which include **postgresql**, **minio**, **memcached**, and **rabbitmq**:
-
-```console
-$ helm dependency update
-Hang tight while we grab the latest from your chart repositories...
-...Successfully got an update from the "stable" chart repository
-Update Complete. ⎈Happy Helming!⎈
-Saving 4 charts
-Downloading postgresql from repo https://kubernetes-charts.storage.googleapis.com/
-Downloading minio from repo https://kubernetes-charts.storage.googleapis.com/
-Downloading memcached from repo https://kubernetes-charts.storage.googleapis.com/
-Downloading rabbitmq from repo https://kubernetes-charts.storage.googleapis.com/
-Deleting outdated charts
+``` console
+$ helm repo add synopsys https://sig-repo.synopsys.com/artifactory/sig-cloudnative
 ```
 
-### Installing the chart
+### Install the chart
 
 To install the chart with the release name `testing`:
 
 ```console
-$ helm upgrade testing . --install --namespace bdba
+$ helm upgrade testing synopsys/bdba --install --namespace bdba
 Release "testing" does not exist. Installing it now.
 NAME: testing
 LAST DEPLOYED: Sun Feb 16 10:50:15 2020
@@ -408,7 +400,7 @@ secret/bdba-tls created
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example:
 
 ```console
-$ helm upgrade testing . --install \
+$ helm upgrade testing synopsys/bdba --install \
    --set frontend.licensing.username="foo@example.com" \
    --set frontend.licensing.password="secret" .
 ```
@@ -416,7 +408,7 @@ $ helm upgrade testing . --install \
 Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example:
 
 ```console
-$ helm upgrade testing . --install -f my-values.yaml
+$ helm upgrade testing synopsys/bdba --install -f my-values.yaml
 #
 ```
 
