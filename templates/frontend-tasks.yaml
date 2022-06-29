@@ -87,10 +87,10 @@ spec:
             exec:
               command: ["sh", "-c", "/srv/venv/appcheck-frontend/bin/celery -b $(printf $BROKER_URL $BROKER_PASSWORD) -q inspect -d celery@frontend-worker.$(hostname) --timeout 10 ping" ]
             initialDelaySeconds: 15
-            periodSeconds: 30
+            periodSeconds: 60
             successThreshold: 1
-            failureThreshold: 3
-            timeoutSeconds: 10
+            failureThreshold: 5
+            timeoutSeconds: 30
           resources:
             {{- toYaml .Values.tasks.resources | nindent 12 }}
           {{- include "bdba.frontendenv" . | nindent 10 }}

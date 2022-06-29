@@ -65,6 +65,8 @@ spec:
         - name: {{ .Chart.Name }}-updater-init
           image: "{{ .Values.frontend.repository }}:{{ .Values.frontend.tag }}"
           imagePullPolicy: {{ .Values.frontend.pullPolicy }}
+          resources:
+            {{- toYaml .Values.updater.resources | nindent 12 }}
           args: [ "init"]
           {{- include "bdba.frontendenv" . | nindent 10 }}
           volumeMounts:
@@ -87,10 +89,10 @@ spec:
             exec:
               command: ["/scripts/probe-updater"]
             initialDelaySeconds: 30
-            periodSeconds: 30
+            periodSeconds: 60
             successThreshold: 1
             failureThreshold: 5
-            timeoutSeconds: 10
+            timeoutSeconds: 30
           securityContext:
             readOnlyRootFilesystem: true
           resources:

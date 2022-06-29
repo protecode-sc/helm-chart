@@ -36,14 +36,18 @@ spec:
               - /tmp/celerybeat.pid
             initialDelaySeconds: 5
             periodSeconds: 5
+            successThreshold: 1
+            failureThreshold: 5
           livenessProbe:
             exec:
               command:
               - cat
               - /tmp/celerybeat.pid
             initialDelaySeconds: 5
-            periodSeconds: 5
-            timeoutSeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 30
+            successThreshold: 1
+            failureThreshold: 5
           {{- include "bdba.frontendenv" . | nindent 10 }}
           volumeMounts:
           {{- include "bdba.frontendmounts" . | indent 12 }}

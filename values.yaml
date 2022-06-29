@@ -116,7 +116,7 @@ fluentd:
       cpu: "200m"
     limits:
       memory: "1Gi"
-      cpu: 2
+      cpu: 1
   logsBucket: bdba-logs
   securityContext:
     enabled: true
@@ -128,7 +128,7 @@ taskslong:
       cpu: "250m"
     limits:
       memory: "4Gi"
-      cpu: 2
+      cpu: 1
 
 tasks:
   resources:
@@ -137,7 +137,7 @@ tasks:
       cpu: "250m"
     limits:
       memory: "4Gi"
-      cpu: 4
+      cpu: 3
 
 fluentbit:
   repository: fluent/fluent-bit
@@ -161,6 +161,9 @@ postgresql:
     requests:
       cpu: "250m"
       memory: "1Gi"
+    # limits:
+      # cpu:
+      # memory 
   securityContext:
     enabled: true
 
@@ -174,6 +177,7 @@ memcached:
       cpu: "250m"
       memory: "256Mi"
     limits:
+      cpu: 1
       memory: "1Gi"
   securityContext:
     enabled: true
@@ -195,6 +199,13 @@ minio:
   existingSecret: bdba-minio-secret
   securityContext:
     enabled: true
+  resources:
+    requests:
+      cpu: "250m"
+      memory: "256Mi"
+#    limits:
+#      cpu:
+#      memory:
 
 rabbitmq:
   image:
@@ -224,6 +235,11 @@ rabbitmq:
   resources:
     requests:
       memory: "1Gi"
+      cpu: 100m
+#   limits:
+#      memory: "1Gi"
+#      cpu: 100m
+
   securityContext:
     enabled: true
 

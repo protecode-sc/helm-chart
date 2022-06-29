@@ -101,9 +101,7 @@ spec:
             successThreshold: 1
             failureThreshold: 3
           resources:
-            requests:
-              memory: "256Mi"
-              cpu: "250m"
+            {{- toYaml .Values.minio.resources | nindent 12 }}
       volumes:
         - name: export
         {{- if .Values.minio.persistence.enabled }}
