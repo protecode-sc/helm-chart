@@ -5,6 +5,10 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by usin
 
 ## Changes
 
+### 2022.6.0 -> 2022.6.1
+* minio and updater initContainer now honor resource requests and limits from values.yaml.
+* Increased healthcheck timeouts and retries of background workers.
+
 ### 2022.3.0 -> 2022.6.0
 * httpProxy configuration value sets also HTTPS proxy.
   
@@ -55,6 +59,20 @@ BDBA should run on fine on any public cloud provider supporting Kubernetes. Node
 BDBA also has been tested on local Kubernetes deployment deployed with kubespray.
 
 Supported Kubernetes versions are 1.19 and later.
+
+### Cluster configuration notes
+
+Some Kubernetes clusters are configured with "Quaranteed QOS", which essentially means that resource limits behave like resource requests.
+With "Queranteed QOS" pods won't be scheduled if nodes are not able to satisfy both CPU and memory limits. 
+In those cases the minimum resource requirements are higher. This helm chart does not specify hard limits for PostgreSQL, RabbitMQ and Minio due to them
+being essential services and having them terminated by exceeding resource limits would be catastrophic. As a rule of thumb, the cluster should have at least
+
+* 6 cores for BDBA pods
+* 4 cores for PostgreSQL, Minio, Rabbitmq and Memcached.
+
+Also a cluster may specify default "LimitRanges" to override limits in case limits are not specified for pod. In this case, resources should be
+adjusted accordingly in values.yaml. Running PostgreSQL in this kind of setup would be dangerous and it is recommended to use PostgreSQL that
+is not running inside the cluster if this is the case.
 
 ### Azure Notes
 
