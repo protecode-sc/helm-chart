@@ -8,6 +8,7 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by usin
 ### 2022.6.0 -> 2022.6.1
 * minio and updater initContainer now honor resource requests and limits from values.yaml.
 * Increased healthcheck timeouts and retries of background workers.
+* API now has default connection limit of 8 per IP. You can change it with `ingress.apiConnLimit`.
 
 ### 2022.3.0 -> 2022.6.0
 * httpProxy configuration value sets also HTTPS proxy.
@@ -399,12 +400,13 @@ Possible values from postgresqlSslMode are specified in https://www.postgresql.o
 
 #### Ingress
 
-Parameter                | Description                  | Default
------------------------- | ---------------------------- | --------------------
-`ingress.enabled`        | Enable ingress.              | true
-`ingress.host`           | Hostname for ingress.        | "bdba.local"
-`ingress.tls.enabled`    | Enable TLS.                  | false
-`ingress.tls.secretName` | TLS secret for certificate.  | bdba-tls
+Parameter                | Description                        | Default
+------------------------ | ---------------------------------- | --------------------
+`ingress.enabled`        | Enable ingress.                    | true
+`ingress.host`           | Hostname for ingress.              | "bdba.local"
+`ingress.tls.enabled`    | Enable TLS.                        | false
+`ingress.tls.secretName` | TLS secret for certificate.        | bdba-tls
+`ingress.apiConnLimit`   | Concurrent API connections per ip. | 8
 
 To create a TLS secret, invoke:
 

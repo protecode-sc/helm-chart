@@ -46,4 +46,51 @@ spec:
               serviceName: {{ $fullName }}-webapp
               servicePort: 8000
         {{- end }}
+---
+{{- if semverCompare ">=1.19-0" .Capabilities.KubeVersion.GitVersion -}}
+apiVersion: networking.k8s.io/v1
+{{- else }}
+apiVersion: networking.k8s.io/v1beta1
+{{- end }}
+kind: Ingress
+metadata:
+  name: {{ $fullName }}-api
+  labels:
+{{ include "bdba.labels" . | indent 4 }}
+  {{- with .Values.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
   {{- end }}
+    nginx.ingress.kubernetes.io/limit-connections: {{ .Values.ingress.apiConnLimit | quote }}
+    {{- if .Values.ingress.class }}
+    kubernetes.io/ingress.class: {{ .Values.ingress.class }}
+    {{- end }}
+spec:
+{{- if .Values.ingress.tls.enabled }}
+  tls:
+    - hosts:
+        - {{ .Values.ingress.host | quote }}
+      {{- if .Values.ingress.tls.secretName }}
+      secretName: {{ .Values.ingress.tls.secretName }}
+      {{- end }}
+{{- end }}
+  rules:
+    - host: {{ .Values.ingress.host | quote }}
+      http:
+        {{- if semverCompare ">=1.19-0" .Capabilities.KubeVersion.GitVersion }}
+        paths:
+          - path: "/api/"
+            pathType: "Prefix"
+            backend:
+              service:
+                name: {{ $fullName }}-webapp
+                port:
+                  number: 8000
+        {{- else }}
+        paths:
+          - path: "/"
+            backend:
+              serviceName: {{ $fullName }}-webapp
+              servicePort: 8000
+        {{- end }}
+{{- end }}

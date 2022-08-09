@@ -258,7 +258,7 @@ ingress:
     route.openshift.io/termination: "edge"
     nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
     nginx.ingress.kubernetes.io/proxy-body-size: "0"
-
+  apiConnLimit: 8
   host: "bdba.local"
 
   tls:
