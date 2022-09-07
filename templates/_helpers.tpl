@@ -24,6 +24,20 @@ If release name contains chart name it will be used as a full name.
 {{- end -}}
 {{- end -}}
 
+{{ define "bdba.rootURL" -}}
+{{- if .Values.frontend.web.rootURL -}}
+{{- printf "%s" .Values.frontend.web.rootURL -}}
+{{- else -}}
+{{- if .Values.ingress.enabled -}}
+{{- if .Values.ingress.tls.enabled -}}
+{{- printf "https://%s" .Values.ingress.host -}}
+{{- else -}}
+{{- printf "http://%s" .Values.ingress.host -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
 {{/*
 Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).

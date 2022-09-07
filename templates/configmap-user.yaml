@@ -25,7 +25,7 @@ data:
   {{- end }}
   HIDE_LICENSES: {{ .Values.frontend.web.hideLicenses | quote }}
   DATA_UPDATE_UPSTREAM: {{ .Values.frontend.licensing.upstream | quote }}
-  ROOTURL: {{ .Values.frontend.web.rootURL | quote }}
+  ROOTURL: {{ template "bdba.rootURL" . }}
   {{- if .Values.frontend.applicationLogging.enabled }}
   APP_LOG_FILE: "/app-log/app.log"
   {{- end }}

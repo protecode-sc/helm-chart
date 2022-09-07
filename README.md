@@ -251,7 +251,10 @@ Parameter                       | Description                             | Defa
 `frontend.web.offlineMode`      | Do not make network request to internet | false
 `frontend.web.admin`            | Administrator user's email address.     | "admin@bdba.local"
 `frontend.web.erroradmin`       | Error report email receiver.            | ""
-`frontend.web.rootURL`          | Root URL of web service for emails.     | "http://bdba.local"
+`frontend.web.rootURL`          | Root URL of web service for emails.     | ""
+
+`frontend.web.rootURL` is only necessary if it differs from `ingress.host` and `ingress.tls` values. 
+By default, URL of the BDBA service is inferred from values specified for Ingress.
 
 #### SMTP configuration
 

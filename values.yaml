@@ -21,7 +21,7 @@ frontend:
     hideLicenses: false
     replicas: 1
     admin: "admin@bdba.local"
-    rootURL: "http://bdba.local"
+    # rootURL: "http://bdba.local"
   email:
     enabled: false
     from: "noreply@bdba.local"
