@@ -337,6 +337,7 @@ StatefulSets. Each worker pod reserves it's own workspace from persistent volume
 Parameter                              | Description                                    | Default
 -------------------------------------- | -----------------------------------------------|----------
 `worker.keda.enabled`                  | Use KEDA autoscaler (requires KEDA in cluster) | false
+`worker.keda.minReplicaCount`          | Minimum number of workers to scale down to     | 1
 `worker.keda.maxReplicaCount`          | Maximum number of workers to scale up to       | 10
 `worker.keda.queueLength`              | # of jobs required to be in queue to scale up  | 2
 `worker.terminationGracePeriodSeconds` | Termination grace period of worker             | 21600

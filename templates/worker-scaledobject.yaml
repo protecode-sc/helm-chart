@@ -10,7 +10,7 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: {{ include "bdba.fullname" . }}-worker
-  minReplicaCount: 1
+  minReplicaCount: {{ .Values.worker.keda.minReplicaCount | default "1" }}
   maxReplicaCount: {{ .Values.worker.keda.maxReplicaCount }}
   triggers:
   - type: rabbitmq

@@ -103,6 +103,7 @@ worker:
   terminationGracePeriodSeconds: 21600
   keda:
     enabled: false
+    minReplicaCount: 1
     maxReplicaCount: 10
     queueLength: 2
 
