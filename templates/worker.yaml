@@ -160,6 +160,11 @@ spec:
             {{- end }}
             - name: {{ include "bdba.fullname" . }}-worker-var-tmp
               mountPath: /var/tmp
+            {{- if .Values.rootCASecret }}
+            - name: ca-store
+              mountPath: /usr/local/share/ca-certificates/appcheck/
+              readOnly: true
+            {{- end }}
           securityContext:
             readOnlyRootFilesystem: true
         {{- if .Values.worker.applicationLogging.enabled }}
@@ -189,6 +194,11 @@ spec:
       {{- end }}
       - name: {{ include "bdba.fullname" . }}-worker-var-tmp
         emptyDir: {}
+      {{- if .Values.rootCASecret }}
+      - name: ca-store
+        secret:
+          secretName: {{ .Values.rootCASecret }}
+      {{- end }}
       {{- if .Values.worker.applicationLogging.enabled }}
       - name: {{ include "bdba.fullname" . }}-worker-fluentbit-config
         configMap:
