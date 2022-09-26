@@ -85,6 +85,7 @@ spec:
             periodSeconds: 30
             successThreshold: 1
             failureThreshold: 5
+            timeoutSeconds: 35
           livenessProbe:
             exec:
               command: ["/scripts/probe-updater"]
@@ -92,7 +93,7 @@ spec:
             periodSeconds: 60
             successThreshold: 1
             failureThreshold: 5
-            timeoutSeconds: 30
+            timeoutSeconds: 35
           securityContext:
             readOnlyRootFilesystem: true
           resources:
