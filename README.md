@@ -468,7 +468,7 @@ $ curl -X POST -u admin "https://<APPLIANCE>/api/backup/"
 Next, Query until the backup is ready.
 
 ```console
-$ curl -X POST -u admin "https://<APPLIANCE>/api/backup/"|jq
+$ curl -u admin "https://<APPLIANCE>/api/backup/"|jq
 {
   "meta": {
     "code": 200
