@@ -87,7 +87,7 @@ spec:
             periodSeconds: 30
             successThreshold: 1
             failureThreshold: 3
-            timeoutSeconds: 10
+            timeoutSeconds: 35
           livenessProbe:
             exec:
               command: ["/docker-healthcheck.sh" ]
@@ -95,7 +95,7 @@ spec:
             periodSeconds: 30
             successThreshold: 1
             failureThreshold: 3
-            timeoutSeconds: 10
+            timeoutSeconds: 35
           resources:
             requests:
               cpu: {{ mul .Values.worker.concurrency 250 }}m

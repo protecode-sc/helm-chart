@@ -83,7 +83,7 @@ spec:
             periodSeconds: 30
             successThreshold: 1
             failureThreshold: 3
-            timeoutSeconds: 30
+            timeoutSeconds: 35
           livenessProbe:
             exec:
               command: ["sh", "-c", "/srv/venv/appcheck-frontend/bin/celery -b $(printf $BROKER_URL $BROKER_PASSWORD) -q inspect -d celery@frontend-long.$(hostname) --timeout 30 ping", ]
@@ -91,7 +91,7 @@ spec:
             periodSeconds: 60
             successThreshold: 1
             failureThreshold: 3
-            timeoutSeconds: 30
+            timeoutSeconds: 35
           {{- include "bdba.frontendenv" . | nindent 10 }}
           volumeMounts:
           {{- include "bdba.frontendmounts" . | indent 12 }}
