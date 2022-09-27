@@ -5,10 +5,11 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by usin
 
 ## Changes
 
-### 2022.6.0 -> 2022.6.1
+### 2022.6.0 -> 2022.9.0
 * minio and updater initContainer now honor resource requests and limits from values.yaml.
 * Increased healthcheck timeouts and retries of background workers.
 * API now has default connection limit of 8 per IP. You can change it with `ingress.apiConnLimit`.
+* `frontend.web.rootUrl` is now automatically inferred from ingress if not explicitly specified.
 
 ### 2022.3.0 -> 2022.6.0
 * httpProxy configuration value sets also HTTPS proxy.
@@ -40,7 +41,7 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by usin
   using ephemeral storage.
 * Added requests and limits for containers that were missing them.
 
-### 2016.03 -> 2021.06
+### 2021.03 -> 2021.06
 
 * Changed Ingress networking API to networking.k8s.io/v1beta1.
 * Pods are now run with readOnlyRootFilesystem, improving security
