@@ -61,7 +61,9 @@ metadata:
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
+    {{- if .Values.ingress.apiConnLimit }}
     nginx.ingress.kubernetes.io/limit-connections: {{ .Values.ingress.apiConnLimit | quote }}
+    {{- end }}
     {{- if .Values.ingress.class }}
     kubernetes.io/ingress.class: {{ .Values.ingress.class }}
     {{- end }}
