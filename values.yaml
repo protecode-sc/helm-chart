@@ -4,7 +4,7 @@
 
 frontend:
   repository: docker.io/sigsynopsys/bdba-frontend
-  tag: 2022.9.0
+  tag: 2022.9.1
   pullPolicy: IfNotPresent
   database:
     {}
@@ -109,7 +109,7 @@ worker:
 
 fluentd:
   repository: docker.io/sigsynopsys/bdba-fluentd
-  tag: 2022.9.0
+  tag: 2022.9.1
   pullPolicy: IfNotPresent
   resources:
     requests:
