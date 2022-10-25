@@ -5,6 +5,14 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by usin
 
 ## Changes
 
+### 2022.9.1 -> 2022.9.2
+* Frontend update to 2022.9.1
+  * More aggressive garbage collection to prevent OOM situations caused by frequent calls to /api/product/.
+
+### 2022.9.0 -> 2022.9.1
+* Worker update to 2022.9.1
+  * Fixes scanning regressions with Windows installers
+
 ### 2022.6.0 -> 2022.9.0
 * minio and updater initContainer now honor resource requests and limits from values.yaml.
 * Increased healthcheck timeouts and retries of background workers.
