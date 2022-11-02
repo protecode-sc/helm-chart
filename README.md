@@ -5,6 +5,10 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by usin
 
 ## Changes
 
+### 2022.9.2 -> 2022.9.3
+* Worker update to 2022.9.2
+  * Replaces OpenSSL 3.x with OpenSSL 1.1.x, resolving CVE-2022-3602 and CVE-2022-3786.
+
 ### 2022.9.1 -> 2022.9.2
 * Frontend update to 2022.9.1
   * More aggressive garbage collection to prevent OOM situations caused by frequent calls to /api/product/.
