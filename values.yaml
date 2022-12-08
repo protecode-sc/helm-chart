@@ -22,6 +22,7 @@ frontend:
     replicas: 1
     admin: "admin@bdba.local"
     # rootURL: "http://bdba.local"
+    vacuumDays: "sunday"
   email:
     enabled: false
     from: "noreply@bdba.local"

@@ -5,6 +5,10 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by usin
 
 ## Changes
 
+### 2022.9.3 -> 2022.12.0
+* Updated postgresql, rabbitmq and memcached images
+* Added `frontend.vacuumDays` variable to specify days when DB is vacuumed.
+
 ### 2022.9.2 -> 2022.9.3
 * Worker update to 2022.9.2
   * Replaces OpenSSL 3.x with OpenSSL 1.1.x, resolving CVE-2022-3602 and CVE-2022-3786.
@@ -265,9 +269,14 @@ Parameter                       | Description                             | Defa
 `frontend.web.admin`            | Administrator user's email address.     | "admin@bdba.local"
 `frontend.web.erroradmin`       | Error report email receiver.            | ""
 `frontend.web.rootURL`          | Root URL of web service for emails.     | ""
+`frontend.web.vacuumDays`       | Days when to force vacuum the db.       | "sunday"
 
 `frontend.web.rootURL` is only necessary if it differs from `ingress.host` and `ingress.tls` values. 
 By default, URL of the BDBA service is inferred from values specified for Ingress.
+
+`frontend.web.vacuumDays` accepts days in quite liberal crontab-format. Examples are
+`sunday`, to vacuum only on sunday, `mon,wed,fri,sun` to vacuum on monday, wednesday, friday and sunday
+and `mon-sun` to vacuum daily.
 
 #### SMTP configuration
 
