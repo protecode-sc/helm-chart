@@ -5,9 +5,12 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by usin
 
 ## Changes
 
+### 2022.12.0 -> 2022.12.1
+* Fixes configmap for vacuumDays
+
 ### 2022.9.3 -> 2022.12.0
 * Updated postgresql, rabbitmq and memcached images
-* Added `frontend.vacuumDays` variable to specify days when DB is vacuumed.
+* Added `frontend.web.vacuumDays` variable to specify days when DB is vacuumed.
 
 ### 2022.9.2 -> 2022.9.3
 * Worker update to 2022.9.2
