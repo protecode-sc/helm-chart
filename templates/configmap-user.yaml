@@ -103,7 +103,7 @@ data:
   {{- if .Values.frontend.ldap.userEmailMatch }}
   LDAP_USER_EMAIL_MATCH: {{ .Values.frontend.ldap.userEmailMatch | quote }}
   {{- end }}
+  {{- end }}
   {{- if .Values.frontend.web.vacuumDays }}
   VACUUM_DAYS: {{ .Values.frontend.web.vacuumDays | quote }}
-  {{- end }}
   {{- end }}
