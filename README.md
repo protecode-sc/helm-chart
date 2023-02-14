@@ -685,8 +685,8 @@ $ curl -T vulndata.tar.xz -u admin:<adminpw> https://<bdba-k8s-ingress>/api/boot
 
 #### Populating component information
 
-After each software update, also supplemental information about components should be .
-This should be done also with first installation in addition to populating the database.
+After each software update, also supplemental information about components should be populated into database.
+This should be done also with first installation in addition to populating the database with vulnerability data.
 
 To achieve this, download data from `https://protecode-sc.com/updates/bootstrap/`. It will return
 `protecode-sc-bootstrap-YYYYMMDD-hhmmss.dat`.
