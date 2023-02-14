@@ -683,6 +683,20 @@ uploading it to
 $ curl -T vulndata.tar.xz -u admin:<adminpw> https://<bdba-k8s-ingress>/api/bootstrap/
 ```
 
+#### Populating component information
+
+After each software update, also supplemental information about components should be .
+This should be done also with first installation in addition to populating the database.
+
+To achieve this, download data from `https://protecode-sc.com/updates/bootstrap/`. It will return
+`protecode-sc-bootstrap-YYYYMMDD-hhmmss.dat`.
+
+To update the database, push it to `http(s)://<ingress-host-name>/api/nvd/`, for example using curl:
+
+```
+$ curl -T protecode-sc-bootstrap-YYYYMMDD-hhmmss.dat -u admin:<adminpw> https://<bdba-k8s-ingress>/api/nvd/
+```
+
 #### Keeping database up-to-date
 
 Similarly, to keep database up-to-date, you can download data from
@@ -694,3 +708,5 @@ To update database, push it to `http(s)://<ingress-host-name>/api/nvd/`, for exa
 $ curl -T appcheck-dataupdate-20210601-145434.dat -u admin:<adminpw> https://<bdba-k8s-ingress>/api/nvd/
 ```
 
+The difference with this file to `protecode-sc-bootstrap`-file is that it contains only delta of seven days and it
+is faster to apply.
