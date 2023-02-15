@@ -81,7 +81,7 @@ BDBA also has been tested on local Kubernetes deployment deployed with kubespray
 
 Supported Kubernetes versions are 1.19 and later.
 
-### Cluster configuration notes
+### Cluster Configuration Notes
 
 Some Kubernetes clusters are configured with "Quaranteed QOS", which essentially means that resource limits behave like resource requests.
 With "Queranteed QOS" pods won't be scheduled if nodes are not able to satisfy both CPU and memory limits. 
@@ -103,7 +103,7 @@ Standard_DS2_v2 instances do not have enough free memory available for BDBA.
 If monitoring is needed, minimum instance size is Standard_DS3_v2. In that
 case node count can be decreased to 2.
 
-## Deploying Black Duck Binary Analysis using the synopsysctl
+## Deploying Black Duck Binary Analysis Using synopsysctl
 
 The following steps describe a high-level overview of the steps required to install BDBA in a Kubernetes cluster.
 
@@ -111,7 +111,7 @@ The following steps describe a high-level overview of the steps required to inst
 2. Create and configure the [Kubernetes cluster](https://synopsys.atlassian.net/wiki/spaces/BDLM/pages/414089277/Preparing+the+Environment), and prepare your environment to install BDBA.
 3. Download [synopsysctl](https://synopsys.atlassian.net/wiki/spaces/BDLM/pages/417234971/Getting+Started+with+Synopsysctl+CLI) and install BDBA.
 
-## Deploying Black Duck Binary Analysis using the Helm package manager
+## Deploying Black Duck Binary Analysis Using the Helm Package Manager
 
 This chart bootstraps Black Duck Binary Analysis deployment on a Kubernetes cluster
 using the Helm package manager.
@@ -128,13 +128,13 @@ Before starting, you will need:
       nodes on GCP.
   * Helm 3
 
-### Install Synopsys repo
+### Install Synopsys Repo
 
 ``` console
 $ helm repo add synopsys https://sig-repo.synopsys.com/artifactory/sig-cloudnative
 ```
 
-### Install the chart
+### Install the Chart
 
 To install the chart with the release name `testing`:
 
@@ -157,12 +157,12 @@ NOTES:
 This section shows an example of how you can configure a Black Duck Binary Analysis instance. It's split into multiple
 sections for clarity.
 
-#### Secrets for services
+#### Secrets for Services
 
 Black Duck Binary Analysis Helm chart uses PostgreSQL. Secrets for other services are automatically provisioned,
 but for PostgreSQL you need to enter the password manually.
 
-##### PostgreSQL secrets
+##### PostgreSQL Secrets
 
 If you use a bundled PostgreSQL database, it is recommended to configure a password
 for PostgreSQL. During the initial installation, a PostgreSQL database is created with that specific
@@ -206,7 +206,7 @@ Parameter                              | Description                          | 
 `rabbitmq.persistence.size`            | Size of RabbitMQ claim.              | 8Gi
 `rabbitmq.persistence.existingClaim`   | Existing claim to use for RabbitMQ.  | ""
 
-#### Alternative object storages
+#### Alternative Object Storages
 
 Black Duck Binary Analysis by default uses minio for storing data to persistent
 volumes. However, Minio can be replaced with any S3-compatible object storage,
@@ -249,7 +249,7 @@ Parameter                     | Description                      | Default
 `frontend.licensing.password` | Password for licensing server.   | ""
 `frontend.licensing.upstream` | Upstream server for data updates.| "https://protecode-sc.com"
 
-#### RabbitMQ configuration
+#### RabbitMQ Configuration
 
 RabbitMQ requires to know the cluster's domain name. If it is not `cluster.local`,
 you need to provide it.
@@ -258,7 +258,7 @@ Parameter                                 | Description                 | Defaul
 ----------------------------------------- | --------------------------- | ----------------
 `rabbitmq.rabbitmq.clustering.k8s_domain` | Internal k8s cluster domain.| cluster.local
 
-#### Web frontend configuration
+#### Web Frontend Configuration
 
 Generic configuration options for customization of frontend behavior.
 
@@ -281,7 +281,7 @@ By default, URL of the BDBA service is inferred from values specified for Ingres
 `sunday`, to vacuum only on sunday, `mon,wed,fri,sun` to vacuum on monday, wednesday, friday and sunday
 and `mon-sun` to vacuum daily.
 
-#### SMTP configuration
+#### SMTP Configuration
 
 Black Duck Binary Analysis can send emails, for example, to invite new users or to send vulnerability
 notifications.
@@ -341,7 +341,7 @@ Parameter                     | Description                                     
 `worker.applicationLogging`   | Enable application logging for worker pods.      | true
 `logRetention`                | Days to keep the application logs (0 to disable) | 30
 
-#### Worker scaling
+#### Worker Scaling
 
 Parameter             | Description                                                     | Default
 --------------------- | ----------------------------------------------------------------|------------------------
@@ -382,7 +382,7 @@ accepting new scan jobs but finishing their current scans. If scan does not fini
 `worker.terminationGracePeriodSeconds` it will be forcefully killed and fail. If scans fail abruptly when
 downscaling, increasing this value will help.
 
-#### Networking and security
+#### Networking and Security
 
 Parameter       | Description                   | Default
 --------------- | ----------------------------- | -----------------------
@@ -477,12 +477,12 @@ secret/bdba-root created
 
 To use this as the root certificate, add `--set rootCASecret=bdba-root` to the Helm command line.
 
-### Migration from an existing appliance
+### Migration from an Existing Appliance
 
 To migrate data from an existing VM-based appliance, backup API of the appliance
 can be used to perform data acquisition.
 
-#### Acquiring backup
+#### Acquiring Backup
 
 First, run:
 
@@ -528,7 +528,7 @@ $ tar xvf backup.pgdump
 x database.pgdump
 ```
 
-#### Stopping services accessing the database
+#### Stopping Services Accessing the Database
 
 Next, you need to stop deployments that access the database. These deployments are:
 
@@ -547,12 +547,12 @@ $ kubectl scale --replicas=0 deployment/NAME-bdba-webapp
 ```
 
 
-#### Preparing the database for pg_restore
+#### Preparing the Database for pg_restore
 
 Before Black Duck Binary Analysis database can be restored, it is required to clean up tables found in the
 database.
 
-##### Internal postgresql
+##### Internal Postgresql
 
 Kubectl into the database container and run:
 
@@ -593,7 +593,7 @@ This will empty the database, but authentication credentials are kept intact.
 
 Exit the db shell with `^D` to proceed.
 
-#### Overwriting the database with a backup
+#### Overwriting the Database with a Backup
 
 Copy the database dump to the PostgreSQL pod.
 
@@ -607,7 +607,7 @@ Next, restore the database. In the PostgreSQL pod, execute:
 $ pg_restore -c -C -Fc -h localhost -U <database-username> -d <database-name> -n public -O </tmp/database.pgdump
 ```
 
-##### Restoring the database on hosted PostgreSQL
+##### Restoring the Database on Hosted PostgreSQL
 
 When using hosted PostgreSQL, database can be restored by piping the database dump to pg_restore.
 
@@ -615,7 +615,7 @@ When using hosted PostgreSQL, database can be restored by piping the database du
 kubectl run -i --env="PGPASSWORD=<database-password>" --rm --image=postgres --restart=Never --command=true psqlshell -- pg_restore -h <database-host> -U <database-username> --verbose -j 1 -Fc -n public -O -d <database-name> <database.pgdump
 ```
 
-#### Restoring the services
+#### Restoring the Services
 
 Next, restore the services:
 
@@ -659,11 +659,11 @@ to figure out proper ingressclass and add the parameter for helm installation co
 
 By default, this is "openshift-default". You can also use `--set ingress.class=""` to use the default as well.
 
-### Airgapped installation
+### Airgapped Installation
 
 BDBA Kubernetes can operate in airgapped mode. However, it needs manual work to be kept up-to-date.
 
-#### Populating database
+#### Populating Database
 
 By default, when BDBA is given licensing username and password, it is able to fetch
 data updates from https://protecode-sc.com/. However, when installation is airgapped, this
@@ -683,7 +683,7 @@ uploading it to
 $ curl -T vulndata.tar.xz -u admin:<adminpw> https://<bdba-k8s-ingress>/api/bootstrap/
 ```
 
-#### Populating component information
+#### Populating Component Information
 
 After each software update, also supplemental information about components should be populated into database.
 This should be done also with first installation in addition to populating the database with vulnerability data.
@@ -697,7 +697,7 @@ To update the database, push it to `http(s)://<ingress-host-name>/api/nvd/`, for
 $ curl -T protecode-sc-bootstrap-YYYYMMDD-hhmmss.dat -u admin:<adminpw> https://<bdba-k8s-ingress>/api/nvd/
 ```
 
-#### Keeping database up-to-date
+#### Keeping the Database Up-To-Date
 
 Similarly, to keep database up-to-date, you can download data from
 `https://protecode-sc.com/updates/`. It will return `appcheck-dataupdate-YYYYMMDD-hhmmss.dat`.
