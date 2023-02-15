@@ -12,7 +12,7 @@ spec:
     - "ReadWriteOnce"
   resources:
     requests:
-      storage: {{ .Values.minio.persistence.size | quote }}    
+      storage: {{ .Values.minio.persistence.size | quote }}
 {{- if .Values.minio.persistence.storageClass }}
   storageClassName: "{{ .Values.minio.persistence.storageClass }}"
 {{- end }}

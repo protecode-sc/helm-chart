@@ -32,7 +32,7 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by usin
 
 ### 2022.3.0 -> 2022.6.0
 * httpProxy configuration value sets also HTTPS proxy.
-  
+
 ### 2021.12.1 -> 2022.3.0
 
 * Added support for KEDA autoscaler.
@@ -84,7 +84,7 @@ Supported Kubernetes versions are 1.19 and later.
 ### Cluster Configuration Notes
 
 Some Kubernetes clusters are configured with "Quaranteed QOS", which essentially means that resource limits behave like resource requests.
-With "Queranteed QOS" pods won't be scheduled if nodes are not able to satisfy both CPU and memory limits. 
+With "Queranteed QOS" pods won't be scheduled if nodes are not able to satisfy both CPU and memory limits.
 In those cases the minimum resource requirements are higher. This helm chart does not specify hard limits for PostgreSQL, RabbitMQ and Minio due to them
 being essential services and having them terminated by exceeding resource limits would be catastrophic. As a rule of thumb, the cluster should have at least
 
@@ -97,7 +97,7 @@ is not running inside the cluster if this is the case.
 
 ### Azure Notes
 
-In Azure, if monitoring addons are enabled with `--enable-addons monitoring`, 
+In Azure, if monitoring addons are enabled with `--enable-addons monitoring`,
 Standard_DS2_v2 instances do not have enough free memory available for BDBA.
 
 If monitoring is needed, minimum instance size is Standard_DS3_v2. In that
@@ -223,7 +223,7 @@ Parameter                   | Description                     | Default
 `s3SecretAccessKey`         | S3 Secret Access Key.           | ""
 `s3Region`                  | S3 Region.                      | ""
 
-To use alternative object storage, minio needs to be disabled. 
+To use alternative object storage, minio needs to be disabled.
 
 If using native S3, you need to consider the following:
 
@@ -274,7 +274,7 @@ Parameter                       | Description                             | Defa
 `frontend.web.rootURL`          | Root URL of web service for emails.     | ""
 `frontend.web.vacuumDays`       | Days when to force vacuum the db.       | "sunday"
 
-`frontend.web.rootURL` is only necessary if it differs from `ingress.host` and `ingress.tls` values. 
+`frontend.web.rootURL` is only necessary if it differs from `ingress.host` and `ingress.tls` values.
 By default, URL of the BDBA service is inferred from values specified for Ingress.
 
 `frontend.web.vacuumDays` accepts days in quite liberal crontab-format. Examples are
@@ -350,7 +350,7 @@ Parameter             | Description                                             
 `worker.storageClass`                  | storageClass for worker's work space.          | ""
 
 If `worker.storageClass` is left empty, scanners will be deployed as Kubernetes
-Deployment and use ephemeral storage for work space. 
+Deployment and use ephemeral storage for work space.
 
 However, if nodes have limited ephemeral storage available (that is, nodes contain
 small root disks), `worker.storageClass` allows reserving work space for
@@ -378,7 +378,7 @@ would work better, but if you have mostly large scans, `1` would trigger new wor
 
 `worker.terminationGracePeriodSeconds` is required for scaling down. As KEDA starts to scale down when there
 are no jobs in the queue by sending termination signal to workers, BDBA workers receiving the signal will stop
-accepting new scan jobs but finishing their current scans. If scan does not finish in 
+accepting new scan jobs but finishing their current scans. If scan does not finish in
 `worker.terminationGracePeriodSeconds` it will be forcefully killed and fail. If scans fail abruptly when
 downscaling, increasing this value will help.
 
@@ -645,7 +645,7 @@ To disable security context declarations in helm charts, add the following to he
 ```
 
 Because BDBA defaults to nginx Ingress class, you also need to specify Ingress class so Openshift can
-create routes properly. To do this, use 
+create routes properly. To do this, use
 
 ```
 $ kubectl get ingressclass

@@ -56,7 +56,7 @@ data:
         </buffer>
       </store>
     </match>
-    
+
     <match tasks>
       @type copy
       <store>
@@ -78,7 +78,7 @@ data:
         </buffer>
       </store>
     </match>
-    
+
     <match longjobs>
       @type copy
       <store>
@@ -100,7 +100,7 @@ data:
         </buffer>
       </store>
     </match>
-    
+
     <match worker>
       @type copy
       <store>
