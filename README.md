@@ -5,8 +5,8 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by usin
 
 ## Changes
 
-### 2023.12.1 -> 2022.3.0
-* Updated BDBA to 2022.3.0.
+### 2022.12.1 -> 2023.3.0
+* Updated BDBA to 2023.3.0.
 * Updated postgresql, rabbitmq and memcached images.
 * Improved documentation with airgapped installations in this file.
 ### 2022.12.0 -> 2022.12.1
