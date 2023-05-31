@@ -152,7 +152,7 @@ global:
 
 postgresql:
   image:
-    tag: 11.19.0-debian-11-r9
+    tag: 11.20.0-debian-11-r7
   enabled: true
   postgresqlUsername: bdba
   postgresqlPassword: CHANGEME
@@ -171,7 +171,7 @@ postgresql:
 
 memcached:
   image:
-    tag: 1.6.18-debian-11-r21
+    tag: 1.6.20-debian-11-r6
   replicaCount: 1
   pdbMinAvailable: 1
   resources:
@@ -211,7 +211,7 @@ minio:
 
 rabbitmq:
   image:
-    tag: 3.10.19-debian-11-r1
+    tag: 3.10.23-debian-11-r3
   rabbitmq:
     username: bdba
     existingPasswordSecret: bdba-rabbitmq-password-secret
