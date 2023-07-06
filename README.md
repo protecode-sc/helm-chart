@@ -5,6 +5,10 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by usin
 
 ## Changes
 
+### 2023.6.0 -> 2023.9.0
+* Added `frontend.web.csrfTrustedOrigins` to override CSRF validations.
+* Added `tasks.concurrency` to control concurrency of BDBA post processing tasks (default 3)
+* Added `tasks.replicas` to allow increasing BDBA post processing tasks replicas.
 ### 2023.3.1 -> 2023.6.0
 * Updated both BDBA frontend and worker to 2023.3.1 releases.
 * Updated postgresql, rabbitmq and memcached images.
@@ -114,14 +118,6 @@ Standard_DS2_v2 instances do not have enough free memory available for BDBA.
 
 If monitoring is needed, minimum instance size is Standard_DS3_v2. In that
 case node count can be decreased to 2.
-
-## Deploying Black Duck Binary Analysis Using synopsysctl
-
-The following steps describe a high-level overview of the steps required to install BDBA in a Kubernetes cluster.
-
-1. Ensure that you fulfill the [prerequisites](https://synopsys.atlassian.net/wiki/spaces/BDLM/pages/417234960/Prerequisites+for+BDBA) to install BDBA.
-2. Create and configure the [Kubernetes cluster](https://synopsys.atlassian.net/wiki/spaces/BDLM/pages/414089277/Preparing+the+Environment), and prepare your environment to install BDBA.
-3. Download [synopsysctl](https://synopsys.atlassian.net/wiki/spaces/BDLM/pages/417234971/Getting+Started+with+Synopsysctl+CLI) and install BDBA.
 
 ## Deploying Black Duck Binary Analysis Using the Helm Package Manager
 
@@ -722,3 +718,22 @@ $ curl -T appcheck-dataupdate-20210601-145434.dat -u admin:<adminpw> https://<bd
 
 The difference with this file to `protecode-sc-bootstrap`-file is that it contains only delta of seven days and it
 is faster to apply.
+
+### Upscaling
+
+As BDBA has varied workloads by nature, there can be no absolute guidance for configuration for example for X scans / day
+and how machines should be provisioned.
+
+BDBA inherintly is an application that processes workloads using queues, stores data in PostgreSQL and provides a web interface.
+In practice this means that all the components except PostgreSQL can be horizontally scaled and distributed among many hardware
+instances. PostgreSQL is the only thing that scales only vertically.
+
+Therefore, primary focus on scaling should be placed on PostgreSQL performance. Running PostgreSQL with enough memory and
+fast disks is advisable. In larger deployments external PostgreSQL should be used.
+
+In case of BDBA workloads getting stuck, increasing replicas help. Different symptons on slowness can be for example
+
+* Web application is slow -> increase web application replicas with `frontend.web.replicas` parameter.
+* Scan jobs stay in the queue for long time -> increase number of workers, either enabling keda or with `worker.replicas` parameter.
+* Post processing jobs stay in the queue for long time -> increase post processing replicas with `tasks.replicas` parameter.
+

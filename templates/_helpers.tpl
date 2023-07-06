@@ -154,6 +154,14 @@ envFrom:
 env:
   - name: HOME
     value: "/home/appcheck"
+  {{- if .Values.tasks.concurrency }}
+  - name: FRONTEND_TASKS_CONCURRENCY
+    value: {{ .Values.tasks.concurrency | quote }}
+  {{- end }}
+  {{- if .Values.frontend.web.csrfTrustedOrigins }}
+  - name: TRUSTED_ORIGINS
+    value: {{ .Values.frontend.web.csrfTrustedOrigins }}
+  {{- end }}
   - name: BROKER_URL
     valueFrom:
       secretKeyRef:

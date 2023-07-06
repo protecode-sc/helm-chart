@@ -23,6 +23,7 @@ frontend:
     admin: "admin@bdba.local"
     # rootURL: "http://bdba.local"
     vacuumDays: "sunday"
+    # csrfTrustedOrigins: "https://...,https://"
   email:
     enabled: false
     from: "noreply@bdba.local"
@@ -133,6 +134,8 @@ taskslong:
       cpu: 1
 
 tasks:
+  replicas: 1
+  concurrency: 3
   resources:
     requests:
       memory: "1Gi"
