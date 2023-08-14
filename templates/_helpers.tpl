@@ -156,7 +156,7 @@ env:
     value: "/home/appcheck"
   {{- if .Values.tasks.concurrency }}
   - name: FRONTEND_TASKS_CONCURRENCY
-    value: {{ .Values.tasks.concurrency | quote }}
+    value: {{ .Values.tasks.concurrency | quote }}
   {{- end }}
   {{- if .Values.frontend.web.csrfTrustedOrigins }}
   - name: TRUSTED_ORIGINS
