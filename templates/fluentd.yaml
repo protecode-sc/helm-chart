@@ -24,13 +24,13 @@ data:
         s3_endpoint {{ template "bdba.s3endpoint" . }}
         {{- end }}
         path webapp/
-        force_path_style true
         <buffer time>
           @type file
-          timekey_wait 1
+          timekey_wait 10m
           timekey 1h
           timekey_use_utc true
           path /logs/webapp
+          flush_at_shutdown true
         </buffer>
       </store>
     </match>
@@ -46,13 +46,13 @@ data:
         s3_endpoint {{ template "bdba.s3endpoint" . }}
         {{- end }}
         path updater/
-        force_path_style true
         <buffer time>
           @type file
-          timekey_wait 1
+          timekey_wait 10m
           timekey 1h
           timekey_use_utc true
           path /logs/updater
+          flush_at_shutdown true
         </buffer>
       </store>
     </match>
@@ -68,13 +68,13 @@ data:
         s3_endpoint {{ template "bdba.s3endpoint" . }}
         {{- end }}
         path tasks/
-        force_path_style true
         <buffer time>
           @type file
-          timekey_wait 1
+          timekey_wait 10m
           timekey 1h
           timekey_use_utc true
           path /logs/tasks
+          flush_at_shutdown true
         </buffer>
       </store>
     </match>
@@ -90,13 +90,13 @@ data:
         s3_endpoint {{ template "bdba.s3endpoint" . }}
         {{- end }}
         path longjobs/
-        force_path_style true
         <buffer time>
           @type file
-          timekey_wait 1
+          timekey_wait 10m
           timekey 1h
           timekey_use_utc true
           path /logs/longjobs
+          flush_at_shutdown true
         </buffer>
       </store>
     </match>
@@ -115,10 +115,11 @@ data:
         force_path_style true
         <buffer time>
           @type file
-          timekey_wait 1
+          timekey_wait 10m
           timekey 1h
           timekey_use_utc true
           path /logs/worker
+          flush_at_shutdown true
         </buffer>
       </store>
     </match>
