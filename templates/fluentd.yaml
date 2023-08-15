@@ -22,9 +22,9 @@ data:
         s3_region {{ .Values.s3Region }}
         {{- else }}
         s3_endpoint {{ template "bdba.s3endpoint" . }}
+        force_path_style true  # Prevent mangling of http endpoint
         {{- end }}
         path webapp/
-        force_path_style true  # Prevent mangling of http endpoint
         <buffer time>
           @type file
           timekey_wait 10m
@@ -45,9 +45,9 @@ data:
         s3_region {{ .Values.s3Region }}
         {{- else }}
         s3_endpoint {{ template "bdba.s3endpoint" . }}
+        force_path_style true  # Prevent mangling of http endpoint
         {{- end }}
         path updater/
-        force_path_style true  # Prevent mangling of http endpoint
         <buffer time>
           @type file
           timekey_wait 10m
@@ -68,9 +68,9 @@ data:
         s3_region {{ .Values.s3Region }}
         {{- else }}
         s3_endpoint {{ template "bdba.s3endpoint" . }}
+        force_path_style true  # Prevent mangling of http endpoint
         {{- end }}
         path tasks/
-        force_path_style true  # Prevent mangling of http endpoint
         <buffer time>
           @type file
           timekey_wait 10m
@@ -91,9 +91,9 @@ data:
         s3_region {{ .Values.s3Region }}
         {{- else }}
         s3_endpoint {{ template "bdba.s3endpoint" . }}
+        force_path_style true  # Prevent mangling of http endpoint
         {{- end }}
         path longjobs/
-        force_path_style true  # Prevent mangling of http endpoint
         <buffer time>
           @type file
           timekey_wait 10m
@@ -114,9 +114,9 @@ data:
         s3_region {{ .Values.s3Region }}
         {{- else }}
         s3_endpoint {{ template "bdba.s3endpoint" . }}
+        force_path_style true
         {{- end }}
         path worker/
-        force_path_style true
         <buffer time>
           @type file
           timekey_wait 10m
