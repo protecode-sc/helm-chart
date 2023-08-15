@@ -146,7 +146,7 @@ tasks:
 
 fluentbit:
   repository: fluent/fluent-bit
-  tag: 1.7
+  tag: 2.1
   pullPolicy: IfNotPresent
 
 global:
