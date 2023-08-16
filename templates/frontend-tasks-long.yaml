@@ -106,8 +106,6 @@ spec:
           image: "{{ .Values.fluentbit.repository }}:{{ .Values.fluentbit.tag }}"
           imagePullPolicy: {{ .Values.fluentbit.pullPolicy }}
           command: ["/fluent-bit/bin/fluent-bit", "-c", "/bdba-fluentbit/fluent-bit.conf"]
-          lifecycle:
-            type: Sidecar
           volumeMounts:
             - name:  {{ include "bdba.fullname" . }}-tasks-long-applog
               mountPath: /app-log
