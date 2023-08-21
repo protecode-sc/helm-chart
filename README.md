@@ -270,17 +270,18 @@ Parameter                                 | Description                 | Defaul
 
 Generic configuration options for customization of frontend behavior.
 
-Parameter                       | Description                             | Default
-------------------------------- | --------------------------------------- |------------------------
-`frontend.web.secretKey`        | Secret key for web application.         | 50 random characters
-`frontend.web.sessionCookieAge` | Session cookie age.                     | "1209600"
-`frontend.web.replicas`         | Number of frontend instances.           | 1
-`frontend.web.hideLicenses`     | Hide licensing information from scan.   | false
-`frontend.web.offlineMode`      | Do not make network request to internet | false
-`frontend.web.admin`            | Administrator user's email address.     | "admin@bdba.local"
-`frontend.web.erroradmin`       | Error report email receiver.            | ""
-`frontend.web.rootURL`          | Root URL of web service for emails.     | ""
-`frontend.web.vacuumDays`       | Days when to force vacuum the db.       | "sunday"
+Parameter                         | Description                             | Default
+--------------------------------- | --------------------------------------- |------------------------
+`frontend.web.secretKey`          | Secret key for web application.         | 50 random characters
+`frontend.web.sessionCookieAge`   | Session cookie age.                     | "1209600"
+`frontend.web.replicas`           | Number of frontend instances.           | 1
+`frontend.web.hideLicenses`       | Hide licensing information from scan.   | false
+`frontend.web.offlineMode`        | Do not make network request to internet | false
+`frontend.web.admin`              | Administrator user's email address.     | "admin@bdba.local"
+`frontend.web.erroradmin`         | Error report email receiver.            | ""
+`frontend.web.rootURL`            | Root URL of web service for emails.     | ""
+`frontend.web.vacuumDays`         | Days when to force vacuum the db.       | "sunday"
+`frontend.web.csrfTrustedOrigins` | Trusted origins for CSRF check          | ""
 
 `frontend.web.rootURL` is only necessary if it differs from `ingress.host` and `ingress.tls` values.
 By default, URL of the BDBA service is inferred from values specified for Ingress.
@@ -288,6 +289,10 @@ By default, URL of the BDBA service is inferred from values specified for Ingres
 `frontend.web.vacuumDays` accepts days in quite liberal crontab-format. Examples are
 `sunday`, to vacuum only on sunday, `mon,wed,fri,sun` to vacuum on monday, wednesday, friday and sunday
 and `mon-sun` to vacuum daily.
+
+`frontend.web.csrfTrustedOrigins` allows specifying list of trusted origins for unsafe requests.
+This is needed for example when TLS is not terminated in BDBA Ingress, but there is application load
+balancer terminating TLS.
 
 #### SMTP Configuration
 
