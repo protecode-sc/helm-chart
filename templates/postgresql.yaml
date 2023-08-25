@@ -54,6 +54,13 @@ spec:
         - name: {{ template "bdba.postgresql.fullname" . }}
           image: "{{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}"
           imagePullPolicy: {{ .Values.postgresql.image.pullPolicy }}
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - "sh" 
+                  - "-c"
+                  - "pg_ctl stop"
           env:
             - name: POSTGRES_USER
               value: {{ .Values.postgresql.postgresqlUsername | quote }}
