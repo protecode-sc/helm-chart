@@ -166,6 +166,7 @@ postgresql:
   postgresqlUsername: bdba
   postgresqlPassword: CHANGEME
   postgresqlDatabase: bdba
+  terminationGracePeriodSeconds: 120
   persistence:
     size: 300Gi
   resources:
