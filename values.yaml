@@ -153,9 +153,15 @@ global:
   postgresql:
     existingSecret: ""
 
-postgresql:
+pgupgrader:
   image:
-    tag: 11.20.0-debian-11-r7
+    repository: ""
+    tag: ""
+
+postgresql:
+  image: 
+    repository: "postgres"
+    tag: "15-bookworm"
   enabled: true
   postgresqlUsername: bdba
   postgresqlPassword: CHANGEME

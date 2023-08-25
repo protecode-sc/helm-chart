@@ -1,0 +1,103 @@
+{{- if .Values.postgresql.enabled }}
+{{- if .Values.postgresql.persistence.enabled }}
+{{- if not .Values.postgresql.persistence.existingClaim }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ template "bdba.postgresql.fullname" . }}
+  labels:
+{{ include "bdba.labels" . | indent 4 }}
+spec:
+  accessModes:
+    - "ReadWriteOnce"
+  resources:
+    requests:
+      storage: {{ .Values.postgresql.persistence.size | quote }}
+{{- if .Values.postgresql.persistence.storageClass }}
+  storageClassName: "{{ .Values.postgresql.persistence.storageClass }}"
+{{- end }}
+{{- end }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ template "bdba.postgresql.fullname" . }}
+  labels:
+    app: "postgresql"
+{{ include "bdba.labels" . | indent 4 }}
+spec:
+  serviceName: {{ template "bdba.postgresql.fullname" . }}-headless
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: "postgresql"
+      release: {{ .Release.Name }}
+      role: master
+  template:
+    metadata:
+      name: {{ template "bdba.postgresql.fullname" . }}
+      labels:
+        app: "postgresql"
+        release: {{ .Release.Name }}
+        role: master
+    spec:
+      initContainers:
+        - name: {{ template "bdba.postgresql.fullname" . }}-upgrader
+          image: "{{ .Values.pgupgrader.image.repository}}:{{ .Values.pgupgrader.image.tag}}"
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: data
+              mountPath: "/pgvolume"
+      containers:
+        - name: {{ template "bdba.postgresql.fullname" . }}
+          image: "{{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}"
+          imagePullPolicy: {{ .Values.postgresql.image.pullPolicy }}
+          env:
+            - name: POSTGRES_USER
+              value: {{ .Values.postgresql.postgresqlUsername | quote }}
+            - name: POSTGRES_DATABASE
+              value: {{ .Values.postgresql.postgresqlDatabase | quote }}
+            - name: PGDATA
+              value: "/data/postgresql/data"
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "bdba.postgresql.fullname" . }}
+                  key: postgresql-password            
+          volumeMounts:
+            - name: data
+              mountPath: "/data/postgresql"
+      volumes:
+{{- if and .Values.postgresql.persistence.enabled .Values.postgresql.persistence.existingClaim }}
+        - name: data
+          persistentVolumeClaim:
+{{- with .Values.postgresql.persistence.existingClaim }}
+            claimName: {{ tpl . $ }}
+{{- end }}
+{{- else if not .Values.postgresql.persistence.enabled }}
+        - name: data
+          emptyDir: {}
+{{- else if and .Values.postgresql.persistence.enabled (not .Values.postgresql.persistence.existingClaim) }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      {{- with .Values.postgresql.persistence.annotations }}
+        annotations:
+        {{- range $key, $value := . }}
+          {{ $key }}: {{ $value }}
+        {{- end }}
+      {{- end }}
+      spec:
+        accessModes:
+        {{- range .Values.postgresql.persistence.accessModes }}
+          - {{ . | quote }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.postgresql.persistence.size | quote }}
+        storageClassName: {{ .Values.postgresql.persistence.storageClass }}
+{{- end }}
+{{- end }}
+{{- end }}
