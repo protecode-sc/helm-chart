@@ -160,8 +160,8 @@ pgupgrader:
 
 postgresql:
   image: 
-    repository: "postgres"
-    tag: "15-bookworm"
+    repository: "bitnami/postgresql"
+    tag: "15.4.0-debian-11-r15"
   enabled: true
   postgresqlUsername: bdba
   postgresqlPassword: CHANGEME
@@ -178,6 +178,21 @@ postgresql:
       # memory
   securityContext:
     enabled: true
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 6
+    successThreshold: 1
+
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 6
+    successThreshold: 1
 
 memcached:
   image:

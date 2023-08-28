@@ -85,6 +85,31 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by usin
 * Added instructions for populating the database in airgapped deployment
 * `frontend.web.rootUrl` is now used for SSO endpoints as well, instead of guessing from HTTP request.
 
+## Upgrading to XXXX.X.X
+
+BDBA helm chart XXXX.X.X upgrades internal PostgreSQL to 15. If you are using external postgresql, you can
+ignore this.
+
+There is an init container that performs the
+volume upgrade automatically. However, for the volume upgrade process to work properly, application containers
+need to be shut down so postgresql can shut down gracefully. To do this, invoke
+
+```
+for deployment in "nightly-bdba-beat" "nightly-bdba-tasks" "nightly-bdba-tasks-long" "nightly-bdba-updater" "nightly-bdba-webapp"; do
+    kubectl delete deployment ${deployment} -n <namespace>
+done
+```
+
+before upgrading BDBA. 
+
+After this, you can upgrade BDBA as usual.
+
+### Recovering from unclean shutdown
+
+Failing to stop application containers using database will likely result in database volume that is not shut down cleanly
+and volume upgrader container will fail. Recovering from this situation requires deleting existing postgresql statefulset
+and rolling back to 2023.6.0 release.
+
 ## Requirements
 
 BDBA should run on fine on any public cloud provider supporting Kubernetes. Nodes should have 7 gigabytes of memory at minimum, and preferably there should be 3 nodes. Examples of minimum suitable nodes are
