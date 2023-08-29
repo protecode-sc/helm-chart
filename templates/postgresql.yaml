@@ -17,6 +17,7 @@ spec:
   storageClassName: "{{ .Values.postgresql.persistence.storageClass }}"
 {{- end }}
 {{- end }}
+{{- end }}
 ---
 apiVersion: v1
 kind: Service
@@ -34,6 +35,18 @@ spec:
   selector:
     app: "postgresql"
     release: {{ .Release.Name }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ template "bdba.postgresql.fullname" . }}
+  labels:
+{{ include "bdba.labels" . | indent 4 }}
+type: Opaque
+data:
+  {{ if .Values.postgresql.postgresqlPassword }}
+  postgresql-password: {{ .Values.postgresql.postgresqlPassword | b64enc | quote }}
+  {{- end }}
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -114,9 +127,11 @@ spec:
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ template "bdba.postgresql.fullname" . }}
+                  name: {{ template "bdba.postgresql.passwordSecretName" . }}
                   key: postgresql-password    
-                  
+          {{- if .Values.postgresql.resources }}
+          resources: {{- toYaml .Values.postgresql.resources | nindent 12 }}
+          {{- end }}                  
           volumeMounts:
             - name: data
               mountPath: "/data/postgresql"
@@ -155,6 +170,5 @@ spec:
           requests:
             storage: {{ .Values.postgresql.persistence.size | quote }}
         storageClassName: {{ .Values.postgresql.persistence.storageClass }}
-{{- end }}
 {{- end }}
 {{- end }}
