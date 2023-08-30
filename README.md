@@ -6,6 +6,7 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by usin
 ## Changes
 
 ### 2023.6.0 -> 2023.9.0
+* Postgresql that is included in BDBA is upgraded to PostgreSQL 15. Please read upgrading guidance after changelog, as there are required steps involved.
 * Added `frontend.web.csrfTrustedOrigins` to override CSRF validations.
 * Added `tasks.concurrency` to control concurrency of BDBA post processing tasks (default 3)
 * Added `tasks.replicas` to allow increasing BDBA post processing tasks replicas.
@@ -85,9 +86,9 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by usin
 * Added instructions for populating the database in airgapped deployment
 * `frontend.web.rootUrl` is now used for SSO endpoints as well, instead of guessing from HTTP request.
 
-## Upgrading to XXXX.X.X
+## Upgrading to 2023.9.0
 
-BDBA helm chart XXXX.X.X upgrades internal PostgreSQL to 15. If you are using external postgresql, you can
+BDBA helm chart 2023.9.0 upgrades internal PostgreSQL to 15. If you are using external postgresql, you can
 ignore this.
 
 There is an init container that performs the
