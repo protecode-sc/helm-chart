@@ -92,11 +92,19 @@ ignore this.
 
 There is an init container that performs the
 volume upgrade automatically. However, for the volume upgrade process to work properly, application containers
-need to be shut down so postgresql can shut down gracefully. To do this, invoke
+need to be shut down so postgresql can shut down gracefully. First figure out `NAMESPACE` and `PREFIX`. 
+
+`NAMESPACE` is the Kubernetes instance where BDBA is deployed. `PREFIX` is the release label that BDBA pods have.
+You can get this for example by invoking `kubeget get deployment -n $NAMESPACE`.
+
+Then invoke:
 
 ```
-for deployment in "nightly-bdba-beat" "nightly-bdba-tasks" "nightly-bdba-tasks-long" "nightly-bdba-updater" "nightly-bdba-webapp"; do
-    kubectl delete deployment ${deployment} -n <namespace>
+export PREFIX=<bdba-release-prefix>
+export NAMESPACE=<bdba-namespace>
+
+for deployment in "$PREFIX-bdba-beat" "$PREFIX-bdba-tasks" "$PREFIX-bdba-tasks-long" "$PREFIX-bdba-updater" "$PREFIX-bdba-webapp"; do
+    kubectl delete deployment "$deployment" -n "$NAMESPACE"
 done
 ```
 
