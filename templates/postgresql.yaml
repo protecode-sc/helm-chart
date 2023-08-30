@@ -36,6 +36,7 @@ spec:
     app: "postgresql"
     release: {{ .Release.Name }}
 ---
+{{- if not .Values.global.postgresql.existingSecret }}
 apiVersion: v1
 kind: Secret
 metadata:
@@ -48,6 +49,7 @@ data:
   postgresql-password: {{ .Values.postgresql.postgresqlPassword | b64enc | quote }}
   {{- end }}
 ---
+{{- end }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -142,16 +144,13 @@ spec:
         fsGroup: {{ .Values.postgresql.securityContext.fsGroup | default 1001 }}
       {{- end }}
       volumes:
-{{- if and .Values.postgresql.persistence.enabled .Values.postgresql.persistence.existingClaim }}
+{{- if .Values.postgresql.persistence.existingClaim }}
         - name: data
           persistentVolumeClaim:
 {{- with .Values.postgresql.persistence.existingClaim }}
             claimName: {{ tpl . $ }}
 {{- end }}
-{{- else if not .Values.postgresql.persistence.enabled }}
-        - name: data
-          emptyDir: {}
-{{- else if and .Values.postgresql.persistence.enabled (not .Values.postgresql.persistence.existingClaim) }}
+{{- else if not .Values.postgresql.persistence.existingClaim }}
   volumeClaimTemplates:
     - metadata:
         name: data
@@ -163,9 +162,7 @@ spec:
       {{- end }}
       spec:
         accessModes:
-        {{- range .Values.postgresql.persistence.accessModes }}
-          - {{ . | quote }}
-        {{- end }}
+        - ReadWriteOnce
         resources:
           requests:
             storage: {{ .Values.postgresql.persistence.size | quote }}
