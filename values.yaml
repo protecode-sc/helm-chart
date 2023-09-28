@@ -68,6 +68,7 @@ frontend:
   uploadBucket: "bdba-uploads"
   securityContext:
     enabled: true
+  # disableEc2Metadata: true
 
 # rootCASecret:
 

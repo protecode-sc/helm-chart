@@ -10,6 +10,8 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by usin
 * Added `frontend.web.csrfTrustedOrigins` to override CSRF validations.
 * Added `tasks.concurrency` to control concurrency of BDBA post processing tasks (default 3)
 * Added `tasks.replicas` to allow increasing BDBA post processing tasks replicas.
+* Added 'frontend.disableEc2Metadata' to disable use of EC2 metadata service.
+
 ### 2023.3.1 -> 2023.6.0
 * Updated both BDBA frontend and worker to 2023.3.1 releases.
 * Updated postgresql, rabbitmq and memcached images.
@@ -152,6 +154,9 @@ Standard_DS2_v2 instances do not have enough free memory available for BDBA.
 
 If monitoring is needed, minimum instance size is Standard_DS3_v2. In that
 case node count can be decreased to 2.
+
+Also, Azure can conflict with some S3/minio operations. This can be resolved
+by settings `frontend.disableEc2Metadata` as `true`.
 
 ## Deploying Black Duck Binary Analysis Using the Helm Package Manager
 
@@ -387,6 +392,17 @@ Parameter                     | Description                                     
 `frontend.applicationLogging` | Enable application logging for webapp pods.      | true
 `worker.applicationLogging`   | Enable application logging for worker pods.      | true
 `logRetention`                | Days to keep the application logs (0 to disable) | 30
+
+#### Cloud provider -specific settings
+
+Some cloud providers (e.g. Azure) may interfere by providing instance metadata at the
+same endpoint as AWS, and cause object storage operations to fail. Usage of instance metadata
+can be disabled.
+
+Parameter                     | Description                              | Default
+----------------------------- | ---------------------------------------- | --------------
+`frontend.disableEc2Metadata` | Disables user of EC2 metadata service    | false
+
 
 #### Worker Scaling
 

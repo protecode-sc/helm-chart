@@ -158,6 +158,10 @@ env:
   - name: FRONTEND_TASKS_CONCURRENCY
     value: {{ .Values.tasks.concurrency | quote }}
   {{- end }}
+  {{- if .Values.frontend.disableEc2Metadata }}
+  - name: AWS_EC2_METADATA_DISABLED
+    value: {{ .Values.frontend.disableEc2Metadata | quote }}
+  {{- end }}
   {{- if .Values.frontend.web.csrfTrustedOrigins }}
   - name: TRUSTED_ORIGINS
     value: {{ .Values.frontend.web.csrfTrustedOrigins }}
