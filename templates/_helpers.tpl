@@ -155,7 +155,7 @@ env:
   - name: HOME
     value: "/home/appcheck"
   {{- if .Values.tasks.concurrency }}
-  - name: FRONTEND_TASKS_CONCURRENCY
+  - name: FRONTEND_WORKER_CONCURRENCY
     value: {{ .Values.tasks.concurrency | quote }}
   {{- end }}
   {{- if .Values.frontend.disableEc2Metadata }}
