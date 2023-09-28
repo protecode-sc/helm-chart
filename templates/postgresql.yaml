@@ -1,0 +1,171 @@
+{{- if .Values.postgresql.enabled }}
+{{- if .Values.postgresql.persistence.enabled }}
+{{- if not .Values.postgresql.persistence.existingClaim }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ template "bdba.postgresql.fullname" . }}
+  labels:
+{{ include "bdba.labels" . | indent 4 }}
+spec:
+  accessModes:
+    - "ReadWriteOnce"
+  resources:
+    requests:
+      storage: {{ .Values.postgresql.persistence.size | quote }}
+{{- if .Values.postgresql.persistence.storageClass }}
+  storageClassName: "{{ .Values.postgresql.persistence.storageClass }}"
+{{- end }}
+{{- end }}
+{{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "bdba.postgresql.fullname" . }}
+  labels:
+{{ include "bdba.labels" . | indent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: 5432
+      targetPort: 5432
+      protocol: TCP
+      name: postgresql
+  selector:
+    app: "postgresql"
+    release: {{ .Release.Name }}
+---
+{{- if not .Values.global.postgresql.existingSecret }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ template "bdba.postgresql.fullname" . }}
+  labels:
+{{ include "bdba.labels" . | indent 4 }}
+type: Opaque
+data:
+  {{ if .Values.postgresql.postgresqlPassword }}
+  postgresql-password: {{ .Values.postgresql.postgresqlPassword | b64enc | quote }}
+  {{- end }}
+---
+{{- end }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ template "bdba.postgresql.fullname" . }}
+  labels:
+    app: "postgresql"
+{{ include "bdba.labels" . | indent 4 }}
+spec:
+  serviceName: {{ template "bdba.postgresql.fullname" . }}-headless
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: "postgresql"
+      release: {{ .Release.Name }}
+      role: master
+  template:
+    metadata:
+      name: {{ template "bdba.postgresql.fullname" . }}
+      labels:
+        app: "postgresql"
+        release: {{ .Release.Name }}
+        role: master
+    spec:
+      initContainers:
+        - name: {{ template "bdba.postgresql.fullname" . }}-upgrader
+          image: "{{ .Values.pgupgrader.image.repository}}:{{ .Values.pgupgrader.image.tag}}"
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: data
+              mountPath: "/pgvolume"
+      containers:
+        - name: {{ template "bdba.postgresql.fullname" . }}
+          image: "{{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}"
+          imagePullPolicy: {{ .Values.postgresql.image.pullPolicy }}
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - "sh" 
+                  - "-c"
+                  - "pg_ctl stop"
+          {{- if .Values.postgresql.livenessProbe.enabled }}
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - exec pg_isready -U {{ .Values.postgresql.postgresqlUsername | quote }} -d {{ .Values.postgresql.postgresqlDatabase | quote }} -h 127.0.0.1 -p 5432
+            initialDelaySeconds: {{ .Values.postgresql.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.postgresql.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.postgresql.livenessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.postgresql.livenessProbe.successThreshold }}
+            failureThreshold: {{ .Values.postgresql.livenessProbe.failureThreshold }}
+          {{- end }}
+          {{- if .Values.postgresql.readinessProbe.enabled }}
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - exec pg_isready -U {{ .Values.postgresql.postgresqlUsername | quote }} -d {{ .Values.postgresql.postgresqlDatabase | quote }} -h 127.0.0.1 -p 5432
+            initialDelaySeconds: {{ .Values.postgresql.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.postgresql.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.postgresql.readinessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.postgresql.readinessProbe.successThreshold }}
+            failureThreshold: {{ .Values.postgresql.readinessProbe.failureThreshold }}
+          {{- end }}
+          env:
+            - name: POSTGRES_USER
+              value: {{ .Values.postgresql.postgresqlUsername | quote }}
+            - name: POSTGRES_DATABASE
+              value: {{ .Values.postgresql.postgresqlDatabase | quote }}
+            - name: PGDATA
+              value: "/data/postgresql/data"
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "bdba.postgresql.passwordSecretName" . }}
+                  key: postgresql-password    
+          {{- if .Values.postgresql.resources }}
+          resources: {{- toYaml .Values.postgresql.resources | nindent 12 }}
+          {{- end }}                  
+          volumeMounts:
+            - name: data
+              mountPath: "/data/postgresql"
+      {{- if .Values.postgresql.securityContext.enabled }}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: {{ .Values.postgresql.securityContext.runAsUser | default 1001 }}
+        fsGroup: {{ .Values.postgresql.securityContext.fsGroup | default 1001 }}
+      {{- end }}
+      volumes:
+{{- if .Values.postgresql.persistence.existingClaim }}
+        - name: data
+          persistentVolumeClaim:
+{{- with .Values.postgresql.persistence.existingClaim }}
+            claimName: {{ tpl . $ }}
+{{- end }}
+{{- else if not .Values.postgresql.persistence.existingClaim }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      {{- with .Values.postgresql.persistence.annotations }}
+        annotations:
+        {{- range $key, $value := . }}
+          {{ $key }}: {{ $value }}
+        {{- end }}
+      {{- end }}
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: {{ .Values.postgresql.persistence.size | quote }}
+        storageClassName: {{ .Values.postgresql.persistence.storageClass }}
+{{- end }}
+{{- end }}

@@ -42,7 +42,7 @@ metadata:
   labels:
 {{ include "bdba.labels" . | indent 4 }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.tasks.replicas | default 1 }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ include "bdba.name" . }}-tasks

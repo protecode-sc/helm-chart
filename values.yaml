@@ -4,7 +4,7 @@
 
 frontend:
   repository: docker.io/sigsynopsys/bdba-frontend
-  tag: 2023.6.0
+  tag: 2023.9.0
   pullPolicy: IfNotPresent
   database:
     {}
@@ -23,6 +23,7 @@ frontend:
     admin: "admin@bdba.local"
     # rootURL: "http://bdba.local"
     vacuumDays: "sunday"
+    # csrfTrustedOrigins: "https://...,https://"
   email:
     enabled: false
     from: "noreply@bdba.local"
@@ -67,6 +68,7 @@ frontend:
   uploadBucket: "bdba-uploads"
   securityContext:
     enabled: true
+  # disableEc2Metadata: true
 
 # rootCASecret:
 
@@ -92,7 +94,7 @@ worker:
   replicas: 1
   concurrency: 1
   repository: docker.io/sigsynopsys/bdba-worker
-  tag: 2023.6.1
+  tag: 2023.9.0
   pullPolicy: IfNotPresent
   applicationLogging:
     enabled: true
@@ -110,7 +112,7 @@ worker:
 
 fluentd:
   repository: docker.io/sigsynopsys/bdba-fluentd
-  tag: 2023.6.0
+  tag: 2023.9.0
   pullPolicy: IfNotPresent
   resources:
     requests:
@@ -133,6 +135,8 @@ taskslong:
       cpu: 1
 
 tasks:
+  replicas: 1
+  concurrency: 3
   resources:
     requests:
       memory: "1Gi"
@@ -143,20 +147,27 @@ tasks:
 
 fluentbit:
   repository: fluent/fluent-bit
-  tag: 1.7
+  tag: 2.1
   pullPolicy: IfNotPresent
 
 global:
   postgresql:
     existingSecret: ""
 
-postgresql:
+pgupgrader:
   image:
-    tag: 11.20.0-debian-11-r7
+    repository: "docker.io/sigsynopsys/bdba-pgupgrader"
+    tag: "2023.9.0"
+
+postgresql:
+  image: 
+    repository: "bitnami/postgresql"
+    tag: "15.4.0-debian-11-r15"
   enabled: true
   postgresqlUsername: bdba
   postgresqlPassword: CHANGEME
   postgresqlDatabase: bdba
+  terminationGracePeriodSeconds: 120
   persistence:
     size: 300Gi
   resources:
@@ -168,6 +179,21 @@ postgresql:
       # memory
   securityContext:
     enabled: true
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 6
+    successThreshold: 1
+
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 6
+    successThreshold: 1
 
 memcached:
   image:

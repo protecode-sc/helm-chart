@@ -1,13 +1,9 @@
 apiVersion: v2
-appVersion: "2023.6.1"
+appVersion: "2023.9.0"
 description: BDBA Helm chart
 name: bdba
-version: "2023.6.1"
+version: "2023.9.0"
 dependencies:
-- name: postgresql
-  version: "8.10.7"
-  repository: https://raw.githubusercontent.com/bitnami/charts/eb5f9a9513d987b519f0ecd732e7031241c50328/bitnami
-  condition: postgresql.enabled
 - name: memcached
   repository: https://raw.githubusercontent.com/bitnami/charts/eb5f9a9513d987b519f0ecd732e7031241c50328/bitnami
   version: "4.2.19"

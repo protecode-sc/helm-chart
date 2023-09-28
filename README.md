@@ -5,6 +5,13 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by usin
 
 ## Changes
 
+### 2023.6.1 -> 2023.9.0
+* Postgresql that is included in BDBA is upgraded to PostgreSQL 15. Please read upgrading guidance after changelog, as there are required steps involved.
+* Added `frontend.web.csrfTrustedOrigins` to override CSRF validations.
+* Added `tasks.concurrency` to control concurrency of BDBA post processing tasks (default 3)
+* Added `tasks.replicas` to allow increasing BDBA post processing tasks replicas.
+* Added 'frontend.disableEc2Metadata' to disable use of EC2 metadata service.
+
 ### 2023.6.0 -> 2023.6.1
 * Update BDBA worker to 2023.6.1.
 
@@ -84,6 +91,39 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by usin
 * Added instructions for populating the database in airgapped deployment
 * `frontend.web.rootUrl` is now used for SSO endpoints as well, instead of guessing from HTTP request.
 
+## Upgrading to 2023.9.0
+
+BDBA helm chart 2023.9.0 upgrades internal PostgreSQL to 15. If you are using external postgresql, you can
+ignore this.
+
+There is an init container that performs the
+volume upgrade automatically. However, for the volume upgrade process to work properly, application containers
+need to be shut down so postgresql can shut down gracefully. First figure out `NAMESPACE` and `PREFIX`. 
+
+`NAMESPACE` is the Kubernetes instance where BDBA is deployed. `PREFIX` is the release label that BDBA pods have.
+You can get this for example by invoking `kubeget get deployment -n $NAMESPACE`.
+
+Then invoke:
+
+```
+export PREFIX=<bdba-release-prefix>
+export NAMESPACE=<bdba-namespace>
+
+for deployment in "$PREFIX-bdba-beat" "$PREFIX-bdba-tasks" "$PREFIX-bdba-tasks-long" "$PREFIX-bdba-updater" "$PREFIX-bdba-webapp"; do
+    kubectl delete deployment "$deployment" -n "$NAMESPACE"
+done
+```
+
+before upgrading BDBA. 
+
+After this, you can upgrade BDBA as usual.
+
+### Recovering from unclean shutdown
+
+Failing to stop application containers using database will likely result in database volume that is not shut down cleanly
+and volume upgrader container will fail. Recovering from this situation requires deleting existing postgresql statefulset
+and rolling back to 2023.6.0 release.
+
 ## Requirements
 
 BDBA should run on fine on any public cloud provider supporting Kubernetes. Nodes should have 7 gigabytes of memory at minimum, and preferably there should be 3 nodes. Examples of minimum suitable nodes are
@@ -118,13 +158,8 @@ Standard_DS2_v2 instances do not have enough free memory available for BDBA.
 If monitoring is needed, minimum instance size is Standard_DS3_v2. In that
 case node count can be decreased to 2.
 
-## Deploying Black Duck Binary Analysis Using synopsysctl
-
-The following steps describe a high-level overview of the steps required to install BDBA in a Kubernetes cluster.
-
-1. Ensure that you fulfill the [prerequisites](https://synopsys.atlassian.net/wiki/spaces/BDLM/pages/417234960/Prerequisites+for+BDBA) to install BDBA.
-2. Create and configure the [Kubernetes cluster](https://synopsys.atlassian.net/wiki/spaces/BDLM/pages/414089277/Preparing+the+Environment), and prepare your environment to install BDBA.
-3. Download [synopsysctl](https://synopsys.atlassian.net/wiki/spaces/BDLM/pages/417234971/Getting+Started+with+Synopsysctl+CLI) and install BDBA.
+Also, Azure can conflict with some S3/minio operations. This can be resolved
+by settings `frontend.disableEc2Metadata` as `true`.
 
 ## Deploying Black Duck Binary Analysis Using the Helm Package Manager
 
@@ -277,17 +312,18 @@ Parameter                                 | Description                 | Defaul
 
 Generic configuration options for customization of frontend behavior.
 
-Parameter                       | Description                             | Default
-------------------------------- | --------------------------------------- |------------------------
-`frontend.web.secretKey`        | Secret key for web application.         | 50 random characters
-`frontend.web.sessionCookieAge` | Session cookie age.                     | "1209600"
-`frontend.web.replicas`         | Number of frontend instances.           | 1
-`frontend.web.hideLicenses`     | Hide licensing information from scan.   | false
-`frontend.web.offlineMode`      | Do not make network request to internet | false
-`frontend.web.admin`            | Administrator user's email address.     | "admin@bdba.local"
-`frontend.web.erroradmin`       | Error report email receiver.            | ""
-`frontend.web.rootURL`          | Root URL of web service for emails.     | ""
-`frontend.web.vacuumDays`       | Days when to force vacuum the db.       | "sunday"
+Parameter                         | Description                             | Default
+--------------------------------- | --------------------------------------- |------------------------
+`frontend.web.secretKey`          | Secret key for web application.         | 50 random characters
+`frontend.web.sessionCookieAge`   | Session cookie age.                     | "1209600"
+`frontend.web.replicas`           | Number of frontend instances.           | 1
+`frontend.web.hideLicenses`       | Hide licensing information from scan.   | false
+`frontend.web.offlineMode`        | Do not make network request to internet | false
+`frontend.web.admin`              | Administrator user's email address.     | "admin@bdba.local"
+`frontend.web.erroradmin`         | Error report email receiver.            | ""
+`frontend.web.rootURL`            | Root URL of web service for emails.     | ""
+`frontend.web.vacuumDays`         | Days when to force vacuum the db.       | "sunday"
+`frontend.web.csrfTrustedOrigins` | Trusted origins for CSRF check          | ""
 
 `frontend.web.rootURL` is only necessary if it differs from `ingress.host` and `ingress.tls` values.
 By default, URL of the BDBA service is inferred from values specified for Ingress.
@@ -295,6 +331,10 @@ By default, URL of the BDBA service is inferred from values specified for Ingres
 `frontend.web.vacuumDays` accepts days in quite liberal crontab-format. Examples are
 `sunday`, to vacuum only on sunday, `mon,wed,fri,sun` to vacuum on monday, wednesday, friday and sunday
 and `mon-sun` to vacuum daily.
+
+`frontend.web.csrfTrustedOrigins` allows specifying list of trusted origins for unsafe requests.
+This is needed for example when TLS is not terminated in BDBA Ingress, but there is application load
+balancer terminating TLS.
 
 #### SMTP Configuration
 
@@ -355,6 +395,17 @@ Parameter                     | Description                                     
 `frontend.applicationLogging` | Enable application logging for webapp pods.      | true
 `worker.applicationLogging`   | Enable application logging for worker pods.      | true
 `logRetention`                | Days to keep the application logs (0 to disable) | 30
+
+#### Cloud provider -specific settings
+
+Some cloud providers (e.g. Azure) may interfere by providing instance metadata at the
+same endpoint as AWS, and cause object storage operations to fail. Usage of instance metadata
+can be disabled.
+
+Parameter                     | Description                              | Default
+----------------------------- | ---------------------------------------- | --------------
+`frontend.disableEc2Metadata` | Disables user of EC2 metadata service    | false
+
 
 #### Worker Scaling
 
@@ -725,3 +776,22 @@ $ curl -T appcheck-dataupdate-20210601-145434.dat -u admin:<adminpw> https://<bd
 
 The difference with this file to `protecode-sc-bootstrap`-file is that it contains only delta of seven days and it
 is faster to apply.
+
+### Upscaling
+
+As BDBA has varied workloads by nature, there can be no absolute guidance for configuration for example for X scans / day
+and how machines should be provisioned.
+
+BDBA inherintly is an application that processes workloads using queues, stores data in PostgreSQL and provides a web interface.
+In practice this means that all the components except PostgreSQL can be horizontally scaled and distributed among many hardware
+instances. PostgreSQL is the only thing that scales only vertically.
+
+Therefore, primary focus on scaling should be placed on PostgreSQL performance. Running PostgreSQL with enough memory and
+fast disks is advisable. In larger deployments external PostgreSQL should be used.
+
+In case of BDBA workloads getting stuck, increasing replicas help. Different symptons on slowness can be for example
+
+* Web application is slow -> increase web application replicas with `frontend.web.replicas` parameter.
+* Scan jobs stay in the queue for long time -> increase number of workers, either enabling keda or with `worker.replicas` parameter.
+* Post processing jobs stay in the queue for long time -> increase post processing replicas with `tasks.replicas` parameter.
+
