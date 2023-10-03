@@ -78,7 +78,7 @@ spec:
           args: [ "worker" ]
           readinessProbe:
             exec:
-              command: ["sh", "-c", "/srv/venv/appcheck-frontend/bin/celery -b $(printf $BROKER_URL $BROKER_PASSWORD) -q inspect -d celery@frontend-worker.$(hostname) --timeout 30 ping" ]
+              command: [ "/scripts/probe-heartbeat" ]
             initialDelaySeconds: 15
             periodSeconds: 30
             successThreshold: 1
@@ -86,7 +86,7 @@ spec:
             timeoutSeconds: 35
           livenessProbe:
             exec:
-              command: ["sh", "-c", "/srv/venv/appcheck-frontend/bin/celery -b $(printf $BROKER_URL $BROKER_PASSWORD) -q inspect -d celery@frontend-worker.$(hostname) --timeout 30 ping" ]
+              command: [ "/scripts/probe-heartbeat" ]
             initialDelaySeconds: 15
             periodSeconds: 60
             successThreshold: 1
