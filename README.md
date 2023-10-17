@@ -328,7 +328,7 @@ Parameter                         | Description                             | De
 `frontend.web.rootURL`            | Root URL of web service for emails.     | ""
 `frontend.web.vacuumDays`         | Days when to force vacuum the db.       | "sunday"
 `frontend.web.csrfTrustedOrigins` | Trusted origins for CSRF check          | ""
-`frontend.web.forcedHttpsUrls`    | Force internal absolute URLS to https   | false
+`frontend.web.forcedHttpsUrls`    | Force internal absolute URLs to https   | false
 
 `frontend.web.rootURL` is only necessary if it differs from `ingress.host` and `ingress.tls` values.
 By default, URL of the BDBA service is inferred from values specified for Ingress.
@@ -341,7 +341,7 @@ and `mon-sun` to vacuum daily.
 This is needed for example when TLS is not terminated in BDBA Ingress, but there is application load
 balancer terminating TLS.
 
-`frontend.web.forcedHttpsUrls` allows forcing all internal absolute URL links to be HTTPS. This is required
+`frontend.web.forcedHttpsUrls` allows forcing all internal absolute URL links to be https. This is required
 if BDBA is running behind a load balancer that does not send X-Forwarded-Proto -header.
 
 #### SMTP Configuration
