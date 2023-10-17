@@ -24,6 +24,7 @@ frontend:
     # rootURL: "http://bdba.local"
     vacuumDays: "sunday"
     # csrfTrustedOrigins: "https://...,https://"
+    forcedHttpsUrls: false
   email:
     enabled: false
     from: "noreply@bdba.local"
