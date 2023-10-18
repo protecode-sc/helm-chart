@@ -166,6 +166,10 @@ env:
   - name: TRUSTED_ORIGINS
     value: {{ .Values.frontend.web.csrfTrustedOrigins }}
   {{- end }}
+  {{- if .Values.frontend.web.forcedHttpsUrls }}
+  - name: FORCED_HTTPS_URLS
+    value: {{ .Values.frontend.web.forcedHttpsUrls | quote }}
+  {{- end }}
   - name: BROKER_URL
     valueFrom:
       secretKeyRef:

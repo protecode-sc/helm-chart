@@ -5,6 +5,10 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by usin
 
 ## Changes
 
+### 2023.9.0 -> 2023.9.1
+* Updated container versions
+* Added support for `frontend.web.forcedHttpsUrls` to force absolute internal urls to be sent over https. This allows running BDBA behind TLS-terminating L4 load balancer.
+
 ### 2023.6.1 -> 2023.9.0
 * Postgresql that is included in BDBA is upgraded to PostgreSQL 15. Please read upgrading guidance after changelog, as there are required steps involved.
 * Added `frontend.web.csrfTrustedOrigins` to override CSRF validations.
@@ -324,6 +328,7 @@ Parameter                         | Description                             | De
 `frontend.web.rootURL`            | Root URL of web service for emails.     | ""
 `frontend.web.vacuumDays`         | Days when to force vacuum the db.       | "sunday"
 `frontend.web.csrfTrustedOrigins` | Trusted origins for CSRF check          | ""
+`frontend.web.forcedHttpsUrls`    | Force internal absolute URLs to https   | false
 
 `frontend.web.rootURL` is only necessary if it differs from `ingress.host` and `ingress.tls` values.
 By default, URL of the BDBA service is inferred from values specified for Ingress.
@@ -335,6 +340,9 @@ and `mon-sun` to vacuum daily.
 `frontend.web.csrfTrustedOrigins` allows specifying list of trusted origins for unsafe requests.
 This is needed for example when TLS is not terminated in BDBA Ingress, but there is application load
 balancer terminating TLS.
+
+`frontend.web.forcedHttpsUrls` allows forcing all internal absolute URL links to be https. This is required
+if BDBA is running behind a load balancer that does not send X-Forwarded-Proto -header.
 
 #### SMTP Configuration
 
