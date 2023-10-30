@@ -170,12 +170,20 @@ env:
   - name: FORCED_HTTPS_URLS
     value: {{ .Values.frontend.web.forcedHttpsUrls | quote }}
   {{- end }}
+  {{ if .Values.rabbitmq.enabled }}
   - name: BROKER_URL
     valueFrom:
       secretKeyRef:
         name: bdba-rabbitmq-broker-url
         key: host
-  {{- if and .Values.postgresql.enabled }}
+  {{ else }}
+  - name: BROKER_URL
+    valueFrom:
+      secretKeyRef:
+        name: {{ include "bdba.fullname" . }}-rabbitmq-secrets
+        key: BROKER_URL
+  {{- end }}
+  {{- if .Values.postgresql.enabled }}
   - name: PGPASSWORD
     valueFrom:
       secretKeyRef:

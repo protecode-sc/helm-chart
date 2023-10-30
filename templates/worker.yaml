@@ -114,6 +114,7 @@ spec:
               value: "no"
             - name: SCANNER_CONCURRENCY
               value: {{ .Values.worker.concurrency | quote }}
+            {{- if .Values.rabbitmq.enabled }}
             - name: BROKER_URL
               valueFrom:
                 secretKeyRef:
@@ -124,6 +125,13 @@ spec:
                 secretKeyRef:
                   name: {{ include "bdba.rabbitmq.passwordSecretName" . }}
                   key: rabbitmq-password
+            {{ else }}
+            - name: BROKER_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "bdba.fullname" . }}-rabbitmq-secrets
+                  key: BROKER_URL
+            {{- end }}
             {{- if .Values.httpProxy }}
             - name: HTTP_PROXY
               valueFrom:

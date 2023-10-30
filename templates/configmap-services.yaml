@@ -39,5 +39,10 @@ data:
   {{- end }}
   INTERNAL_BUCKET: {{ .Values.frontend.internalBucket | quote }}
   UPLOAD_BUCKET: {{ .Values.frontend.uploadBucket | quote }}
+  {{- if .Values.memcached.enabled }}
   MEMCACHED: "{{ template "bdba.memcached.fullname" . }}:11211"
+  {{- else }}
+  MEMCACHED: {{ .Values.memcachedHostPort | quote }}
+  MEMCACHED_TLS: {{ .Values.memcachedTls | quote }}
+  {{- end }}
   INTERNAL_FRONTEND_URL: "http://{{ template "bdba.fullname" . }}-webapp:8000"

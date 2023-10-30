@@ -197,6 +197,7 @@ postgresql:
     successThreshold: 1
 
 memcached:
+  enabled: true
   image:
     tag: 1.6.21-debian-11-r107
   replicaCount: 1
@@ -240,6 +241,7 @@ rabbitmq:
   image:
     tag: 3.10.25-debian-11-r71
   rabbitmq:
+    enabled: true
     username: bdba
     existingPasswordSecret: bdba-rabbitmq-password-secret
     ## Erlang cookie to determine whether different nodes are allowed to communicate with each other
@@ -302,6 +304,13 @@ s3Endpoint: ""
 s3AccessKeyId: ""
 s3SecretAccessKey: ""
 s3Region: ""
+
+# External rabbitmq url
+brokerUrl: ""
+
+# External memcached
+memcachedHostPort: ""
+memcachedTls: false
 
 resources: {}
 
