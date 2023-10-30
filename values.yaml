@@ -305,12 +305,17 @@ s3AccessKeyId: ""
 s3SecretAccessKey: ""
 s3Region: ""
 
-# External rabbitmq url
+# External rabbitmq url (amqp://<user>:<password>@<host>:<port>/<vhost>)
 brokerUrl: ""
+brokerTls: false
+brokerClientSecretName: "" # tls secret for rabbitmq client certificate
+brokerRootCASecretName: "" # tls secret for rabbitmq root certificate  
 
 # External memcached
 memcachedHostPort: ""
 memcachedTls: false
+memcachedTlsClientSecretName: ""
+memcachedRootCASecretName: ""
 
 resources: {}
 

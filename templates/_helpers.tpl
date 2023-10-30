@@ -263,6 +263,26 @@ env:
   mountPath: /postgresql/ca/
   readOnly: true
 {{- end }}
+{{- if .Values.memcachedClientSecretName }}
+- name: memcached-client-store
+  mountPath: /memcached/client-cert/
+  readOnly: true
+{{- end }}
+{{- if .Values.memcachedRootCASecretName }}
+- name: memcached-ca-store
+  mountPath: /memcached/ca/
+  readOnly: true
+{{- end }}
+{{- if .Values.brokerClientSecretName }}
+- name: rabbitmq-client-store
+  mountPath: /rabbitmq/client-cert/
+  readOnly: true
+{{- end }}
+{{- if .Values.brokerRootCASecretName }}
+- name: rabbitmq-ca-store
+  mountPath: /rabbitmq/ca/
+  readOnly: true
+{{- end }}
 - name: tmpdir
   mountPath: /tmp
 {{- end -}}
@@ -287,6 +307,16 @@ env:
 - name: pgssl-ca-store
   secret:
     secretName: {{ .Values.frontend.database.rootCASecretName }}
+{{- end }}
+{{- if .Values.memcachedRootCASecretName }}
+- name: memcached-ca-store
+  secret:
+    secretName: {{ .Values.memcachedRootCASecretName }}
+{{- end }}
+{{- if .Values.memcachedClientSecretName }}
+- name: memcached-client-store
+  secret:
+    secretName: {{ .Values.memcachedClientSecretName }}
 {{- end }}
 - name: tmpdir
   emptyDir: {}
