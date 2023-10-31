@@ -3,6 +3,10 @@
 # Declare variables to be passed into your templates.
 
 frontend:
+  serviceAccount:
+    create: true
+    name: ""
+  createSecrets: true
   repository: docker.io/sigsynopsys/bdba-frontend
   tag: 2023.9.1
   pullPolicy: IfNotPresent

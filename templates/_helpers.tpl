@@ -62,6 +62,14 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
     {{- end -}}
 {{- end -}}
 
+{{- define "bdba.frontend.serviceAccountName" -}}
+    {{- if .Values.frontend.serviceAccount.name -}}
+        {{- printf "%s" .Values.frontend.serviceAccount.name -}}
+    {{- else -}}
+        {{- printf "%s-manage-secrets" (include "bdba.fullname" .) -}}
+    {{- end -}}
+{{- end -}}
+
 {{/*
 Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
