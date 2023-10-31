@@ -201,7 +201,11 @@ env:
       secretKeyRef:
         name: {{ include "bdba.minio.secretName" . }}
         key: secretkey
-{{- end }}
+  {{- end }}
+  {{ if .Values.brokerTls }}
+  - name: BROKER_USE_SSL
+    value: {{ .Values.brokerTls | quote }}
+  {{- end }}
 {{- end }}
 
 {{- define "bdba.s3env" -}}
@@ -317,6 +321,16 @@ env:
 - name: memcached-client-store
   secret:
     secretName: {{ .Values.memcachedClientSecretName }}
+{{- end }}
+{{- if .Values.brokerRootCASecretName }}
+- name: rabbitmq-ca-store
+  secret:
+    secretName: {{ .Values.brokerRootCASecretName }}
+{{- end }}
+{{- if .Values.brokerClientSecretName }}
+- name: rabbitmq-client-store
+  secret:
+    secretName: {{ .Values.brokerClientSecretName }}
 {{- end }}
 - name: tmpdir
   emptyDir: {}

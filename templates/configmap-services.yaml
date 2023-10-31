@@ -52,4 +52,12 @@ data:
   MEMCACHED_CAFILE: "/memcached/ca/ca.pem"
   {{- end }}
   {{- end }}
+  {{- if .Values.brokerClientSecretName }}
+  BROKER_TLS_CLIENT_KEY: "/rabbitmq/client-cert/tls.key"
+  BROKER_TLS_CLIENT_CERT: "/rabbitmq/client-cert/tls.crt"
+  {{- end }}
+  {{- if .Values.brokerRootCASecretName }}
+  BROKER_CA_CERTS: "/rabbitmq/ca/ca.pem"
+  {{- end }}
+
   INTERNAL_FRONTEND_URL: "http://{{ template "bdba.fullname" . }}-webapp:8000"
