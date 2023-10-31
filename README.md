@@ -5,6 +5,9 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by usin
 
 ## Changes
 
+### 2023.12.0
+* Added support for external rabbitmq and external memcached with optional mTLS.
+
 ### 2023.9.0 -> 2023.9.1
 * Updated container versions
 * Added support for `frontend.web.forcedHttpsUrls` to force absolute internal urls to be sent over https. This allows running BDBA behind TLS-terminating L4 load balancer.
@@ -499,7 +502,99 @@ $ kubectl create secret tls bdba-pgclient --key key.pem --cert cert.pem
 secret/bdba-pgclient created
 ```
 
-Possible values from postgresqlSslMode are specified in https://www.postgresql.org/docs/11/libpq-ssl.html.
+Possible values for `postgresqlSslMode` are specified in https://www.postgresql.org/docs/11/libpq-ssl.html.
+
+#### External Rabbitmq
+
+BDBA supports external rabbitmq with mutual TLS encryption. It also works with RabbitMQ-as-a-service offerings
+such as Amazon MQ. 
+
+*IMPORTANT!*: It is mandatory that rabbitmq is configured with larger-than-default consumer timeout. Some BDBA 
+tasks are longer than rabbitmq defaults allow and recommended value for it is `86400000`. Without this value,
+BDBA containers will experience unscheduled restarts and in some cases prematurely killed jobs.
+To set this value, add `consumer_timeout = 86400000` in `/etc/rabbitmq/rabbitmq.conf` if rabbitmq is running
+as systemd service. With other deployment models, consult the documentation how to do this.
+
+Configuration values are
+
+Parameter                | Description                                      | Default
+------------------------ | ------------------------------------------------ | --------------------
+`rabbitmq.enabled`       | Enable internal rabbitmq                         | true
+`brokerUrl`              | URL for broker                                   | ""
+`brokerTls`              | Enable TLS                                       | false
+`brokerRootCASecretName` | Kubernetes secret for root certificate           | ""
+`brokerClientSecretName` | Kubernetes secret name for client authentication | ""
+
+`rabbitmq.enabled` needs to be set as `false` to enable external rabbitmq.
+
+`brokerUrl` is the connection strings for rabbitmq service. It is in the form of `amqp://<user>:<password>@<host>:<port>/<vhost>`.
+
+NOTE! `brokerUrl` parameter does not support amqps suffix. To use amqps (amqp over TLS), specify port `5671` in connection
+string and set `brokerTls` as true.
+
+##### Root certificate
+
+In case TLS is in use for rabbitmq, you need to specify `brokerRootCASecretName` which points to a secret that contains
+the root certificate that rabbitmq uses unless the rabbitmq server certificate is signed by known trusted Certificate Authority.
+
+To populate the CA secret, run
+```
+$ kubectl create secret -n bdba generic rabbitmq-ca --from-file=ca.pem
+```
+
+Note that the filename MUST be ca.pem. In this case, the `brokerRootCASecretName` would be `rabbitmq-ca`.
+
+##### mTLS client authentication
+
+If rabbitmq server requires mTLS client authentication, you can pass client certificate in `brokerClientSecretName` secret.
+
+To populate the client certificate and key, run
+```
+$ kubectl create secret tls -n dev rabbitmq-client-cert --key="client-key.pem" --cert="client.pem"
+```
+
+In this case, the `brokerClientSecretName` would be `rabbitmq-client-cert`.
+
+#### External memcached
+BDBA uses memcached for certain locks and caches. Usage of external memcached is supported. It also works with
+memcached-as-a-service offerings such as Amazon ElastiCache. Memcached instance can be very lightweight.
+
+Configuration values are
+
+Parameter                      | Description                                      | Default
+------------------------------ | ------------------------------------------------ | --------------------
+`memcached.enabled`            | Enable internal memcached                        | true
+`memcachedHostPort`            | Host:port pair of memcached service              | ""
+`memcachedTls`                 | Enable TLS for memcached                         | false
+`memcachedRootCASecretName`    | Kubernetes secret for root certificate           | ""
+`memcachedTlsClientSecretName` | Kubernetes secret name for client authentication | ""
+
+`memcached.enabled` needs to be set as `false` to enable external memcached.
+
+`memcachedHostPort` is the <host>:<port> pair for memcached service, for example `memcached:11211`.
+
+##### Root certificate
+
+In case TLS is in use for memcached, you need to specify `memcachedRootCASecretName` which points to a secret that contains
+the root certificate that memcached uses unless the memcached server certificate is signed by known trusted Certificate Authority.
+
+To populate the CA secret, run
+```
+$ kubectl create secret -n bdba generic memcached-ca --from-file=ca.pem
+```
+
+Note that the filename MUST be ca.pem. In this case, the `memcachedRootCASecretName` would be `memcached-ca`.
+
+##### mTLS client authentication
+
+If memcached server requires mTLS client authentication, you can pass client certificate in `memcachedClientSecretName` secret.
+
+To populate the client certificate and key, run
+```
+$ kubectl create secret tls -n dev memcached-client-cert --key="client-key.pem" --cert="client.pem"
+```
+
+In this case, the `memcachedClientSecretName` would be `memcached-client-cert`.
 
 #### Ingress
 
@@ -551,6 +646,15 @@ secret/bdba-root created
 
 To use this as the root certificate, add `--set rootCASecret=bdba-root` to the Helm command line.
 
+### Backing up database
+To take backup of internal postgresql if external postgresql is not in use, you can use kubectl and pg_dump.
+
+```
+$ kubectl exec -it -n bdba bdba-postgresql-0 -- sh -c 'PGPASSWORD=$POSTGRES_PASSWORD pg_dump -Fc -d bdba -U bdba' >backup.pgdump
+```
+
+This will create backup.pgdump which is standard postgresql custom-format archive that can be restored using pg_restore.
+
 ### Migration from an Existing Appliance
 
 To migrate data from an existing VM-based appliance, backup API of the appliance
@@ -589,19 +693,6 @@ Once it is ready, get the "location" from the response and download the database
 $ curl -o backup.pgdump.tar -u admin "http://<APPLIANCE>/api/backup/appliance-NNNNN.pgdump"
 ```
 
-##### BDBA < 2021.12.0
-
-BDBA before 2021.12.0 wrapped the pgdump inside tarball. If backup is taken
-from BDBA before 2021.12.0, this step is necessary. If it is 2021.12.0 or later,
-this step can be omitted.
-
-Extract it backup file if it is made by BDBA before 2021.12.0:
-
-```console
-$ tar xvf backup.pgdump
-x database.pgdump
-```
-
 #### Stopping Services Accessing the Database
 
 Next, you need to stop deployments that access the database. These deployments are:
@@ -631,7 +722,7 @@ database.
 Kubectl into the database container and run:
 
 ```console
-$ kubectl exec -it -n dev hayrynen1-postgresql-0 bash
+$ kubectl exec -it -n bdba bdba-postgresql-0 bash
 ```
 
 In the PostgreSQL pod, enter the interactive PostgreSQL shell and execute:
