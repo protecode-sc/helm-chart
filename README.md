@@ -194,7 +194,7 @@ repository or cloning the chart from github.
 $ helm repo add synopsys https://sig-repo.synopsys.com/artifactory/sig-cloudnative
 ```
 
-##### Before upgrade
+##### Before the upgrade
 
 Ensure that `synopsys` helm repository is up-to-date.
 
