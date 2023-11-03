@@ -504,16 +504,16 @@ secret/bdba-pgclient created
 
 Possible values for `postgresqlSslMode` are specified in https://www.postgresql.org/docs/15/libpq-ssl.html.
 
-#### External Rabbitmq
+#### External RabbitMQ
 
 BDBA supports external RabbitMQ with mutual TLS encryption. It also works with RabbitMQ-as-a-service offerings
 such as Amazon MQ. 
 
 *IMPORTANT!*: It is mandatory that RabbitMQ is configured with larger than default consumer timeout. Some BDBA 
-tasks are longer than RabbitMQ defaults allow and recommended value for it is `86400000`. Without this value,
+tasks are longer than RabbitMQ defaults allow and the recommended value for them is `86400000`. Without this value,
 BDBA containers will experience unscheduled restarts and in some cases prematurely killed jobs.
 To set this value, add `consumer_timeout = 86400000` in `/etc/rabbitmq/rabbitmq.conf` if rabbitmq is running
-as systemd service. With other deployment models, consult the documentation how to do this.
+as a systemd service. With other deployment models, consult the documentation on how to do this.
 
 The configuration values are:
 
@@ -527,15 +527,15 @@ Parameter                | Description                                      | De
 
 `rabbitmq.enabled` needs to be set as `false` to enable external RabbitMQ.
 
-`brokerUrl` is the connection strings for rabbitmq service. It is in the form of `amqp://<user>:<password>@<host>:<port>/<vhost>`.
+`brokerUrl` is the connection string for RabbitMQ service. It is in the form of `amqp://<user>:<password>@<host>:<port>/<vhost>`.
 
-NOTE! `brokerUrl` parameter does not support amqps suffix. To use amqps (amqp over TLS), specify port `5671` in connection
+NOTE! The `brokerUrl` parameter does not support the amqps suffix. To use amqps (amqp over TLS), specify the port `5671` in the connection
 string and set `brokerTls` as true.
 
 ##### Root Certificate
 
 In case TLS is in use for RabbitMQ, you need to specify `brokerRootCASecretName` which points to a secret that contains
-the root certificate that RabbitMQ uses unless the RabbitMQ server certificate is signed by known trusted Certificate Authority.
+the root certificate that RabbitMQ uses unless the RabbitMQ server certificate is signed by a known trusted Certificate Authority.
 
 To populate the CA secret, run:
 ```console
@@ -546,7 +546,7 @@ Note that the filename MUST be ca.pem. In this case, `brokerRootCASecretName` wo
 
 ##### mTLS Client Authentication
 
-If the RabbitMQ server requires mTLS client authentication, you can pass the client certificate in `brokerClientSecretName` secret.
+If the RabbitMQ server requires mTLS client authentication, you can pass the client certificate in the `brokerClientSecretName` secret.
 
 To populate the client certificate and the key, run:
 ```console
@@ -557,7 +557,7 @@ In this case, `brokerClientSecretName` would be `rabbitmq-client-cert`.
 
 #### External memcached
 BDBA uses memcached for certain locks and caches. Usage of external memcached is supported. It also works with
-memcached-as-a-service offerings such as Amazon ElastiCache. Memcached instance can be very lightweight.
+memcached-as-a-service offerings such as Amazon ElastiCache. The memcached instance can be very lightweight.
 
 The configuration values are:
 
@@ -571,14 +571,14 @@ Parameter                      | Description                                    
 
 `memcached.enabled` needs to be set as `false` to enable external memcached.
 
-`memcachedHostPort` is the <host>:<port> pair for memcached service, for example `memcached:11211`.
+`memcachedHostPort` is the <host>:<port> pair for the memcached service, for example `memcached:11211`.
 
 ##### Root Certificate
 
 In case TLS is in use for memcached, you need to specify `memcachedRootCASecretName` which points to a secret that contains
-the root certificate that memcached uses unless the memcached server certificate is signed by known trusted Certificate Authority.
+the root certificate that memcached uses, unless the memcached server certificate is signed by a known trusted Certificate Authority.
 
-To populate the CA secret, run
+To populate the CA secret, run:
 ```
 $ kubectl create secret -n bdba generic memcached-ca --from-file=ca.pem
 ```
@@ -587,14 +587,14 @@ Note that the filename MUST be ca.pem. In this case, `memcachedRootCASecretName`
 
 ##### mTLS Client Authentication
 
-If memcached server requires mTLS client authentication, you can pass client certificate in `memcachedClientSecretName` secret.
+If the memcached server requires mTLS client authentication, you can pass the client certificate in the `memcachedClientSecretName` secret.
 
-To populate the client certificate and the key, run
+To populate the client certificate and the key, run:
 ```
 $ kubectl create secret tls -n dev memcached-client-cert --key="client-key.pem" --cert="client.pem"
 ```
 
-In this case, `memcachedClientSecretName` would be `memcached-client-cert`.
+In this case, the `memcachedClientSecretName` would be `memcached-client-cert`.
 
 #### Ingress
 
