@@ -506,60 +506,60 @@ Possible values for `postgresqlSslMode` are specified in https://www.postgresql.
 
 #### External Rabbitmq
 
-BDBA supports external rabbitmq with mutual TLS encryption. It also works with RabbitMQ-as-a-service offerings
+BDBA supports external RabbitMQ with mutual TLS encryption. It also works with RabbitMQ-as-a-service offerings
 such as Amazon MQ. 
 
-*IMPORTANT!*: It is mandatory that rabbitmq is configured with larger-than-default consumer timeout. Some BDBA 
-tasks are longer than rabbitmq defaults allow and recommended value for it is `86400000`. Without this value,
+*IMPORTANT!*: It is mandatory that RabbitMQ is configured with larger than default consumer timeout. Some BDBA 
+tasks are longer than RabbitMQ defaults allow and recommended value for it is `86400000`. Without this value,
 BDBA containers will experience unscheduled restarts and in some cases prematurely killed jobs.
 To set this value, add `consumer_timeout = 86400000` in `/etc/rabbitmq/rabbitmq.conf` if rabbitmq is running
 as systemd service. With other deployment models, consult the documentation how to do this.
 
-Configuration values are
+The configuration values are:
 
 Parameter                | Description                                      | Default
 ------------------------ | ------------------------------------------------ | --------------------
-`rabbitmq.enabled`       | Enable internal rabbitmq                         | true
+`rabbitmq.enabled`       | Enable internal RabbitMQ                         | true
 `brokerUrl`              | URL for broker                                   | ""
 `brokerTls`              | Enable TLS                                       | false
 `brokerRootCASecretName` | Kubernetes secret for root certificate           | ""
 `brokerClientSecretName` | Kubernetes secret name for client authentication | ""
 
-`rabbitmq.enabled` needs to be set as `false` to enable external rabbitmq.
+`rabbitmq.enabled` needs to be set as `false` to enable external RabbitMQ.
 
 `brokerUrl` is the connection strings for rabbitmq service. It is in the form of `amqp://<user>:<password>@<host>:<port>/<vhost>`.
 
 NOTE! `brokerUrl` parameter does not support amqps suffix. To use amqps (amqp over TLS), specify port `5671` in connection
 string and set `brokerTls` as true.
 
-##### Root certificate
+##### Root Certificate
 
-In case TLS is in use for rabbitmq, you need to specify `brokerRootCASecretName` which points to a secret that contains
-the root certificate that rabbitmq uses unless the rabbitmq server certificate is signed by known trusted Certificate Authority.
+In case TLS is in use for RabbitMQ, you need to specify `brokerRootCASecretName` which points to a secret that contains
+the root certificate that RabbitMQ uses unless the RabbitMQ server certificate is signed by known trusted Certificate Authority.
 
-To populate the CA secret, run
-```
+To populate the CA secret, run:
+```console
 $ kubectl create secret -n bdba generic rabbitmq-ca --from-file=ca.pem
 ```
 
-Note that the filename MUST be ca.pem. In this case, the `brokerRootCASecretName` would be `rabbitmq-ca`.
+Note that the filename MUST be ca.pem. In this case, `brokerRootCASecretName` would be `rabbitmq-ca`.
 
-##### mTLS client authentication
+##### mTLS Client Authentication
 
-If rabbitmq server requires mTLS client authentication, you can pass client certificate in `brokerClientSecretName` secret.
+If the RabbitMQ server requires mTLS client authentication, you can pass the client certificate in `brokerClientSecretName` secret.
 
-To populate the client certificate and key, run
-```
+To populate the client certificate and the key, run:
+```console
 $ kubectl create secret tls -n dev rabbitmq-client-cert --key="client-key.pem" --cert="client.pem"
 ```
 
-In this case, the `brokerClientSecretName` would be `rabbitmq-client-cert`.
+In this case, `brokerClientSecretName` would be `rabbitmq-client-cert`.
 
 #### External memcached
 BDBA uses memcached for certain locks and caches. Usage of external memcached is supported. It also works with
 memcached-as-a-service offerings such as Amazon ElastiCache. Memcached instance can be very lightweight.
 
-Configuration values are
+The configuration values are:
 
 Parameter                      | Description                                      | Default
 ------------------------------ | ------------------------------------------------ | --------------------
@@ -573,7 +573,7 @@ Parameter                      | Description                                    
 
 `memcachedHostPort` is the <host>:<port> pair for memcached service, for example `memcached:11211`.
 
-##### Root certificate
+##### Root Certificate
 
 In case TLS is in use for memcached, you need to specify `memcachedRootCASecretName` which points to a secret that contains
 the root certificate that memcached uses unless the memcached server certificate is signed by known trusted Certificate Authority.
@@ -583,18 +583,18 @@ To populate the CA secret, run
 $ kubectl create secret -n bdba generic memcached-ca --from-file=ca.pem
 ```
 
-Note that the filename MUST be ca.pem. In this case, the `memcachedRootCASecretName` would be `memcached-ca`.
+Note that the filename MUST be ca.pem. In this case, `memcachedRootCASecretName` would be `memcached-ca`.
 
-##### mTLS client authentication
+##### mTLS Client Authentication
 
 If memcached server requires mTLS client authentication, you can pass client certificate in `memcachedClientSecretName` secret.
 
-To populate the client certificate and key, run
+To populate the client certificate and the key, run
 ```
 $ kubectl create secret tls -n dev memcached-client-cert --key="client-key.pem" --cert="client.pem"
 ```
 
-In this case, the `memcachedClientSecretName` would be `memcached-client-cert`.
+In this case, `memcachedClientSecretName` would be `memcached-client-cert`.
 
 #### Ingress
 
@@ -646,14 +646,14 @@ secret/bdba-root created
 
 To use this as the root certificate, add `--set rootCASecret=bdba-root` to the Helm command line.
 
-### Backing up database
+### Backing Up Database
 To take backup of internal postgresql if external postgresql is not in use, you can use kubectl and pg_dump.
 
 ```
 $ kubectl exec -it -n bdba bdba-postgresql-0 -- sh -c 'PGPASSWORD=$POSTGRES_PASSWORD pg_dump -Fc -d bdba -U bdba' >backup.pgdump
 ```
 
-This will create backup.pgdump which is standard postgresql custom-format archive that can be restored using pg_restore.
+This will create `backup.pgdump` which is standard postgresql custom-format archive that can be restored using pg_restore.
 
 ### Migration from an Existing Appliance
 
