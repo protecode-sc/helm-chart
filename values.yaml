@@ -3,6 +3,10 @@
 # Declare variables to be passed into your templates.
 
 frontend:
+  serviceAccount:
+    create: true
+    name: ""
+  createSecrets: true
   repository: docker.io/sigsynopsys/bdba-frontend
   tag: 2023.9.1
   pullPolicy: IfNotPresent
@@ -197,6 +201,7 @@ postgresql:
     successThreshold: 1
 
 memcached:
+  enabled: true
   image:
     tag: 1.6.21-debian-11-r107
   replicaCount: 1
@@ -240,6 +245,7 @@ rabbitmq:
   image:
     tag: 3.10.25-debian-11-r71
   rabbitmq:
+    enabled: true
     username: bdba
     existingPasswordSecret: bdba-rabbitmq-password-secret
     ## Erlang cookie to determine whether different nodes are allowed to communicate with each other
@@ -302,6 +308,18 @@ s3Endpoint: ""
 s3AccessKeyId: ""
 s3SecretAccessKey: ""
 s3Region: ""
+
+# External rabbitmq url (amqp://<user>:<password>@<host>:<port>/<vhost>)
+brokerUrl: ""
+brokerTls: false
+brokerClientSecretName: "" # tls secret for rabbitmq client certificate
+brokerRootCASecretName: "" # tls secret for rabbitmq root certificate  
+
+# External memcached
+memcachedHostPort: ""
+memcachedTls: false
+memcachedTlsClientSecretName: ""
+memcachedRootCASecretName: ""
 
 resources: {}
 

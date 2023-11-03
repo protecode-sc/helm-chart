@@ -114,6 +114,7 @@ spec:
               value: "no"
             - name: SCANNER_CONCURRENCY
               value: {{ .Values.worker.concurrency | quote }}
+            {{- if .Values.rabbitmq.enabled }}
             - name: BROKER_URL
               valueFrom:
                 secretKeyRef:
@@ -124,6 +125,13 @@ spec:
                 secretKeyRef:
                   name: {{ include "bdba.rabbitmq.passwordSecretName" . }}
                   key: rabbitmq-password
+            {{ else }}
+            - name: BROKER_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "bdba.fullname" . }}-rabbitmq-secrets
+                  key: BROKER_URL
+            {{- end }}
             {{- if .Values.httpProxy }}
             - name: HTTP_PROXY
               valueFrom:
@@ -147,6 +155,20 @@ spec:
             - name: TASKS_LOG_FILE
               value: /app-log/celery.log
             {{- end }}
+            {{- if and (not .Values.rabbitmq.enabled) .Values.brokerRootCASecretName }}
+            - name: BROKER_CA_CERTS
+              value: /rabbitmq/ca/ca.pem
+            {{- end }}
+            {{ if .Values.brokerTls }}
+            - name: BROKER_USE_SSL
+              value: {{ .Values.brokerTls | quote }}
+            {{- end }}
+            {{- if and (not .Values.rabbitmq.enabled) .Values.brokerClientSecretName }}
+            - name: BROKER_TLS_CLIENT_CERT
+              value: "/rabbitmq/client-cert/tls.crt"
+            - name: BROKER_TLS_CLIENT_KEY
+              value: "/rabbitmq/client-cert/tls.key"
+            {{- end }}
             {{- include "bdba.s3env" . | nindent 12 }}
           volumeMounts:
             - name: {{ include "bdba.fullname" . }}-worker-applog
@@ -163,6 +185,16 @@ spec:
             {{- if .Values.rootCASecret }}
             - name: ca-store
               mountPath: /usr/local/share/ca-certificates/appcheck/
+              readOnly: true
+            {{- end }}
+            {{- if and (not .Values.rabbitmq.enabled) .Values.brokerRootCASecretName }}
+            - name: rabbitmq-ca-store
+              mountPath: /rabbitmq/ca/
+              readOnly: true
+            {{- end }}
+            {{- if and (not .Values.rabbitmq.enabled) .Values.brokerClientSecretName }}
+            - name: rabbitmq-client-cert-store
+              mountPath: /rabbitmq/client-cert/
               readOnly: true
             {{- end }}
           securityContext:
@@ -198,6 +230,16 @@ spec:
       - name: ca-store
         secret:
           secretName: {{ .Values.rootCASecret }}
+      {{- end }}
+      {{- if and (not .Values.rabbitmq.enabled) .Values.brokerRootCASecretName }}
+      - name: rabbitmq-ca-store
+        secret:
+          secretName: {{ .Values.brokerRootCASecretName }}
+      {{- end }}
+      {{- if and (not .Values.rabbitmq.enabled) .Values.brokerClientSecretName }}
+      - name: rabbitmq-client-cert-store
+        secret:
+          secretName: {{ .Values.brokerClientSecretName }}
       {{- end }}
       {{- if .Values.worker.applicationLogging.enabled }}
       - name: {{ include "bdba.fullname" . }}-worker-fluentbit-config

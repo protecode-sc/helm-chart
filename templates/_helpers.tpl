@@ -62,6 +62,14 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
     {{- end -}}
 {{- end -}}
 
+{{- define "bdba.frontend.serviceAccountName" -}}
+    {{- if .Values.frontend.serviceAccount.name -}}
+        {{- printf "%s" .Values.frontend.serviceAccount.name -}}
+    {{- else -}}
+        {{- printf "%s-manage-secrets" (include "bdba.fullname" .) -}}
+    {{- end -}}
+{{- end -}}
+
 {{/*
 Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
@@ -170,12 +178,20 @@ env:
   - name: FORCED_HTTPS_URLS
     value: {{ .Values.frontend.web.forcedHttpsUrls | quote }}
   {{- end }}
+  {{ if .Values.rabbitmq.enabled }}
   - name: BROKER_URL
     valueFrom:
       secretKeyRef:
         name: bdba-rabbitmq-broker-url
         key: host
-  {{- if and .Values.postgresql.enabled }}
+  {{ else }}
+  - name: BROKER_URL
+    valueFrom:
+      secretKeyRef:
+        name: {{ include "bdba.fullname" . }}-rabbitmq-secrets
+        key: BROKER_URL
+  {{- end }}
+  {{- if .Values.postgresql.enabled }}
   - name: PGPASSWORD
     valueFrom:
       secretKeyRef:
@@ -193,7 +209,11 @@ env:
       secretKeyRef:
         name: {{ include "bdba.minio.secretName" . }}
         key: secretkey
-{{- end }}
+  {{- end }}
+  {{ if .Values.brokerTls }}
+  - name: BROKER_USE_SSL
+    value: {{ .Values.brokerTls | quote }}
+  {{- end }}
 {{- end }}
 
 {{- define "bdba.s3env" -}}
@@ -255,6 +275,26 @@ env:
   mountPath: /postgresql/ca/
   readOnly: true
 {{- end }}
+{{- if .Values.memcachedClientSecretName }}
+- name: memcached-client-store
+  mountPath: /memcached/client-cert/
+  readOnly: true
+{{- end }}
+{{- if .Values.memcachedRootCASecretName }}
+- name: memcached-ca-store
+  mountPath: /memcached/ca/
+  readOnly: true
+{{- end }}
+{{- if .Values.brokerClientSecretName }}
+- name: rabbitmq-client-store
+  mountPath: /rabbitmq/client-cert/
+  readOnly: true
+{{- end }}
+{{- if .Values.brokerRootCASecretName }}
+- name: rabbitmq-ca-store
+  mountPath: /rabbitmq/ca/
+  readOnly: true
+{{- end }}
 - name: tmpdir
   mountPath: /tmp
 {{- end -}}
@@ -279,6 +319,26 @@ env:
 - name: pgssl-ca-store
   secret:
     secretName: {{ .Values.frontend.database.rootCASecretName }}
+{{- end }}
+{{- if .Values.memcachedRootCASecretName }}
+- name: memcached-ca-store
+  secret:
+    secretName: {{ .Values.memcachedRootCASecretName }}
+{{- end }}
+{{- if .Values.memcachedClientSecretName }}
+- name: memcached-client-store
+  secret:
+    secretName: {{ .Values.memcachedClientSecretName }}
+{{- end }}
+{{- if .Values.brokerRootCASecretName }}
+- name: rabbitmq-ca-store
+  secret:
+    secretName: {{ .Values.brokerRootCASecretName }}
+{{- end }}
+{{- if .Values.brokerClientSecretName }}
+- name: rabbitmq-client-store
+  secret:
+    secretName: {{ .Values.brokerClientSecretName }}
 {{- end }}
 - name: tmpdir
   emptyDir: {}
