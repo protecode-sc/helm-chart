@@ -502,7 +502,7 @@ $ kubectl create secret tls bdba-pgclient --key key.pem --cert cert.pem
 secret/bdba-pgclient created
 ```
 
-Possible values for `postgresqlSslMode` are specified in https://www.postgresql.org/docs/11/libpq-ssl.html.
+Possible values for `postgresqlSslMode` are specified in https://www.postgresql.org/docs/15/libpq-ssl.html.
 
 #### External Rabbitmq
 
