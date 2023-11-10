@@ -244,8 +244,8 @@ minio:
 rabbitmq:
   image:
     tag: 3.10.25-debian-11-r71
+  enabled: true
   rabbitmq:
-    enabled: true
     username: bdba
     existingPasswordSecret: bdba-rabbitmq-password-secret
     ## Erlang cookie to determine whether different nodes are allowed to communicate with each other
