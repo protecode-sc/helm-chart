@@ -167,7 +167,7 @@ pgupgrader:
 postgresql:
   image: 
     repository: "bitnami/postgresql"
-    tag: "15.4.0-debian-11-r54"
+    tag: "15.5.0-debian-11-r15"
   enabled: true
   postgresqlUsername: bdba
   postgresqlPassword: CHANGEME
@@ -203,7 +203,7 @@ postgresql:
 memcached:
   enabled: true
   image:
-    tag: 1.6.21-debian-11-r107
+    tag: 1.6.22-debian-11-r1
   replicaCount: 1
   pdbMinAvailable: 1
   resources:
@@ -243,7 +243,7 @@ minio:
 
 rabbitmq:
   image:
-    tag: 3.10.25-debian-11-r71
+    tag: 3.10.25-debian-11-r74
   enabled: true
   rabbitmq:
     username: bdba
