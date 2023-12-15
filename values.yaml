@@ -73,6 +73,9 @@ frontend:
   uploadBucket: "bdba-uploads"
   securityContext:
     enabled: true
+  extraEnv: []
+#    - name: "EXTRA_VARIABLE"
+#      value: "FOO"
   # disableEc2Metadata: true
 
 # rootCASecret:
@@ -114,7 +117,8 @@ worker:
     minReplicaCount: 1
     maxReplicaCount: 10
     queueLength: 2
-
+  extraEnv: []
+  
 fluentd:
   repository: docker.io/sigsynopsys/bdba-fluentd
   tag: 2023.9.1

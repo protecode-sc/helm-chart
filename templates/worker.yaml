@@ -170,6 +170,10 @@ spec:
               value: "/rabbitmq/client-cert/tls.key"
             {{- end }}
             {{- include "bdba.s3env" . | nindent 12 }}
+            {{- with .Values.worker.extraEnv }}
+            {{ toYaml . | nindent 12 }}
+            {{- end }}
+
           volumeMounts:
             - name: {{ include "bdba.fullname" . }}-worker-applog
               mountPath: /app-log
@@ -197,6 +201,7 @@ spec:
               mountPath: /rabbitmq/client-cert/
               readOnly: true
             {{- end }}
+
           securityContext:
             readOnlyRootFilesystem: true
         {{- if .Values.worker.applicationLogging.enabled }}

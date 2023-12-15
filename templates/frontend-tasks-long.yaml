@@ -93,6 +93,9 @@ spec:
             failureThreshold: 3
             timeoutSeconds: 35
           {{- include "bdba.frontendenv" . | nindent 10 }}
+          {{- with .Values.frontend.extraEnv }}
+          {{ toYaml . | nindent 12 }}
+          {{- end }}
           volumeMounts:
           {{- include "bdba.frontendmounts" . | indent 12 }}
             - name: {{ include "bdba.fullname" . }}-tasks-long-applog
