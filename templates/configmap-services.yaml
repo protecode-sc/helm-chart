@@ -39,5 +39,25 @@ data:
   {{- end }}
   INTERNAL_BUCKET: {{ .Values.frontend.internalBucket | quote }}
   UPLOAD_BUCKET: {{ .Values.frontend.uploadBucket | quote }}
+  {{- if .Values.memcached.enabled }}
   MEMCACHED: "{{ template "bdba.memcached.fullname" . }}:11211"
+  {{- else }}
+  MEMCACHED: {{ .Values.memcachedHostPort | quote }}
+  MEMCACHED_TLS: {{ .Values.memcachedTls | quote }}
+  {{- if .Values.memcachedClientSecretName }}
+  MEMCACHED_TLS_CLIENT_KEY: "/memcached/client-cert/tls.key"
+  MEMCACHED_TLS_CLIENT_CERT: "/memcached/client-cert/tls.crt"
+  {{- end }}
+  {{- if .Values.memcachedRootCASecretName }}
+  MEMCACHED_CAFILE: "/memcached/ca/ca.pem"
+  {{- end }}
+  {{- end }}
+  {{- if .Values.brokerClientSecretName }}
+  BROKER_TLS_CLIENT_KEY: "/rabbitmq/client-cert/tls.key"
+  BROKER_TLS_CLIENT_CERT: "/rabbitmq/client-cert/tls.crt"
+  {{- end }}
+  {{- if .Values.brokerRootCASecretName }}
+  BROKER_CA_CERTS: "/rabbitmq/ca/ca.pem"
+  {{- end }}
+
   INTERNAL_FRONTEND_URL: "http://{{ template "bdba.fullname" . }}-webapp:8000"
