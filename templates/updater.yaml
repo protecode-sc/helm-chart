@@ -80,7 +80,14 @@ spec:
           args: [ "update" ]
           readinessProbe:
             exec:
-              command: ["/scripts/probe-updater"]
+              command:
+              - sh
+              - -c
+              - |-
+                if [ -f /tmp/updater.pid ]; then
+                  test -d /proc/$(cat /tmp/updater.pid);
+                else /scripts/probe-updater
+                fi
             initialDelaySeconds: 30
             periodSeconds: 30
             successThreshold: 1
@@ -88,7 +95,14 @@ spec:
             timeoutSeconds: 35
           livenessProbe:
             exec:
-              command: ["/scripts/probe-updater"]
+              command:
+              - sh
+              - -c
+              - |-
+                if [ -f /tmp/updater.pid ]; then
+                  test -d /proc/$(cat /tmp/updater.pid);
+                else /scripts/probe-updater
+                fi
             initialDelaySeconds: 30
             periodSeconds: 60
             successThreshold: 1

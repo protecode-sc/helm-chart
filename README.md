@@ -5,6 +5,9 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by usin
 
 ## Changes
 
+### 2023.12.1
+* Fixed updater health check that could cause it to timeout during first install.
+
 ### 2023.12.0
 * Added support for external rabbitmq and external memcached with optional mTLS.
 * Added support for `frontend.extraEnv` and `worker.extraEnv` to pass additional environment variables
