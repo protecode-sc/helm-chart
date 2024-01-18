@@ -81,13 +81,7 @@ spec:
           readinessProbe:
             exec:
               command:
-              - sh
-              - -c
-              - |-
-                if [ -f /tmp/updater.pid ]; then
-                  test -d /proc/$(cat /tmp/updater.pid);
-                else /scripts/probe-updater
-                fi
+              - /scripts/probe-updater
             initialDelaySeconds: 30
             periodSeconds: 30
             successThreshold: 1
@@ -96,13 +90,7 @@ spec:
           livenessProbe:
             exec:
               command:
-              - sh
-              - -c
-              - |-
-                if [ -f /tmp/updater.pid ]; then
-                  test -d /proc/$(cat /tmp/updater.pid);
-                else /scripts/probe-updater
-                fi
+              - /scripts/probe-updater
             initialDelaySeconds: 30
             periodSeconds: 60
             successThreshold: 1
