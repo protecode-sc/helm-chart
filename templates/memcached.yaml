@@ -63,7 +63,7 @@ spec:
           readinessProbe:
             tcpSocket:
               port: 11211
-            initialDelaySeconds: 60
+            initialDelaySeconds: 5
             periodSeconds: 15
             timeoutSeconds: 1
             successThreshold: 1
