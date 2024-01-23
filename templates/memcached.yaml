@@ -13,8 +13,8 @@ spec:
       protocol: TCP
       name: memcache
   selector:
-    app: "memcached"
-    release: {{ .Release.Name }}
+    app.kubernetes.io/name: "memcached"
+    app.kubernetes.io/instance: {{ .Release.Name }}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -34,6 +34,8 @@ spec:
       labels:
         app.kubernetes.io/name: "memcached"
         app.kubernetes.io/instance: "{{ .Release.Name }}"
+        release: {{ .Release.Name | quote }}
+        app: "memcached"
     spec:
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -49,6 +51,7 @@ spec:
         - name: "memcached"
           image: "{{ .Values.memcached.image.repository }}:{{ .Values.memcached.image.tag }}"
           imagePullPolicy: {{ .Values.memcached.image.pullPolicy }}
+          args: [ "-l", "0.0.0.0" ]
           livenessProbe:
             tcpSocket:
               port: 11211
@@ -65,6 +68,9 @@ spec:
             timeoutSeconds: 1
             successThreshold: 1
             failureThreshold: 3
+          ports:
+            - name: "memcache"
+              containerPort: 11211
           resources:
             {{- toYaml .Values.memcached.resources | nindent 12 }}
 {{- end }}
