@@ -26,14 +26,14 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: "memcached"
-      release: {{ .Release.Name }}
+      app.kubernetes.io/name: "memcached"
+      app.kubernetes.io/instance: {{ .Release.Name }}
   template:
     metadata:
       name: {{ template "bdba.memcached.fullname" . }}
       labels:
-        app: "memcached"
-        release: {{ .Release.Name }}
+        app.kubernetes.io/name: "memcached"
+        app.kubernetes.io/instance: "{{ .Release.Name }}"
     spec:
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
