@@ -164,6 +164,7 @@ global:
     existingSecret: ""
 
 pgupgrader:
+  enabled: true
   image:
     repository: "docker.io/sigsynopsys/bdba-pgupgrader"
     tag: "2023.12.0"

@@ -5,6 +5,12 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by usin
 
 ## Changes
 
+### 2023.12.2
+* Removed bitnami memcached helm chart and replaced it with internal `memcached.yaml`. Also memcached container
+  is replaced with official Docker memcached container.
+* pgupgrader can now be disabled using `pgupgrader.enabled=false`.
+* All containers now honor imagePullSecrets.
+
 ### 2023.12.1
 * Fixed updater health check that could cause it to timeout during first install.
 
