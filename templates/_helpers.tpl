@@ -224,6 +224,13 @@ env:
       name: {{ include "bdba.fullname" . }}-services-configmap
       key: S3_ENDPOINT
 {{- end }}
+{{- if .Values.s3Region }}
+- name: S3_REGION
+  valueFrom:
+    configMapKeyRef:
+      name: {{ include "bdba.fullname" . }}-services-configmap
+      key: S3_REGION
+{{- end }}
 {{- if .Values.minio.enabled }}
 - name: AWS_ACCESS_KEY_ID
   valueFrom:
