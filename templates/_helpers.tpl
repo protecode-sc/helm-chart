@@ -230,6 +230,11 @@ env:
     configMapKeyRef:
       name: {{ include "bdba.fullname" . }}-services-configmap
       key: S3_REGION
+- name: AWS_DEFAULT_REGION
+  valueFrom:
+    configMapKeyRef:
+      name: {{ include "bdba.fullname" . }}-services-configmap
+      key: S3_REGION
 {{- end }}
 {{- if .Values.minio.enabled }}
 - name: AWS_ACCESS_KEY_ID
