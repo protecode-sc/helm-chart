@@ -6,6 +6,7 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by usin
 ## Changes
 
 ### 2023.12.2
+* s3Region is now properly propagated to all containers using S3.
 * Added support for installing BDBA using images from Ironbank.
 * Removed bitnami memcached helm chart and replaced it with internal `memcached.yaml`. Also memcached container
   is replaced with official Docker memcached container.

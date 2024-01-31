@@ -25,7 +25,7 @@ Please consult `README.md` how to do so.
 
 ### Installation
 
-Ironbank confuguration can be used by just adding values-ironbank.yaml for helm chart. Example:
+Ironbank configuration can be used by just adding values-ironbank.yaml for helm chart. Example:
 
 ```
 $ helm upgrade bdba-ironbank . --install --namespace ironbank --debug -f values.yaml -f values-ironbank.yaml -f ../../configs/values-bdba.yaml
