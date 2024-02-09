@@ -5,6 +5,9 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by usin
 
 ## Changes
 
+### 2023.12.3
+* Set http proxy configuration also as lower case environment variables to fix compatibility with AWS tooling.
+
 ### 2023.12.2
 * s3Region is now properly propagated to all containers using S3.
 * Added support for installing BDBA using images from Ironbank.
