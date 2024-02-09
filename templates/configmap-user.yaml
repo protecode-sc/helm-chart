@@ -10,9 +10,12 @@ data:
   {{- if .Values.httpProxy }}
   HTTP_PROXY: {{ .Values.httpProxy | quote }}
   HTTPS_PROXY: {{ .Values.httpProxy | quote }}
+  http_proxy: {{ .Values.httpProxy | quote }}
+  https_proxy: {{ .Values.httpProxy | quote }}
   {{- end }}
   {{- if .Values.httpNoProxy }}
   NO_PROXY: {{ .Values.httpNoProxy | quote }}
+  no_proxy: {{ .Values.httpNoProxy | quote }}
   {{- end }}
   {{- if .Values.logRetention }}
   LOG_RETENTION_DAYS: {{ .Values.logRetention | quote }}

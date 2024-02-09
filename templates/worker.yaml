@@ -138,7 +138,17 @@ spec:
                 configMapKeyRef:
                   name: {{ include "bdba.fullname" . }}-user-configmap
                   key: HTTP_PROXY
+            - name: http_proxy
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "bdba.fullname" . }}-user-configmap
+                  key: HTTP_PROXY
             - name: HTTPS_PROXY
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "bdba.fullname" . }}-user-configmap
+                  key: HTTP_PROXY
+            - name: https_proxy
               valueFrom:
                 configMapKeyRef:
                   name: {{ include "bdba.fullname" . }}-user-configmap
@@ -146,6 +156,11 @@ spec:
             {{- end }}
             {{- if .Values.httpNoProxy }}
             - name: NO_PROXY
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "bdba.fullname" . }}-user-configmap
+                  key: NO_PROXY
+            - name: no_proxy
               valueFrom:
                 configMapKeyRef:
                   name: {{ include "bdba.fullname" . }}-user-configmap
