@@ -6,6 +6,7 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by usin
 ## Changes
 
 ### 2023.12.3
+* Include `secrets-rabbitmq.yaml` for external rabbitmq secrets.
 * Set http proxy configuration also as lower case environment variables to fix compatibility with AWS tooling.
 
 ### 2023.12.2
