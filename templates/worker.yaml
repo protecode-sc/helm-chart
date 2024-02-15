@@ -97,6 +97,9 @@ spec:
             failureThreshold: 3
             timeoutSeconds: 35
           resources:
+            {{- if .Values.worker.resources }}
+            {{- toYaml .Values.worker.resources | nindent 12 }}
+            {{ else }}
             requests:
               cpu: {{ mul .Values.worker.concurrency 250 }}m
               memory: {{ mul .Values.worker.concurrency .Values.worker.memoryPerScanner }}Gi
@@ -109,6 +112,7 @@ spec:
               {{- if not .Values.worker.storageClass }}
               ephemeral-storage: {{ mul .Values.worker.concurrency 100}}Gi
               {{- end }}
+            {{- end }}
           env:
             - name: SKIP_FRONTEND_ANNOUNCE
               value: "no"

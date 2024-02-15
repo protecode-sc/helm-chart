@@ -118,6 +118,15 @@ worker:
     maxReplicaCount: 10
     queueLength: 2
   extraEnv: []
+#  resources:
+#    requests:
+#      memory: "4Gi"
+#      cpu: "1"
+#      ephemeral-storage: "30Gi"
+#    limits:
+#      memory: "6Gi"
+#      cpu: "2"
+#      ephemeral-storage: "30Gi"
   
 fluentd:
   repository: docker.io/sigsynopsys/bdba-fluentd
