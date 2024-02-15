@@ -148,6 +148,8 @@ spec:
         app.kubernetes.io/name: {{ include "bdba.name" . }}-fluentd
         app.kubernetes.io/instance: {{ .Release.Name }}
         release: {{ .Release.Name | quote }}
+      annotations:
+        {{- include "bdba.configchecksum" . | nindent 8 }}
     spec:
       containers:
         - name: {{ .Chart.Name }}-fluentd
