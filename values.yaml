@@ -102,7 +102,7 @@ worker:
   replicas: 1
   concurrency: 1
   repository: docker.io/sigsynopsys/bdba-worker
-  tag: "2023.12.2"
+  tag: "2023.12.3"
   pullPolicy: IfNotPresent
   applicationLogging:
     enabled: true
