@@ -6,6 +6,7 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by usin
 ## Changes
 
 ### 2023.12.4
+* Bump worker image to 2023.12.3.
 * Worker now honors '.Values.worker.resources' for fine grained resource requests and limits.
 * fluentd is not reloaded with config changes.
 
