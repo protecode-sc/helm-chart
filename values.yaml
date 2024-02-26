@@ -124,7 +124,7 @@ worker:
 #      cpu: "1"
 #      ephemeral-storage: "30Gi"
 #    limits:
-#      memory: "6Gi"
+#      memory: "8Gi"
 #      cpu: "2"
 #      ephemeral-storage: "30Gi"
   
