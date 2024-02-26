@@ -1,0 +1,42 @@
+frontend:
+  tag: "2023.12.2"
+  repository: "registry1.dso.mil/synopsys/bdba/bdba-frontend"
+  applicationLogging:
+    enabled: false
+
+worker:
+  tag: "2023.12.2"
+  repository: "registry1.dso.mil/synopsys/bdba/bdba-worker"
+  applicationLogging:
+    enabled: false
+
+postgresql:
+  image:
+    repository: "registry1.dso.mil/ironbank/opensource/postgres/postgresql"
+    tag: "15.5"
+
+pgupgrader:
+  enabled: false
+
+rabbitmq:
+  image:
+    registry: "registry1.dso.mil/ironbank"
+    repository: "bitnami/rabbitmq"
+    tag: "3.12.12"
+  global:
+    imagePullSecrets: []
+  # Ironbank image removes curl, which probes depend on.
+  livenessProbe:
+    enabled: false
+  readinessProbe:
+    enabled: false
+
+memcached:
+  image:
+    repository: "registry1.dso.mil/ironbank/opensource/memcached/memcached"
+    tag: "1.6.23"
+
+minio:
+  image:
+    repository: "registry1.dso.mil/ironbank/opensource/minio/minio"
+    tag: "RELEASE.2024-01-18T22-51-28Z"

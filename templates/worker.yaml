@@ -97,6 +97,9 @@ spec:
             failureThreshold: 3
             timeoutSeconds: 35
           resources:
+            {{- if .Values.worker.resources }}
+            {{- toYaml .Values.worker.resources | nindent 12 }}
+            {{ else }}
             requests:
               cpu: {{ mul .Values.worker.concurrency 250 }}m
               memory: {{ mul .Values.worker.concurrency .Values.worker.memoryPerScanner }}Gi
@@ -109,6 +112,7 @@ spec:
               {{- if not .Values.worker.storageClass }}
               ephemeral-storage: {{ mul .Values.worker.concurrency 100}}Gi
               {{- end }}
+            {{- end }}
           env:
             - name: SKIP_FRONTEND_ANNOUNCE
               value: "no"
@@ -138,7 +142,17 @@ spec:
                 configMapKeyRef:
                   name: {{ include "bdba.fullname" . }}-user-configmap
                   key: HTTP_PROXY
+            - name: http_proxy
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "bdba.fullname" . }}-user-configmap
+                  key: HTTP_PROXY
             - name: HTTPS_PROXY
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "bdba.fullname" . }}-user-configmap
+                  key: HTTP_PROXY
+            - name: https_proxy
               valueFrom:
                 configMapKeyRef:
                   name: {{ include "bdba.fullname" . }}-user-configmap
@@ -146,6 +160,11 @@ spec:
             {{- end }}
             {{- if .Values.httpNoProxy }}
             - name: NO_PROXY
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "bdba.fullname" . }}-user-configmap
+                  key: NO_PROXY
+            - name: no_proxy
               valueFrom:
                 configMapKeyRef:
                   name: {{ include "bdba.fullname" . }}-user-configmap

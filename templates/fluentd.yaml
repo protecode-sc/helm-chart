@@ -148,6 +148,8 @@ spec:
         app.kubernetes.io/name: {{ include "bdba.name" . }}-fluentd
         app.kubernetes.io/instance: {{ .Release.Name }}
         release: {{ .Release.Name | quote }}
+      annotations:
+        {{- include "bdba.configchecksum" . | nindent 8 }}
     spec:
       containers:
         - name: {{ .Chart.Name }}-fluentd
@@ -156,6 +158,40 @@ spec:
           args: ["-c", "/bdba-fluentd/fluentd.conf"]
           env:
             {{- include "bdba.s3env" . | nindent 12 }}
+            {{- if .Values.httpProxy }}
+            - name: HTTP_PROXY
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "bdba.fullname" . }}-user-configmap
+                  key: HTTP_PROXY
+            - name: http_proxy
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "bdba.fullname" . }}-user-configmap
+                  key: HTTP_PROXY
+            - name: HTTPS_PROXY
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "bdba.fullname" . }}-user-configmap
+                  key: HTTP_PROXY
+            - name: https_proxy
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "bdba.fullname" . }}-user-configmap
+                  key: HTTP_PROXY
+            {{- end }}
+            {{- if .Values.httpNoProxy }}
+            - name: NO_PROXY
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "bdba.fullname" . }}-user-configmap
+                  key: NO_PROXY
+            - name: no_proxy
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "bdba.fullname" . }}-user-configmap
+                  key: NO_PROXY
+            {{- end }}
           volumeMounts:
             - name: {{ include "bdba.fullname" . }}-fluentd-logs
               mountPath: /logs

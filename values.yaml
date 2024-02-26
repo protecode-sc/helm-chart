@@ -8,7 +8,7 @@ frontend:
     name: ""
   createSecrets: true
   repository: docker.io/sigsynopsys/bdba-frontend
-  tag: 2023.12.0
+  tag: "2023.12.2"
   pullPolicy: IfNotPresent
   database:
     {}
@@ -102,7 +102,7 @@ worker:
   replicas: 1
   concurrency: 1
   repository: docker.io/sigsynopsys/bdba-worker
-  tag: 2023.12.0
+  tag: "2023.12.3"
   pullPolicy: IfNotPresent
   applicationLogging:
     enabled: true
@@ -118,10 +118,19 @@ worker:
     maxReplicaCount: 10
     queueLength: 2
   extraEnv: []
+#  resources:
+#    requests:
+#      memory: "4Gi"
+#      cpu: "1"
+#      ephemeral-storage: "30Gi"
+#    limits:
+#      memory: "6Gi"
+#      cpu: "2"
+#      ephemeral-storage: "30Gi"
   
 fluentd:
   repository: docker.io/sigsynopsys/bdba-fluentd
-  tag: 2023.12.0
+  tag: "2023.12.2"
   pullPolicy: IfNotPresent
   resources:
     requests:
@@ -164,9 +173,10 @@ global:
     existingSecret: ""
 
 pgupgrader:
+  enabled: true
   image:
     repository: "docker.io/sigsynopsys/bdba-pgupgrader"
-    tag: "2023.12.0"
+    tag: "2023.12.2"
 
 postgresql:
   image: 
@@ -207,7 +217,8 @@ postgresql:
 memcached:
   enabled: true
   image:
-    tag: 1.6.22-debian-11-r1
+    repository: memcached
+    tag: 1.6.23-bookworm
   replicaCount: 1
   pdbMinAvailable: 1
   resources:

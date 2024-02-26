@@ -75,6 +75,11 @@ spec:
         release: {{ .Release.Name }}
         role: master
     spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.pgupgrader.enabled }}
       initContainers:
         - name: {{ template "bdba.postgresql.fullname" . }}-upgrader
           image: "{{ .Values.pgupgrader.image.repository}}:{{ .Values.pgupgrader.image.tag}}"
@@ -82,6 +87,7 @@ spec:
           volumeMounts:
             - name: data
               mountPath: "/pgvolume"
+      {{- end }}
       containers:
         - name: {{ template "bdba.postgresql.fullname" . }}
           image: "{{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}"

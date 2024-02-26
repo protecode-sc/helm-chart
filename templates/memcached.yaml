@@ -1,0 +1,76 @@
+{{- if .Values.memcached.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "bdba.memcached.fullname" . }}
+  labels:
+{{ include "bdba.labels" . | indent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: 11211
+      targetPort: 11211
+      protocol: TCP
+      name: memcache
+  selector:
+    app.kubernetes.io/name: "memcached"
+    app.kubernetes.io/instance: {{ .Release.Name }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "bdba.memcached.fullname" . }}
+  labels:
+{{ include "bdba.labels" . | indent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: "memcached"
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      name: {{ template "bdba.memcached.fullname" . }}
+      labels:
+        app.kubernetes.io/name: "memcached"
+        app.kubernetes.io/instance: "{{ .Release.Name }}"
+        release: {{ .Release.Name | quote }}
+        app: "memcached"
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      {{- if .Values.memcached.securityContext.enabled }}
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      {{- end }}
+      containers:
+        - name: "memcached"
+          image: "{{ .Values.memcached.image.repository }}:{{ .Values.memcached.image.tag }}"
+          imagePullPolicy: {{ .Values.memcached.image.pullPolicy }}
+          args: [ "-l", "0.0.0.0" ]
+          livenessProbe:
+            tcpSocket:
+              port: 11211
+            initialDelaySeconds: 5
+            periodSeconds: 30
+            timeoutSeconds: 1
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            tcpSocket:
+              port: 11211
+            initialDelaySeconds: 5
+            periodSeconds: 15
+            timeoutSeconds: 1
+            successThreshold: 1
+            failureThreshold: 3
+          ports:
+            - name: "memcache"
+              containerPort: 11211
+          resources:
+            {{- toYaml .Values.memcached.resources | nindent 12 }}
+{{- end }}

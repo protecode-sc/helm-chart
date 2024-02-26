@@ -5,6 +5,23 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by usin
 
 ## Changes
 
+### 2023.12.4
+* Bump worker image to 2023.12.3.
+* Worker now honors '.Values.worker.resources' for fine grained resource requests and limits.
+* fluentd is now reloaded with config changes.
+
+### 2023.12.3
+* Include `secrets-rabbitmq.yaml` for external rabbitmq secrets.
+* Set http proxy configuration also as lower case environment variables to fix compatibility with AWS tooling.
+
+### 2023.12.2
+* s3Region is now properly propagated to all containers using S3.
+* Added support for installing BDBA using images from Ironbank.
+* Removed bitnami memcached helm chart and replaced it with internal `memcached.yaml`. Also memcached container
+  is replaced with official Docker memcached container.
+* pgupgrader can now be disabled using `pgupgrader.enabled=false`.
+* All containers now honor imagePullSecrets.
+
 ### 2023.12.1
 * Fixed updater health check that could cause it to timeout during first install.
 
