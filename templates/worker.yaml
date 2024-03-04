@@ -264,6 +264,7 @@ spec:
       - name: rabbitmq-client-cert-store
         secret:
           secretName: {{ .Values.brokerClientSecretName }}
+          defaultMode: 0640
       {{- end }}
       {{- if .Values.worker.applicationLogging.enabled }}
       - name: {{ include "bdba.fullname" . }}-worker-fluentbit-config
