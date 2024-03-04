@@ -5,6 +5,9 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by usin
 
 ## Changes
 
+### 2023.12.5
+* Fixed client secret permissions when mTLS was in use for external services to be more strict.
+
 ### 2023.12.4
 * Bump worker image to 2023.12.3.
 * Worker now honors '.Values.worker.resources' for fine grained resource requests and limits.
