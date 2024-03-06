@@ -327,6 +327,7 @@ env:
 - name: pgssl-client-store
   secret:
     secretName: {{ .Values.frontend.database.clientSecretName }}
+    defaultMode: 0640
 {{- end }}
 {{- if .Values.frontend.database.rootCASecretName }}
 - name: pgssl-ca-store
@@ -342,6 +343,7 @@ env:
 - name: memcached-client-store
   secret:
     secretName: {{ .Values.memcachedClientSecretName }}
+    defaultMode: 0640
 {{- end }}
 {{- if .Values.brokerRootCASecretName }}
 - name: rabbitmq-ca-store
@@ -352,6 +354,7 @@ env:
 - name: rabbitmq-client-store
   secret:
     secretName: {{ .Values.brokerClientSecretName }}
+    defaultMode: 0640
 {{- end }}
 - name: tmpdir
   emptyDir: {}
