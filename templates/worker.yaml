@@ -158,6 +158,10 @@ spec:
                   name: {{ include "bdba.fullname" . }}-user-configmap
                   key: HTTP_PROXY
             {{- end }}
+            {{- if .Values.worker.scanSpecificLogging.enabled }}
+            - name: SCAN_LOG_DIR
+              value: /scan-logs
+            {{- end }}
             {{- if .Values.httpNoProxy }}
             - name: NO_PROXY
               valueFrom:
@@ -210,6 +214,10 @@ spec:
               mountPath: /usr/local/share/ca-certificates/appcheck/
               readOnly: true
             {{- end }}
+            {{- if .Values.worker.scanSpecificLogging.enabled }}
+            - name: {{ include "bdba.fullname" . }}-worker-scan-logs
+              mountPath: /scan-logs
+            {{- end }}
             {{- if and (not .Values.rabbitmq.enabled) .Values.brokerRootCASecretName }}
             - name: rabbitmq-ca-store
               mountPath: /rabbitmq/ca/
@@ -244,6 +252,10 @@ spec:
       volumes:
       - name: {{ include "bdba.fullname" . }}-worker-applog
         emptyDir: {}
+      {{- if .Values.worker.scanSpecificLogging.enabled }}
+      - name: {{ include "bdba.fullname" . }}-worker-scan-logs
+        emptyDir: {}
+      {{- end }}
       {{- if not .Values.worker.storageClass }}
       - name: {{ include "bdba.fullname" . }}-worker-tmp
         emptyDir: {}

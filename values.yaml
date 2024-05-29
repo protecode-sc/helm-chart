@@ -106,6 +106,8 @@ worker:
   pullPolicy: IfNotPresent
   applicationLogging:
     enabled: true
+  scanSpecificLogging:
+    enabled: false
   memoryPerScanner: 4  # Gigabytes, must be integer
   storagePerScanner: 30  # Gigabytes, must be integer
   storageClass: ""

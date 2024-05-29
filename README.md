@@ -432,11 +432,15 @@ To use this as the root certificate, add `--set frontend.ldap.rootCASecret=bdba-
 Black Duck Binary Analysis uses Fluentd to centrally log. Relevant application pods are joined by
 a Fluent Bit sidecar.
 
-Parameter                     | Description                                      | Default
------------------------------ | ------------------------------------------------ | ---------------
-`frontend.applicationLogging` | Enable application logging for webapp pods.      | true
-`worker.applicationLogging`   | Enable application logging for worker pods.      | true
-`logRetention`                | Days to keep the application logs (0 to disable) | 30
+Parameter                             | Description                                      | Default
+------------------------------------- | ------------------------------------------------ | ---------------
+`frontend.applicationLogging.enabled` | Enable application logging for webapp pods.      | true
+`worker.applicationLogging.enabled`   | Enable application logging for worker pods.      | true
+`worker.scanSpecificLogging.enabled`  | Enable scan specific logging in worker pods.     | false
+`logRetention`                        | Days to keep the application logs (0 to disable) | 30
+
+`worker.scanSpecificLogging.enabled` enables scan-specific logging in worker. After scan has been completed,
+it uploads the logs into object storage so they can be downloaded for troubleshooting. 
 
 #### Cloud provider -specific settings
 
@@ -464,6 +468,9 @@ However, if nodes have limited ephemeral storage available (that is, nodes conta
 small root disks), `worker.storageClass` allows reserving work space for
 scanners from persistent volumes. This also makes the workers run as Kubernetes
 StatefulSets. Each worker pod reserves it's own workspace from persistent volume.
+
+It is recommended to keep `worker.concurrency` as 1 to isolate scanners from each other and
+to more efficiently use cluster resources. 
 
 #### Worker Autoscaling
 
