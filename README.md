@@ -794,7 +794,7 @@ Exit the db shell with `^D` to proceed.
 Copy the database dump to the PostgreSQL pod.
 
 ```console
-$ kubectl cp database.pgdump dev/NS-postgresql-0:/tmp
+$ kubectl cp database.pgdump NS/<release>-postgresql-0:/tmp
 ```
 
 Next, restore the database. In the PostgreSQL pod, execute:
