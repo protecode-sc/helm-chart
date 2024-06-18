@@ -7,7 +7,7 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by usin
 
 ### 2024.6.0
 * Bump containers to new 2024.6.0 versions.
-* Upgrade service containers
+* Upgrade service containers.
 * Added support for storing and fetching scan specific log files. This needs to be enabled using `worker.scanSpecificLogging.enabled`.
 
 ### 2024.3.1
@@ -441,7 +441,7 @@ Parameter                             | Description                             
 ------------------------------------- | ------------------------------------------------ | ---------------
 `frontend.applicationLogging.enabled` | Enable application logging for webapp pods.      | true
 `worker.applicationLogging.enabled`   | Enable application logging for worker pods.      | true
-`worker.scanSpecificLogging.enabled`  | Enable scan specific logging in worker pods.     | false
+`worker.scanSpecificLogging.enabled`  | Enable scan specific logging in worker pods.     | false
 `logRetention`                        | Days to keep the application logs (0 to disable) | 30
 
 `worker.scanSpecificLogging.enabled` enables scan-specific logging in worker. After scan has been completed,
