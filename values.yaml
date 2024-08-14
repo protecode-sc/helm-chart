@@ -74,6 +74,10 @@ frontend:
   securityContext:
     enabled: true
   extraEnv: []
+  metrics:
+    enabled: false
+    serviceMonitor:
+      enabled: false
 #    - name: "EXTRA_VARIABLE"
 #      value: "FOO"
   # disableEc2Metadata: true
