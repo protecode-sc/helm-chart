@@ -187,4 +187,10 @@ spec:
       app.kubernetes.io/instance: {{ .Release.Name }}
   endpoints:
   - port: gunicorn
+    relabelings:
+      - action: labeldrop
+        regex: pod
+      - action: labeldrop
+        regex: instance
+
 {{- end }}
