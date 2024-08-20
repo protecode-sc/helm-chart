@@ -6,6 +6,9 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by usin
 ## Changes
 
 ### 2024.6.0
+* Bump worker container for 2024.6.1.
+
+### 2024.6.0
 * Bump containers to new 2024.6.0 versions.
 * Upgrade service containers.
 * Added support for storing and fetching scan specific log files. This needs to be enabled using `worker.scanSpecificLogging.enabled`.
