@@ -448,6 +448,14 @@ Monitoring is disabled by default. To enable monitoring, you need to have promet
 Even if monitoring is enabled, BDBA rejects metrics requests coming thru ingress unless authentication
 for monitoring is enabled.
 
+There is included grafana dashboard in `contrib/bdba-metrics-grafana.json` which can be added to
+`kube-prometheus-stack` deployment using kubectl. For example:
+
+```console
+$ kubectl create configmap bdba-dashboard -n <prometheus-namespace> --file=contrib/bdba-metrics-grafana.json -o yaml --dry-run|kubectl apply -f -
+$ kubectl label configmap bdba-dashboard -n <prometheus-namespace> grafana_dashboard=1
+```
+
 #### Logging
 
 Black Duck Binary Analysis uses Fluentd to centrally log. Relevant application pods are joined by
