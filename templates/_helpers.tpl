@@ -310,6 +310,8 @@ env:
 {{- end }}
 - name: tmpdir
   mountPath: /tmp
+- name: home
+  mountPath: /home/appcheck
 {{- end -}}
 
 {{- define "bdba.frontendvolumes" -}}
@@ -357,6 +359,8 @@ env:
     defaultMode: 0640
 {{- end }}
 - name: tmpdir
+  emptyDir: {}
+- name: home
   emptyDir: {}
 {{- end -}}
 
