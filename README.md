@@ -5,6 +5,9 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by usin
 
 ## Changes
 
+### 2024.9.0
+* Added support for prometheus metrics for collecting scan counts and average time spent on various scan tests.
+
 ### 2024.6.0
 * Bump worker container for 2024.6.1.
 
@@ -434,6 +437,27 @@ secret/bdba-ldap-root created
 ```
 
 To use this as the root certificate, add `--set frontend.ldap.rootCASecret=bdba-ldap-root` to the Helm command line.
+
+#### Monitoring
+
+BDBA webapp can expose several prometheus gauges via `/metrics` endpoint. 
+
+Parameter                                 | Description                                   |
+----------------------------------------- | --------------------------------------------- | ------- 
+`frontend.metrics.enabled`                | Enable monitoring endpoint in web application | false
+`frontend.metrics.serviceMonitor.enabled` | Deploy ServiceMonitor object for prometheus   | false
+
+Monitoring is disabled by default. To enable monitoring, you need to have prometheus inside the cluster.
+Even if monitoring is enabled, BDBA rejects metrics requests coming thru ingress unless authentication
+for monitoring is enabled.
+
+There is included grafana dashboard in `contrib/bdba-metrics-grafana.json` which can be added to
+`kube-prometheus-stack` deployment using kubectl. For example:
+
+```console
+$ kubectl create configmap bdba-dashboard -n <prometheus-namespace> --file=contrib/bdba-metrics-grafana.json -o yaml --dry-run|kubectl apply -f -
+$ kubectl label configmap bdba-dashboard -n <prometheus-namespace> grafana_dashboard=1
+```
 
 #### Logging
 

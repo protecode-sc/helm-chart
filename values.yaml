@@ -8,7 +8,7 @@ frontend:
     name: ""
   createSecrets: true
   repository: docker.io/sigsynopsys/bdba-frontend
-  tag: "2024.6.0"
+  tag: "2024.9.0"
   pullPolicy: IfNotPresent
   database:
     {}
@@ -76,6 +76,10 @@ frontend:
   extraEnv: []
 #    - name: "EXTRA_VARIABLE"
 #      value: "FOO"
+  metrics:
+    enabled: false
+    serviceMonitor:
+      enabled: false
   # disableEc2Metadata: true
 
 # rootCASecret:
@@ -102,7 +106,7 @@ worker:
   replicas: 1
   concurrency: 1
   repository: docker.io/sigsynopsys/bdba-worker
-  tag: "2024.6.1"
+  tag: "2024.9.0"
   pullPolicy: IfNotPresent
   applicationLogging:
     enabled: true
@@ -132,7 +136,7 @@ worker:
   
 fluentd:
   repository: docker.io/sigsynopsys/bdba-fluentd
-  tag: "2024.6.0"
+  tag: "2024.9.0"
   pullPolicy: IfNotPresent
   resources:
     requests:
@@ -178,7 +182,7 @@ pgupgrader:
   enabled: true
   image:
     repository: "docker.io/sigsynopsys/bdba-pgupgrader"
-    tag: "2024.6.0"
+    tag: "2024.9.0"
 
 postgresql:
   image: 

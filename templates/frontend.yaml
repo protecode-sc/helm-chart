@@ -95,12 +95,14 @@ spec:
           {{- with .Values.frontend.extraEnv }}
           {{ toYaml . | nindent 12 }}
           {{- end }}
+          {{- if .Values.frontend.metrics.enabled }}
+            - name: METRICS
+              value: "true"
+          {{- end }}
           volumeMounts:
           {{- include "bdba.frontendmounts" . | indent 12 }}
             - name: {{ include "bdba.fullname" . }}-webapp-applog
               mountPath: /app-log
-            - name: {{ include "bdba.fullname" . }}-webapp-home
-              mountPath: /home/appcheck
           securityContext:
             readOnlyRootFilesystem: true
         {{- if .Values.frontend.applicationLogging.enabled }}
@@ -156,6 +158,8 @@ metadata:
   name: {{ include "bdba.fullname" . }}-webapp
   labels:
 {{ include "bdba.labels" . | indent 4 }}
+  annotations:
+    prometheus.io/scrape: "true"
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -166,3 +170,25 @@ spec:
   selector:
     app.kubernetes.io/name: {{ include "bdba.name" . }}-webapp
     app.kubernetes.io/instance: {{ .Release.Name }}
+{{- if .Values.frontend.metrics.serviceMonitor.enabled }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "bdba.fullname" . }}-webapp
+  labels:
+{{ include "bdba.labels" . | indent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "bdba.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  endpoints:
+  - port: gunicorn
+    relabelings:
+      - action: labeldrop
+        regex: pod
+      - action: labeldrop
+        regex: instance
+
+{{- end }}
