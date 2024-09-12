@@ -74,12 +74,12 @@ frontend:
   securityContext:
     enabled: true
   extraEnv: []
+#    - name: "EXTRA_VARIABLE"
+#      value: "FOO"
   metrics:
     enabled: false
     serviceMonitor:
       enabled: false
-#    - name: "EXTRA_VARIABLE"
-#      value: "FOO"
   # disableEc2Metadata: true
 
 # rootCASecret:
