@@ -442,7 +442,7 @@ To use this as the root certificate, add `--set frontend.ldap.rootCASecret=bdba-
 
 BDBA webapp can expose several prometheus gauges via `/metrics` endpoint. 
 
-Parameter                                 | Description                                   |
+Parameter                                 | Description                                   | Default
 ----------------------------------------- | --------------------------------------------- | ------- 
 `frontend.metrics.enabled`                | Enable monitoring endpoint in web application | false
 `frontend.metrics.serviceMonitor.enabled` | Deploy ServiceMonitor object for prometheus   | false
