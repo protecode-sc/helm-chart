@@ -8,7 +8,7 @@ frontend:
     name: ""
   createSecrets: true
   repository: docker.io/sigsynopsys/bdba-frontend
-  tag: "2024.9.0"
+  tag: "2024.9.1"
   pullPolicy: IfNotPresent
   database:
     {}

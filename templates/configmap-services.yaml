@@ -42,6 +42,7 @@ data:
   {{- end }}
   INTERNAL_BUCKET: {{ .Values.frontend.internalBucket | quote }}
   UPLOAD_BUCKET: {{ .Values.frontend.uploadBucket | quote }}
+  LOGS_BUCKET: {{ .Values.fluentd.logsBucket | quote }}
   {{- if .Values.memcached.enabled }}
   MEMCACHED: "{{ template "bdba.memcached.fullname" . }}:11211"
   {{- else }}

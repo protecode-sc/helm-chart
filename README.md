@@ -5,6 +5,10 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by usin
 
 ## Changes
 
+### 2024.9.1
+* Bump frontend container to 2024.9.1
+* Fix missing log bucket configuration from configmap.
+
 ### 2024.9.0
 * Added support for prometheus metrics for collecting scan counts and average time spent on various scan tests.
 
