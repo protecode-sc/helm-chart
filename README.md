@@ -5,6 +5,9 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by usin
 
 ## Changes
 
+### 2024.9.2
+* Bump worker container to 2024.9.2
+
 ### 2024.9.1
 * Bump frontend container to 2024.9.1
 * Fix missing log bucket configuration from configmap.
