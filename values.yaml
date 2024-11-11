@@ -7,7 +7,7 @@ frontend:
     create: true
     name: ""
   createSecrets: true
-  repository: docker.io/sigsynopsys/bdba-frontend
+  repository: docker.io/blackducksoftware/bdba-frontend
   tag: "2024.9.1"
   pullPolicy: IfNotPresent
   database:
@@ -105,7 +105,7 @@ updater:
 worker:
   replicas: 1
   concurrency: 1
-  repository: docker.io/sigsynopsys/bdba-worker
+  repository: docker.io/blackducksoftware/bdba-worker
   tag: "2024.9.2"
   pullPolicy: IfNotPresent
   applicationLogging:
@@ -135,7 +135,7 @@ worker:
 #      ephemeral-storage: "30Gi"
   
 fluentd:
-  repository: docker.io/sigsynopsys/bdba-fluentd
+  repository: docker.io/blackducksoftware/bdba-fluentd
   tag: "2024.9.0"
   pullPolicy: IfNotPresent
   resources:
@@ -181,7 +181,7 @@ global:
 pgupgrader:
   enabled: true
   image:
-    repository: "docker.io/sigsynopsys/bdba-pgupgrader"
+    repository: "docker.io/blackducksoftware/bdba-pgupgrader"
     tag: "2024.9.0"
 
 postgresql:
