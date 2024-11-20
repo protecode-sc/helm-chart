@@ -234,20 +234,34 @@ Before starting, you will need:
       nodes on GCP.
   * Helm 3
 
-### Install Synopsys Repo
+
+### Install theing BDBA using Helm
+
+BDBA can be installed both by using published helm chart from https://sig-repo.synopsys.com/artifactory/sig-cloudnative
+repository or cloning the chart from github.
+
+#### Install Using Synopsys Repository
 
 ``` console
 $ helm repo add synopsys https://sig-repo.synopsys.com/artifactory/sig-cloudnative
 ```
 
-### Install the Chart
+##### Before the upgrade
+
+Ensure that `synopsys` helm repository is up-to-date.
+
+```console
+$ helm repo update
+```
+
+##### Upgrade the deployment
 
 To install the chart with the release name `testing`:
 
 ```console
-$ helm upgrade testing synopsys/bdba --install --namespace bdba
-Release "testing" does not exist. Installing it now.
-NAME: testing
+$ helm upgrade bdba synopsys/bdba --install --namespace bdba
+Release "bdba" does not exist. Installing it now.
+NAME: bdba
 LAST DEPLOYED: Sun Feb 16 10:50:15 2020
 NAMESPACE: bdba
 STATUS: deployed
@@ -257,6 +271,34 @@ NOTES:
 1. Get the application URL by running these commands:
 ```
 
+#### Install using git clone
+
+If you are using git clone from https://github.com/protecode-sc/helm-chart, process is similar.
+BDBA chart version can be selected by checking out to `<version>` branch or using `master` branch
+for the latest release.
+
+Installation procedure using git repo directly differs slightly.
+
+##### Update the dependencies
+
+```console
+$ helm dependency update
+```
+
+##### Install the chart
+
+```console
+$ helm upgrade bdba . --install --namespace bdba
+Release "bdba" does not exist. Installing it now.
+NAME: bdba
+LAST DEPLOYED: Sun Feb 16 10:50:15 2020
+NAMESPACE: bdba
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+NOTES:
+1. Get the application URL by running these commands:
+```
 
 ### Configuration
 
