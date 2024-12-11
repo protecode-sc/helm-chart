@@ -202,6 +202,7 @@ postgresql:
     # limits:
       # cpu:
       # memory
+  authScheme: "scram-sha-256"  # If postgresql volume is created using postgresql 13, this needs to be md5.
   securityContext:
     enabled: true
   livenessProbe:

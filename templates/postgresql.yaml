@@ -58,7 +58,7 @@ data:
   postgresql.conf: |-
 {{ .Files.Get "files/postgresql.conf" | indent 4 }}
   pg_hba.conf: |-
-     host all all all scram-sha-256
+     host all all all {{ .Values.postgresql.authScheme | default "scram-sha-256" }}
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -91,6 +91,25 @@ spec:
       {{- end }}
       {{- if .Values.pgupgrader.enabled }}
       initContainers:
+        - name: {{ template "bdba.postgresql.fullname" . }}-ensure-db
+          image: "{{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}"
+          command:
+            - "/usr/local/bin/docker-ensure-initdb.sh"
+          volumeMounts:
+            - name: data
+              mountPath: "/pgvolume"
+          env:
+            - name: POSTGRES_USER
+              value: {{ .Values.postgresql.postgresqlUsername | quote }}
+            - name: POSTGRES_DATABASE
+              value: {{ .Values.postgresql.postgresqlDatabase | quote }}
+            - name: PGDATA
+              value: "/pgvolume/data"
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "bdba.postgresql.passwordSecretName" . }}
+                  key: postgresql-password
         - name: {{ template "bdba.postgresql.fullname" . }}-upgrader
           image: "{{ .Values.pgupgrader.image.repository}}:{{ .Values.pgupgrader.image.tag}}"
           imagePullPolicy: Always
