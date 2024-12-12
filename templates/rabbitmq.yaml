@@ -1,0 +1,181 @@
+{{- if .Values.rabbitmq.enabled }}
+{{- if .Values.rabbitmq.persistence.enabled }}
+{{- if not .Values.rabbitmq.persistence.existingClaim }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ template "bdba.rabbitmq.fullname" . }}
+  labels:
+{{ include "bdba.labels" . | indent 4 }}
+spec:
+  accessModes:
+    - "ReadWriteOnce"
+  resources:
+    requests:
+      storage: {{ .Values.rabbitmq.persistence.size | quote }}
+{{- if .Values.rabbitmq.persistence.storageClass }}
+  storageClassName: "{{ .Values.rabbitmq.persistence.storageClass }}"
+{{- end }}
+{{- end }}
+{{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "bdba.rabbitmq.fullname" . }}
+  labels:
+{{ include "bdba.labels" . | indent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: 5672
+      targetPort: 5672
+      protocol: TCP
+      name: rabbitmq
+  selector:
+    app: "rabbitmq"
+    release: {{ .Release.Name }}
+#---
+#{{- if not .Values.global.rabbitmq.existingSecret }}
+#apiVersion: v1
+#kind: Secret
+#metadata:
+#  name: {{ template "bdba.rabbitmq.fullname" . }}
+#  labels:
+#{{ include "bdba.labels" . | indent 4 }}
+#type: Opaque
+#data:
+#  {{ if .Values.rabbitmq.postgresqlPassword }}
+#  postgresql-password: {{ .Values.postgresql.postgresqlPassword | b64enc | quote }}
+#  {{- end }}
+#---
+#{{- end }}
+#apiVersion: v1
+#kind: ConfigMap
+#metadata:
+#  name: {{ template "bdba.postgresql.fullname" . }}-configuration
+#data:
+#  postgresql.conf: |-
+#{{ .Files.Get "files/postgresql.conf" | indent 4 }}
+#  pg_hba.conf: |-
+#     host all all all {{ .Values.postgresql.authScheme | default "scram-sha-256" }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ template "bdba.rabbitmq.fullname" . }}
+  labels:
+    app: "rabbitmq"
+{{ include "bdba.labels" . | indent 4 }}
+spec:
+  serviceName: {{ template "bdba.rabbitmq.fullname" . }}-headless
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: "rabbitmq"
+      release: {{ .Release.Name }}
+      role: master
+  template:
+    metadata:
+      name: {{ template "bdba.rabbitmq.fullname" . }}
+      labels:
+        app: "rabbitmq"
+        release: {{ .Release.Name }}
+        role: master
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ template "bdba.rabbitmq.fullname" . }}
+          image: "{{ .Values.rabbitmq.image.repository }}:{{ .Values.rabbitmq.image.tag }}"
+          imagePullPolicy: {{ .Values.rabbitmq.image.pullPolicy }}
+#          {{- if .Values.postgresql.livenessProbe.enabled }}
+#          livenessProbe:
+#            exec:
+#              command:
+#                - /bin/sh
+#                - -c
+#                - exec pg_isready -U {{ .Values.postgresql.postgresqlUsername | quote }} -d {{ .Values.postgresql.postgresqlDatabase | quote }} -h 127.0.0.1 -p 5432
+#            initialDelaySeconds: {{ .Values.postgresql.livenessProbe.initialDelaySeconds }}
+#            periodSeconds: {{ .Values.postgresql.livenessProbe.periodSeconds }}
+#            timeoutSeconds: {{ .Values.postgresql.livenessProbe.timeoutSeconds }}
+#            successThreshold: {{ .Values.postgresql.livenessProbe.successThreshold }}
+#            failureThreshold: {{ .Values.postgresql.livenessProbe.failureThreshold }}
+#          {{- end }}
+#          {{- if .Values.postgresql.readinessProbe.enabled }}
+#          readinessProbe:
+#            exec:
+#              command:
+#                - /bin/sh
+#                - -c
+#                - exec pg_isready -U {{ .Values.postgresql.postgresqlUsername | quote }} -d {{ .Values.postgresql.postgresqlDatabase | quote }} -h 127.0.0.1 -p 5432
+#            initialDelaySeconds: {{ .Values.postgresql.livenessProbe.initialDelaySeconds }}
+#            periodSeconds: {{ .Values.postgresql.readinessProbe.periodSeconds }}
+#            timeoutSeconds: {{ .Values.postgresql.readinessProbe.timeoutSeconds }}
+#            successThreshold: {{ .Values.postgresql.readinessProbe.successThreshold }}
+#            failureThreshold: {{ .Values.postgresql.readinessProbe.failureThreshold }}
+#          {{- end }}
+#          env:
+#            - name: POSTGRES_USER
+#              value: {{ .Values.postgresql.postgresqlUsername | quote }}
+#            - name: POSTGRES_DATABASE
+#              value: {{ .Values.postgresql.postgresqlDatabase | quote }}
+#            - name: PGDATA
+#              value: "/data/postgresql/data"
+#            - name: POSTGRES_PASSWORD
+#              valueFrom:
+#                secretKeyRef:
+#                  name: {{ template "bdba.postgresql.passwordSecretName" . }}
+#                  key: postgresql-password    
+#          {{- if .Values.postgresql.resources }}
+          resources: {{- toYaml .Values.rabbitmq.resources | nindent 12 }}
+          {{- end }}                  
+          volumeMounts:
+            - name: data
+              mountPath: "/data/rabbitmq"
+#            - name: {{ template "bdba.postgresql.fullname" . }}-configuration
+#              mountPath: "/pgconf"
+#              readOnly: true
+#          command:
+#            - "postgres"
+#            - "-c"
+#            - "config_file=/pgconf/postgresql.conf"
+      {{- if .Values.rabbitmq.securityContext.enabled }}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: {{ .Values.rabbitmq.securityContext.runAsUser | default 1001 }}
+        fsGroup: {{ .Values.rabbitmq.securityContext.fsGroup | default 1001 }}
+      {{- end }}
+      volumes:
+#        - name: {{ template "bdba.postgresql.fullname" . }}-configuration
+#          configMap:
+#            name: {{ template "bdba.postgresql.fullname" . }}-configuration
+{{- if .Values.rabbitmq.persistence.existingClaim }}
+        - name: data
+          persistentVolumeClaim:
+{{- with .Values.rabbitmq.persistence.existingClaim }}
+            claimName: {{ tpl . $ }}
+{{- end }}
+{{- else if not .Values.rabbitmq.persistence.existingClaim }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      {{- with .Values.rabbitmq.persistence.annotations }}
+        annotations:
+        {{- range $key, $value := . }}
+          {{ $key }}: {{ $value }}
+        {{- end }}
+      {{- end }}
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: {{ .Values.rabbitmq.persistence.size | quote }}
+        storageClassName: {{ .Values.rabbitmq.persistence.storageClass }}
+{{- end }}
+{{- end }}
