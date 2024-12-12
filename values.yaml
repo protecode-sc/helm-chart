@@ -185,9 +185,9 @@ pgupgrader:
     tag: "2024.9.0"
 
 postgresql:
-  image: 
-    repository: "bitnami/postgresql"
-    tag: "15.10.0-debian-12-r2"
+  image:
+    repository: "docker.io/library/postgres"
+    tag: "15.10-bookworm"
   enabled: true
   postgresqlUsername: bdba
   postgresqlPassword: CHANGEME
@@ -202,6 +202,7 @@ postgresql:
     # limits:
       # cpu:
       # memory
+  authScheme: "scram-sha-256"  # If postgresql volume is created using postgresql 13, this needs to be md5.
   securityContext:
     enabled: true
   livenessProbe:
