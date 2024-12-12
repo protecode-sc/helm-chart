@@ -58,7 +58,7 @@ data:
   postgresql.conf: |-
 {{ .Files.Get "files/postgresql.conf" | indent 4 }}
   pg_hba.conf: |-
-     host all all all {{ .Values.postgresql.authScheme | default "scram-sha-256" }}
+     host all all all {{ .Values.postgresql.authScheme | default "md5" }}
 ---
 apiVersion: apps/v1
 kind: StatefulSet
