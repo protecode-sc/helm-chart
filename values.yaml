@@ -288,6 +288,7 @@ rabbitmq:
       consumer_timeout = 86400000
     plugins: rabbitmq_management
   persistence:
+    enabled: true
     size: 8Gi
   resources:
     requests:
