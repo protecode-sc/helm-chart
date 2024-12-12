@@ -1,23 +1,4 @@
 {{- if .Values.rabbitmq.enabled }}
-{{- if .Values.rabbitmq.persistence.enabled }}
-{{- if not .Values.rabbitmq.persistence.existingClaim }}
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: {{ template "bdba.rabbitmq.fullname" . }}
-  labels:
-{{ include "bdba.labels" . | indent 4 }}
-spec:
-  accessModes:
-    - "ReadWriteOnce"
-  resources:
-    requests:
-      storage: {{ .Values.rabbitmq.persistence.size | quote }}
-{{- if .Values.rabbitmq.persistence.storageClass }}
-  storageClassName: "{{ .Values.rabbitmq.persistence.storageClass }}"
-{{- end }}
-{{- end }}
-{{- end }}
 ---
 apiVersion: v1
 kind: Service
@@ -35,30 +16,14 @@ spec:
   selector:
     app: "rabbitmq"
     release: {{ .Release.Name }}
-#---
-#{{- if not .Values.global.rabbitmq.existingSecret }}
-#apiVersion: v1
-#kind: Secret
-#metadata:
-#  name: {{ template "bdba.rabbitmq.fullname" . }}
-#  labels:
-#{{ include "bdba.labels" . | indent 4 }}
-#type: Opaque
-#data:
-#  {{ if .Values.rabbitmq.postgresqlPassword }}
-#  postgresql-password: {{ .Values.postgresql.postgresqlPassword | b64enc | quote }}
-#  {{- end }}
-#---
-#{{- end }}
-#apiVersion: v1
-#kind: ConfigMap
-#metadata:
-#  name: {{ template "bdba.postgresql.fullname" . }}-configuration
-#data:
-#  postgresql.conf: |-
-#{{ .Files.Get "files/postgresql.conf" | indent 4 }}
-#  pg_hba.conf: |-
-#     host all all all {{ .Values.postgresql.authScheme | default "scram-sha-256" }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "bdba.rabbitmq.fullname" . }}-configuration
+data:
+  rabbitmq.conf: |-
+{{ .Files.Get "files/rabbitmq.conf" | indent 4 }}
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -93,57 +58,51 @@ spec:
         - name: {{ template "bdba.rabbitmq.fullname" . }}
           image: "{{ .Values.rabbitmq.image.repository }}:{{ .Values.rabbitmq.image.tag }}"
           imagePullPolicy: {{ .Values.rabbitmq.image.pullPolicy }}
-#          {{- if .Values.postgresql.livenessProbe.enabled }}
-#          livenessProbe:
-#            exec:
-#              command:
-#                - /bin/sh
-#                - -c
-#                - exec pg_isready -U {{ .Values.postgresql.postgresqlUsername | quote }} -d {{ .Values.postgresql.postgresqlDatabase | quote }} -h 127.0.0.1 -p 5432
-#            initialDelaySeconds: {{ .Values.postgresql.livenessProbe.initialDelaySeconds }}
-#            periodSeconds: {{ .Values.postgresql.livenessProbe.periodSeconds }}
-#            timeoutSeconds: {{ .Values.postgresql.livenessProbe.timeoutSeconds }}
-#            successThreshold: {{ .Values.postgresql.livenessProbe.successThreshold }}
-#            failureThreshold: {{ .Values.postgresql.livenessProbe.failureThreshold }}
-#          {{- end }}
-#          {{- if .Values.postgresql.readinessProbe.enabled }}
-#          readinessProbe:
-#            exec:
-#              command:
-#                - /bin/sh
-#                - -c
-#                - exec pg_isready -U {{ .Values.postgresql.postgresqlUsername | quote }} -d {{ .Values.postgresql.postgresqlDatabase | quote }} -h 127.0.0.1 -p 5432
-#            initialDelaySeconds: {{ .Values.postgresql.livenessProbe.initialDelaySeconds }}
-#            periodSeconds: {{ .Values.postgresql.readinessProbe.periodSeconds }}
-#            timeoutSeconds: {{ .Values.postgresql.readinessProbe.timeoutSeconds }}
-#            successThreshold: {{ .Values.postgresql.readinessProbe.successThreshold }}
-#            failureThreshold: {{ .Values.postgresql.readinessProbe.failureThreshold }}
-#          {{- end }}
-#          env:
-#            - name: POSTGRES_USER
-#              value: {{ .Values.postgresql.postgresqlUsername | quote }}
-#            - name: POSTGRES_DATABASE
-#              value: {{ .Values.postgresql.postgresqlDatabase | quote }}
-#            - name: PGDATA
-#              value: "/data/postgresql/data"
-#            - name: POSTGRES_PASSWORD
-#              valueFrom:
-#                secretKeyRef:
-#                  name: {{ template "bdba.postgresql.passwordSecretName" . }}
-#                  key: postgresql-password    
-#          {{- if .Values.postgresql.resources }}
+          {{- if .Values.rabbitmq.livenessProbe.enabled }}
+          livenessProbe:
+            exec:
+              command:
+                - rabbitmq-diagnostics
+                - "-q" 
+                - ping
+            initialDelaySeconds: {{ .Values.rabbitmq.livenessProbe.initialDelaySeconds | default 60 }}
+            periodSeconds: {{ .Values.rabbitmq.livenessProbe.periodSeconds | default 60 }}
+            timeoutSeconds: {{ .Values.rabbitmq.livenessProbe.timeoutSeconds | default 10 }}
+            successThreshold: {{ .Values.rabbitmq.livenessProbe.successThreshold | default 1 }}
+            failureThreshold: {{ .Values.rabbitmq.livenessProbe.failureThreshold | default 1 }}
+          {{- end }}
+          {{- if .Values.rabbitmq.readinessProbe.enabled }}
+          readinessProbe:
+            exec:
+              command:
+                - rabbitmq-diagnostics
+                - "-q" 
+                - ping
+            initialDelaySeconds: {{ .Values.rabbitmq.readinessProbe.initialDelaySeconds | default 60 }}
+            periodSeconds: {{ .Values.rabbitmq.readinessProbe.periodSeconds | default 60 }}
+            timeoutSeconds: {{ .Values.rabbitmq.readinessProbe.timeoutSeconds | default 10 }}
+            successThreshold: {{ .Values.rabbitmq.readinessProbe.successThreshold | default 1 }}
+            failureThreshold: {{ .Values.rabbitmq.readinessProbe.failureThreshold | default 1 }}
+          {{- end }}
+          env:
+            - name: RABBITMQ_DEFAULT_USER
+              value: {{ .Values.rabbitmq.rabbitmq.username | quote }}
+            - name: RABBITMQ_CONFIG_FILE
+              value: "/conf/rabbitmq.conf"
+            - name: RABBITMQ_DEFAULT_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "bdba.rabbitmq.passwordSecretName" . }}
+                  key: rabbitmq-password    
+          {{- if .Values.rabbitmq.resources }}
           resources: {{- toYaml .Values.rabbitmq.resources | nindent 12 }}
           {{- end }}                  
           volumeMounts:
             - name: data
-              mountPath: "/data/rabbitmq"
-#            - name: {{ template "bdba.postgresql.fullname" . }}-configuration
-#              mountPath: "/pgconf"
-#              readOnly: true
-#          command:
-#            - "postgres"
-#            - "-c"
-#            - "config_file=/pgconf/postgresql.conf"
+              mountPath: "/var/lib/rabbitmq"
+            - name: {{ template "bdba.rabbitmq.fullname" . }}-configuration
+              mountPath: "/conf"
+              readOnly: true
       {{- if .Values.rabbitmq.securityContext.enabled }}
       securityContext:
         runAsNonRoot: true
@@ -151,9 +110,9 @@ spec:
         fsGroup: {{ .Values.rabbitmq.securityContext.fsGroup | default 1001 }}
       {{- end }}
       volumes:
-#        - name: {{ template "bdba.postgresql.fullname" . }}-configuration
-#          configMap:
-#            name: {{ template "bdba.postgresql.fullname" . }}-configuration
+        - name: {{ template "bdba.rabbitmq.fullname" . }}-configuration
+          configMap:
+            name: {{ template "bdba.rabbitmq.fullname" . }}-configuration
 {{- if .Values.rabbitmq.persistence.existingClaim }}
         - name: data
           persistentVolumeClaim:

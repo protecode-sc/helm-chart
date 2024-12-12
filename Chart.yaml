@@ -3,8 +3,3 @@ appVersion: "2024.9.2"
 description: BDBA Helm chart
 name: bdba
 version: "2024.9.2"
-dependencies:
-- name: rabbitmq
-  repository: https://raw.githubusercontent.com/bitnami/charts/eb5f9a9513d987b519f0ecd732e7031241c50328/bitnami
-  version: "6.18.2"
-  condition: rabbitmq.enabled
