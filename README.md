@@ -159,13 +159,16 @@ using external rabbitmq, you can ignore this.
 There is no easy migration path of old rabbitmq volume since there will be many major rabbitmq version upgrades.
 Existing work queues will be lost during update.
 
-Upgrade will create a new rabbitmq volume. After the upgrade and when old rabbitmq is no longer running,
-you should remove the volume associated with it. It is most likely called "persistence-bdba-rabbitmq-server-0"
-in the namespace bdba was installed. To remove it after upgrade, issue
+Before upgrading, old rabbitmq instance must be removed and ensured that no leftovers from rabbitmq
+helm chart are in working directory.
 
 ```console
-$ kubectl delete pvc -n <namespace> persistence-bdba-rabbitmq-server-0
+$ rm -rf charts/||true
+$ kubectl delete statefulset -n <namespace> <release>-rabbitmq
+$ kubectl delete pvc -n <namespace> data-<release>-rabbitmq-0
 ```
+
+After old rabbitmq is removed, upgrading BDBA can continue as usual.
 
 ## Upgrading to 2023.9.0
 
