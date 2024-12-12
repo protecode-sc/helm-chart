@@ -202,7 +202,10 @@ postgresql:
     # limits:
       # cpu:
       # memory
-  authScheme: "scram-sha-256"  # If postgresql volume is created using postgresql 13, this needs to be md5.
+  # If postgresql volume is created using postgresql 15 or later, this can be enabled. Default is "md5" for
+  # backwards compatibility with database volumes created with older postgres versions.
+  # authScheme: "scram-sha-256" 
+  #
   securityContext:
     enabled: true
   livenessProbe:
