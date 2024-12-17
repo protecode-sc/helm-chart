@@ -1,6 +1,6 @@
 # Black Duck Binary Analysis on Kubernetes
 
-You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by using the Helm package manager.
+You can deploy Black Duck Binary Analysis on a Kubernetes cluster by using the Helm package manager.
 
 ## Changes
 
@@ -945,7 +945,7 @@ $ curl -T bdba-onprem-data-update-YYYYMMDD-hhmmss.tar.zst -u admin:<adminpw> htt
 #### Keeping the Database Up-To-Date
 
 Similarly, to keep database up-to-date, you can download data from
-`https://bdba.blackduck.com/updates/`. It will return `bdba-onprem-data-update-YYYYMMDD-hhmmss.tar.zst`.
+`https://bdba.blackduck.com/updates-v2/`. It will return `bdba-onprem-data-update-YYYYMMDD-hhmmss.tar.zst`.
 
 To update database, push it to `http(s)://<ingress-host-name>/api/nvd/`, for example using curl:
 
