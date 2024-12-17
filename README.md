@@ -934,12 +934,12 @@ After each software update, also supplemental information about components shoul
 This should be done also with first installation in addition to populating the database with vulnerability data.
 
 To achieve this, download data from `https://bdba.blackduck.com/updates-v2/bootstrap/`. It will return
-`bdba-onprem-data-update-YYYYMMDD-hhmmss.tar.zst`.
+`bdba-onprem-data-bootstrap-YYYYMMDD-hhmmss.tar.zst`.
 
 To update the database, push it to `http(s)://<ingress-host-name>/api/nvd/`, for example using curl:
 
 ```
-$ curl -T bdba-onprem-data-update-YYYYMMDD-hhmmss.tar.zst -u admin:<adminpw> https://<bdba-k8s-ingress>/api/nvd/
+$ curl -T bdba-onprem-data-bootstrap-YYYYMMDD-hhmmss.tar.zst -u admin:<adminpw> https://<bdba-k8s-ingress>/api/nvd/
 ```
 
 #### Keeping the Database Up-To-Date
