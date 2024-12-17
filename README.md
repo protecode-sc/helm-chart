@@ -1,7 +1,6 @@
 # Black Duck Binary Analysis on Kubernetes
 
-You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by using the synopsysctl CLI
-(command-line interface) or by using the Helm package manager.
+You can deploy Black Duck Binary Analysis on a Kubernetes cluster either by using the Helm package manager.
 
 ## Changes
 
@@ -241,7 +240,7 @@ Before starting, you will need:
 ### Install Synopsys Repo
 
 ``` console
-$ helm repo add synopsys https://sig-repo.synopsys.com/artifactory/sig-cloudnative
+$ helm repo add blackduck https://repo.blackduck.com/artifactory/sig-cloudnative/
 ```
 
 ### Install the Chart
@@ -249,7 +248,7 @@ $ helm repo add synopsys https://sig-repo.synopsys.com/artifactory/sig-cloudnati
 To install the chart with the release name `testing`:
 
 ```console
-$ helm upgrade testing synopsys/bdba --install --namespace bdba
+$ helm upgrade testing blackduck/bdba --install --namespace bdba
 Release "testing" does not exist. Installing it now.
 NAME: testing
 LAST DEPLOYED: Sun Feb 16 10:50:15 2020
@@ -349,7 +348,7 @@ For other object storage options (like external Minio), `s3Endpoint`,
 
 #### Licensing
 
-To access the data that Black Duck Binary Analysis needs a username and password for the licensing server are required. These are credentials needed for accessing onprem updates from Synopsys Community.
+To access the data that Black Duck Binary Analysis needs a username and password for the licensing server are required. These are credentials needed for accessing onprem updates from Black Duck Community.
 Without these, automatic data updates will not function. In case you are operating airgapped installation,
 you can omit these.
 
@@ -357,7 +356,7 @@ Parameter                     | Description                      | Default
 ----------------------------- | -------------------------------- |------------------------
 `frontend.licensing.username` | Username for licensing server.   | ""
 `frontend.licensing.password` | Password for licensing server.   | ""
-`frontend.licensing.upstream` | Upstream server for data updates.| "https://protecode-sc.com"
+`frontend.licensing.upstream` | Upstream server for data updates.| "https://bdba.blackduck.com"
 
 #### RabbitMQ Configuration
 
@@ -916,8 +915,8 @@ data updates from https://protecode-sc.com/. However, when installation is airga
 option is not possible. However, it is still possible to manually populate the internal
 vulnerability database and keep it up-to-date.
 
-To populate the database, you can download dataset from `https://protecode-sc.com/updates/vulndata/`.
-This requires the same credential that are used for Synopsys community. You will receive "vulndata.tar.xz"
+To populate the database, you can download dataset from `https://bdba.blackduck.com/updates/vulndata/`.
+This requires the same credential that are used for Black Duck Community. You will receive "vulndata.tar.xz"
 which is roughly 500MB.
 
 This can be brought to airgapped network, and inserted into running BDBA kubernetes deployment by
@@ -934,28 +933,27 @@ $ curl -T vulndata.tar.xz -u admin:<adminpw> https://<bdba-k8s-ingress>/api/boot
 After each software update, also supplemental information about components should be populated into database.
 This should be done also with first installation in addition to populating the database with vulnerability data.
 
-To achieve this, download data from `https://protecode-sc.com/updates/bootstrap/`. It will return
-`protecode-sc-bootstrap-YYYYMMDD-hhmmss.dat`.
+To achieve this, download data from `https://bdba.blackduck.com/updates-v2/bootstrap/`. It will return
+`bdba-onprem-data-update-YYYYMMDD-hhmmss.tar.zst`.
 
 To update the database, push it to `http(s)://<ingress-host-name>/api/nvd/`, for example using curl:
 
 ```
-$ curl -T protecode-sc-bootstrap-YYYYMMDD-hhmmss.dat -u admin:<adminpw> https://<bdba-k8s-ingress>/api/nvd/
+$ curl -T bdba-onprem-data-update-YYYYMMDD-hhmmss.tar.zst -u admin:<adminpw> https://<bdba-k8s-ingress>/api/nvd/
 ```
 
 #### Keeping the Database Up-To-Date
 
 Similarly, to keep database up-to-date, you can download data from
-`https://protecode-sc.com/updates/`. It will return `appcheck-dataupdate-YYYYMMDD-hhmmss.dat`.
+`https://bdba.blackduck.com/updates/`. It will return `bdba-onprem-data-update-YYYYMMDD-hhmmss.tar.zst`.
 
 To update database, push it to `http(s)://<ingress-host-name>/api/nvd/`, for example using curl:
 
 ```
-$ curl -T appcheck-dataupdate-20210601-145434.dat -u admin:<adminpw> https://<bdba-k8s-ingress>/api/nvd/
+$ curl -T bdba-onprem-data-update-YYYYMMDD-hhmmss.tar.zst -u admin:<adminpw> https://<bdba-k8s-ingress>/api/nvd/
 ```
 
-The difference with this file to `protecode-sc-bootstrap`-file is that it contains only delta of seven days and it
-is faster to apply.
+The difference with this file to bootstrap -variant is that it contains only delta of seven days and it is faster to apply.
 
 ### Upscaling
 
