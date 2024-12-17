@@ -268,7 +268,9 @@ minio:
 
 rabbitmq:
   image:
-    tag: 3.10.25-debian-12-r20
+    repository: "docker.io/library/rabbitmq"
+    # Suffix this with -management if access to rabbitmq management is needed
+    tag: "4.0.4"
   enabled: true
   rabbitmq:
     username: bdba
@@ -276,26 +278,29 @@ rabbitmq:
     ## Erlang cookie to determine whether different nodes are allowed to communicate with each other
     ## ref: https://github.com/bitnami/bitnami-docker-rabbitmq#environment-variables
     ## hard-coded to prevent restarts of rabbitmq (not used for security reasons)
-    existingErlangSecret: bdba-rabbitmq-erlang-cookie-secret
-    configuration: |-
-      ## Clustering
-      #      cluster_formation.peer_discovery_backend = rabbit_peer_discovery_k8s
-      #      cluster_formation.k8s.host = kubernetes.default.svc.{{.Values.rabbitmq.rabbitmq.clustering.k8s_domain}}
-      #      cluster_formation.node_cleanup.interval = 10
-      #      cluster_formation.node_cleanup.only_log_warning = true
-      #      cluster_partition_handling = autoheal
-      # queue master locator
-      queue_master_locator=min-masters
-      # enable guest user
-      loopback_users.guest = false
-      consumer_timeout = 86400000
-    plugins: rabbitmq_management
   persistence:
+    enabled: true
     size: 8Gi
   resources:
     requests:
       memory: "1Gi"
       cpu: 100m
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 60
+    periodSeconds: 60
+    timeoutSeconds: 5
+    failureThreshold: 6
+    successThreshold: 1
+
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 1
+    periodSeconds: 2
+    timeoutSeconds: 2
+    failureThreshold: 6
+    successThreshold: 1
+
 #   limits:
 #      memory: "1Gi"
 #      cpu: 100m

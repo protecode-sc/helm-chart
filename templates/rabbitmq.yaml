@@ -1,0 +1,140 @@
+{{- if .Values.rabbitmq.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "bdba.rabbitmq.fullname" . }}
+  labels:
+{{ include "bdba.labels" . | indent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: 5672
+      targetPort: 5672
+      protocol: TCP
+      name: rabbitmq
+  selector:
+    app: "rabbitmq"
+    release: {{ .Release.Name }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "bdba.rabbitmq.fullname" . }}-configuration
+data:
+  rabbitmq.conf: |-
+{{ .Files.Get "files/rabbitmq.conf" | indent 4 }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ template "bdba.rabbitmq.fullname" . }}
+  labels:
+    app: "rabbitmq"
+{{ include "bdba.labels" . | indent 4 }}
+spec:
+  serviceName: {{ template "bdba.rabbitmq.fullname" . }}-headless
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: "rabbitmq"
+      release: {{ .Release.Name }}
+      role: master
+  template:
+    metadata:
+      name: {{ template "bdba.rabbitmq.fullname" . }}
+      labels:
+        app: "rabbitmq"
+        release: {{ .Release.Name }}
+        role: master
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ template "bdba.rabbitmq.fullname" . }}
+          image: "{{ .Values.rabbitmq.image.repository }}:{{ .Values.rabbitmq.image.tag }}"
+          imagePullPolicy: {{ .Values.rabbitmq.image.pullPolicy }}
+          {{- if .Values.rabbitmq.livenessProbe.enabled }}
+          livenessProbe:
+            exec:
+              command:
+                - rabbitmq-diagnostics
+                - "-q" 
+                - ping
+            initialDelaySeconds: {{ .Values.rabbitmq.livenessProbe.initialDelaySeconds | default 60 }}
+            periodSeconds: {{ .Values.rabbitmq.livenessProbe.periodSeconds | default 60 }}
+            timeoutSeconds: {{ .Values.rabbitmq.livenessProbe.timeoutSeconds | default 10 }}
+            successThreshold: {{ .Values.rabbitmq.livenessProbe.successThreshold | default 1 }}
+            failureThreshold: {{ .Values.rabbitmq.livenessProbe.failureThreshold | default 1 }}
+          {{- end }}
+          {{- if .Values.rabbitmq.readinessProbe.enabled }}
+          readinessProbe:
+            exec:
+              command:
+                - rabbitmq-diagnostics
+                - "-q" 
+                - ping
+            initialDelaySeconds: {{ .Values.rabbitmq.readinessProbe.initialDelaySeconds | default 60 }}
+            periodSeconds: {{ .Values.rabbitmq.readinessProbe.periodSeconds | default 60 }}
+            timeoutSeconds: {{ .Values.rabbitmq.readinessProbe.timeoutSeconds | default 10 }}
+            successThreshold: {{ .Values.rabbitmq.readinessProbe.successThreshold | default 1 }}
+            failureThreshold: {{ .Values.rabbitmq.readinessProbe.failureThreshold | default 1 }}
+          {{- end }}
+          env:
+            - name: RABBITMQ_DEFAULT_USER
+              value: {{ .Values.rabbitmq.rabbitmq.username | quote }}
+            - name: RABBITMQ_CONFIG_FILE
+              value: "/conf/rabbitmq.conf"
+            - name: RABBITMQ_DEFAULT_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "bdba.rabbitmq.passwordSecretName" . }}
+                  key: rabbitmq-password    
+          {{- if .Values.rabbitmq.resources }}
+          resources: {{- toYaml .Values.rabbitmq.resources | nindent 12 }}
+          {{- end }}                  
+          volumeMounts:
+            - name: data
+              mountPath: "/var/lib/rabbitmq"
+            - name: {{ template "bdba.rabbitmq.fullname" . }}-configuration
+              mountPath: "/conf"
+              readOnly: true
+      {{- if .Values.rabbitmq.securityContext.enabled }}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: {{ .Values.rabbitmq.securityContext.runAsUser | default 1001 }}
+        fsGroup: {{ .Values.rabbitmq.securityContext.fsGroup | default 1001 }}
+      {{- end }}
+      volumes:
+        - name: {{ template "bdba.rabbitmq.fullname" . }}-configuration
+          configMap:
+            name: {{ template "bdba.rabbitmq.fullname" . }}-configuration
+{{- if .Values.rabbitmq.persistence.existingClaim }}
+        - name: data
+          persistentVolumeClaim:
+{{- with .Values.rabbitmq.persistence.existingClaim }}
+            claimName: {{ tpl . $ }}
+{{- end }}
+{{- else if not .Values.rabbitmq.persistence.existingClaim }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      {{- with .Values.rabbitmq.persistence.annotations }}
+        annotations:
+        {{- range $key, $value := . }}
+          {{ $key }}: {{ $value }}
+        {{- end }}
+      {{- end }}
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: {{ .Values.rabbitmq.persistence.size | quote }}
+        storageClassName: {{ .Values.rabbitmq.persistence.storageClass }}
+{{- end }}
+{{- end }}
