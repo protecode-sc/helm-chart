@@ -4,15 +4,19 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster by using the H
 
 ## Changes
 
+### 2024.12.1
+* Bump frontend container 2024.12.2.
+* Bump worker container 2024.12.2.
+
 ### 2024.12.0
 * Bump containers to new 2024.12.0 versions.
 * Switches postgresql container from bitnami/postgresql to docker.io/library/postgres image.
 
 ### 2024.9.2
-* Bump worker container to 2024.9.2
+* Bump worker container to 2024.9.2.
 
 ### 2024.9.1
-* Bump frontend container to 2024.9.1
+* Bump frontend container to 2024.9.1.
 * Fix missing log bucket configuration from configmap.
 
 ### 2024.9.0
