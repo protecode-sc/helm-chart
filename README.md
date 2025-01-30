@@ -237,7 +237,7 @@ Before starting, you will need:
       nodes on GCP.
   * Helm 3
 
-### Install Synopsys Repo
+### Install Blackduck Repo
 
 ``` console
 $ helm repo add blackduck https://repo.blackduck.com/artifactory/sig-cloudnative/
@@ -698,7 +698,7 @@ secret/bdba-tls created
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example:
 
 ```console
-$ helm upgrade testing synopsys/bdba --install \
+$ helm upgrade testing blackduck/bdba --install \
    --set frontend.licensing.username="foo@example.com" \
    --set frontend.licensing.password="secret" .
 ```
@@ -706,7 +706,7 @@ $ helm upgrade testing synopsys/bdba --install \
 Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example:
 
 ```console
-$ helm upgrade testing synopsys/bdba --install -f my-values.yaml
+$ helm upgrade testing blackduck/bdba --install -f my-values.yaml
 #
 ```
 
