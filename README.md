@@ -4,6 +4,10 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster by using the H
 
 ## Changes
 
+### 2025.3.0
+* BDBA 2025.3.0
+* !!! IMPORTANT !!! Read upgrading guide below if you are using bundled rabbitmq.
+
 ### 2024.12.1
 * Bump frontend container 2024.12.3.
 * Bump worker container 2024.12.3.
@@ -154,7 +158,7 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster by using the H
 * Added instructions for populating the database in airgapped deployment
 * `frontend.web.rootUrl` is now used for SSO endpoints as well, instead of guessing from HTTP request.
 
-## Upgrading to XXXX.XX.XX
+## Upgrading to 2025.3.0
 
 BDBA helm chart XXXX.XX.X moves away from bitnami rabbitmq helm chart to internal one. In case you are
 using external rabbitmq, you can ignore this.
