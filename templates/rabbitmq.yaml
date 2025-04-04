@@ -67,9 +67,9 @@ spec:
                 - ping
             initialDelaySeconds: {{ .Values.rabbitmq.livenessProbe.initialDelaySeconds | default 60 }}
             periodSeconds: {{ .Values.rabbitmq.livenessProbe.periodSeconds | default 60 }}
-            timeoutSeconds: {{ .Values.rabbitmq.livenessProbe.timeoutSeconds | default 10 }}
+            timeoutSeconds: {{ .Values.rabbitmq.livenessProbe.timeoutSeconds | default 30 }}
             successThreshold: {{ .Values.rabbitmq.livenessProbe.successThreshold | default 1 }}
-            failureThreshold: {{ .Values.rabbitmq.livenessProbe.failureThreshold | default 1 }}
+            failureThreshold: {{ .Values.rabbitmq.livenessProbe.failureThreshold | default 5 }}
           {{- end }}
           {{- if .Values.rabbitmq.readinessProbe.enabled }}
           readinessProbe:
