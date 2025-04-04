@@ -154,6 +154,25 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster by using the H
 * Added instructions for populating the database in airgapped deployment
 * `frontend.web.rootUrl` is now used for SSO endpoints as well, instead of guessing from HTTP request.
 
+## Upgrading to XXXX.XX.XX
+
+BDBA helm chart XXXX.XX.X moves away from bitnami rabbitmq helm chart to internal one. In case you are
+using external rabbitmq, you can ignore this.
+
+There is no easy migration path of old rabbitmq volume since there will be many major rabbitmq version upgrades.
+Existing work queues will be lost during update.
+
+Before upgrading, old rabbitmq instance must be removed and ensured that no leftovers from rabbitmq
+helm chart are in working directory.
+
+```console
+$ rm -rf charts/||true
+$ kubectl delete statefulset -n <namespace> <release>-rabbitmq
+$ kubectl delete pvc -n <namespace> data-<release>-rabbitmq-0
+```
+
+After old rabbitmq is removed, upgrading BDBA can continue as usual.
+
 ## Upgrading to 2023.9.0
 
 BDBA helm chart 2023.9.0 upgrades internal PostgreSQL to 15. If you are using external postgresql, you can
