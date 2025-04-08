@@ -289,15 +289,15 @@ rabbitmq:
     enabled: true
     initialDelaySeconds: 60
     periodSeconds: 60
-    timeoutSeconds: 5
+    timeoutSeconds: 30
     failureThreshold: 6
     successThreshold: 1
 
   readinessProbe:
     enabled: true
     initialDelaySeconds: 1
-    periodSeconds: 2
-    timeoutSeconds: 2
+    periodSeconds: 60
+    timeoutSeconds: 30
     failureThreshold: 6
     successThreshold: 1
 

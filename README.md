@@ -160,7 +160,7 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster by using the H
 
 ## Upgrading to 2025.3.0
 
-BDBA helm chart XXXX.XX.X moves away from bitnami rabbitmq helm chart to internal one. In case you are
+BDBA helm chart 2025.3.0 moves away from bitnami rabbitmq helm chart to internal one. In case you are
 using external rabbitmq, you can ignore this.
 
 There is no easy migration path of old rabbitmq volume since there will be many major rabbitmq version upgrades.
