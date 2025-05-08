@@ -4,6 +4,10 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster by using the H
 
 ## Changes
 
+### 2025.3.1
+* Bump frontend container to 2025.3.1.
+* Bump worker container to 2025.3.1.
+
 ### 2025.3.0
 * BDBA 2025.3.0
 * !!! IMPORTANT !!! Read upgrading guide below if you are using bundled rabbitmq.
