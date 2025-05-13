@@ -59,6 +59,9 @@ spec:
           image: "{{ .Values.rabbitmq.image.repository }}:{{ .Values.rabbitmq.image.tag }}"
           imagePullPolicy: {{ .Values.rabbitmq.image.pullPolicy }}
           command: ["/bin/sh", "-c", "if [ -f /var/lib/rabbitmq/.erlang.cookie ]; then chmod 0400 /var/lib/rabbitmq/.erlang.cookie; fi"]
+          volumeMounts:
+            - name: data
+              mountPath: "/var/lib/rabbitmq"
       containers:
         - name: {{ template "bdba.rabbitmq.fullname" . }}
           image: "{{ .Values.rabbitmq.image.repository }}:{{ .Values.rabbitmq.image.tag }}"
