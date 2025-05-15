@@ -256,8 +256,6 @@ minio:
   securityContext:
     enabled: true
   existingSecret: bdba-minio-secret
-  securityContext:
-    enabled: true
   resources:
     requests:
       cpu: "250m"
