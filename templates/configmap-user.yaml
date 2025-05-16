@@ -110,3 +110,34 @@ data:
   {{- if .Values.frontend.web.vacuumDays }}
   VACUUM_DAYS: {{ .Values.frontend.web.vacuumDays | quote }}
   {{- end }}
+  ENABLE_SAML: {{ .Values.frontend.saml.enabled | quote }}
+  {{- if .Values.frontend.saml.enabled }}
+  SAML_SP_ENTITY_ID: {{ .Values.frontend.saml.spEntityId | quote }}
+  {{- if .Values.frontend.saml.slug }}
+  SAML_SLUG: {{ .Values.frontend.saml.slug | quote }}
+  {{- end }}
+  {{- if .Values.frontend.saml.idpMetadata }}
+  SAML_IDP_METADATA: {{ .Values.frontend.saml.idpMetadata | quote }}
+  {{- end }}
+  {{- if .Values.frontend.saml.idpMetadataUrl }}
+  SAML_IDP_METADATA_URL: {{ .Values.frontend.saml.idpMetadataUrl | quote }}
+  {{- end }}
+  {{- if .Values.frontend.saml.createUsers }}
+  SAML_CREATE_USERS: {{ .Values.frontend.saml.createUsers | quote }}
+  {{- end }}
+  {{- if .Values.frontend.saml.groupAttrName }}
+  SAML_GROUP_ATTR_NAME: {{ .Values.frontend.saml.groupAttrName | quote }}
+  {{- end }}
+  {{- if .Values.frontend.saml.roleGroupAttrName }}
+  SAML_ROLE_GROUP_ATTR_NAME: {{ .Values.frontend.saml.roleGroupAttrName | quote }}
+  {{- end }}
+  {{- if .Values.frontend.saml.poweruserGroupName }}
+  SAML_POWERUSER_GROUP_NAME: {{ .Values.frontend.saml.poweruserGroupName | quote }}
+  {{- end }}
+  {{- if .Values.frontend.saml.adminGroupName }}
+  SAML_ADMIN_GROUP_NAME: {{ .Values.frontend.saml.adminGroupName | quote }}
+  {{- end }}
+  {{- if .Values.frontend.saml.usernameAttrName }}
+  SAML_USERNAME_ATTR_NAME: {{ .Values.frontend.saml.usernameAttrName | quote }}
+  {{- end }}
+  {{- end }}
