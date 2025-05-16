@@ -188,7 +188,7 @@ ignore this.
 
 There is an init container that performs the
 volume upgrade automatically. However, for the volume upgrade process to work properly, application containers
-need to be shut down so postgresql can shut down gracefully. First figure out `NAMESPACE` and `PREFIX`. 
+need to be shut down so postgresql can shut down gracefully. First figure out `NAMESPACE` and `PREFIX`.
 
 `NAMESPACE` is the Kubernetes instance where BDBA is deployed. `PREFIX` is the release label that BDBA pods have.
 You can get this for example by invoking `kubeget get deployment -n $NAMESPACE`.
@@ -204,7 +204,7 @@ for deployment in "$PREFIX-bdba-beat" "$PREFIX-bdba-tasks" "$PREFIX-bdba-tasks-l
 done
 ```
 
-before upgrading BDBA. 
+before upgrading BDBA.
 
 After this, you can upgrade BDBA as usual.
 
@@ -481,10 +481,10 @@ To use this as the root certificate, add `--set frontend.ldap.rootCASecret=bdba-
 
 #### Monitoring
 
-BDBA webapp can expose several prometheus gauges via `/metrics` endpoint. 
+BDBA webapp can expose several prometheus gauges via `/metrics` endpoint.
 
 Parameter                                 | Description                                   | Default
------------------------------------------ | --------------------------------------------- | ------- 
+----------------------------------------- | --------------------------------------------- | -------
 `frontend.metrics.enabled`                | Enable monitoring endpoint in web application | false
 `frontend.metrics.serviceMonitor.enabled` | Deploy ServiceMonitor object for prometheus   | false
 
@@ -513,7 +513,7 @@ Parameter                             | Description                             
 `logRetention`                        | Days to keep the application logs (0 to disable) | 30
 
 `worker.scanSpecificLogging.enabled` enables scan-specific logging in worker. After scan has been completed,
-it uploads the logs into object storage so they can be downloaded for troubleshooting. 
+it uploads the logs into object storage so they can be downloaded for troubleshooting.
 
 #### Cloud provider -specific settings
 
@@ -543,7 +543,7 @@ scanners from persistent volumes. This also makes the workers run as Kubernetes
 StatefulSets. Each worker pod reserves it's own workspace from persistent volume.
 
 It is recommended to keep `worker.concurrency` as 1 to isolate scanners from each other and
-to more efficiently use cluster resources. 
+to more efficiently use cluster resources.
 
 #### Worker Autoscaling
 
@@ -618,9 +618,9 @@ Possible values for `postgresqlSslMode` are specified in https://www.postgresql.
 #### External RabbitMQ
 
 BDBA supports external RabbitMQ with mutual TLS encryption. It also works with RabbitMQ-as-a-service offerings
-such as Amazon MQ. 
+such as Amazon MQ.
 
-*IMPORTANT!*: It is mandatory that RabbitMQ is configured with larger than default consumer timeout. Some BDBA 
+*IMPORTANT!*: It is mandatory that RabbitMQ is configured with larger than default consumer timeout. Some BDBA
 tasks are longer than RabbitMQ defaults allow and the recommended value for them is `86400000`. Without this value,
 BDBA containers will experience unscheduled restarts and in some cases prematurely killed jobs.
 To set this value, add `consumer_timeout = 86400000` in `/etc/rabbitmq/rabbitmq.conf` if rabbitmq is running
@@ -1010,7 +1010,7 @@ By default, when BDBA is using embedded minio or rabbitmq, it creates the secret
 job creates secrets for minio and rabbitmq, and stores them as Kubernetes secrets. This requires a service account.
 
 If for some reason service accounts are not functioning in cluster or pods do not have access to use them,
-you can disable the service account and create the secrets manually. 
+you can disable the service account and create the secrets manually.
 
 Service account relevant parameters are
 
