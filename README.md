@@ -493,7 +493,7 @@ Parameter                          | Description                                
 `frontend.saml.idpMetadataUrl`     | URL to the identity provider metadata               | ""
 `frontend.saml.idpMetadata`        | Identity provider metadata                          | ""
 `frontend.saml.slug`               | Single sign-on URL slug                             | ""
-`frontend.saml.createUsers`        | Create user accounts automatically on initial login | "true"
+`frontend.saml.createUsers`        | Create user accounts automatically on initial login | true
 `frontend.saml.groupAttrName`      | Attribute name used by the IdP for user groups      | ""
 `frontend.saml.roleGroupAttrName`  | Attribute name used by the IdP for role groups      | ""
 `frontend.saml.poweruserGroupName` | Role group name for poweruser assignment            | ""

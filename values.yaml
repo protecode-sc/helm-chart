@@ -65,7 +65,7 @@ frontend:
     #      ...
     #    </EntityDescriptor>
     #  slug: "bdba"
-    #  createUsers: "true"
+    #  createUsers: true
     #  groupAttrName: "user-groups"
     #  roleGroupAttrName: "role-groups"
     #  poweruserGroupName: "BDBA Powerusers"
