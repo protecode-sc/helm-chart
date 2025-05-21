@@ -213,6 +213,10 @@ spec:
       - name: {{ include "bdba.fullname" . }}-fluentd-config
         configMap:
           name: {{ include "bdba.fullname" . }}-fluentd-config
+      tolerations:
+        {{- with .Values.tolerations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
 ---
 apiVersion: v1
 kind: Service
