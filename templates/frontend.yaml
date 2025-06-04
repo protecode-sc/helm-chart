@@ -59,13 +59,24 @@ spec:
         app.kubernetes.io/name: {{ include "bdba.name" . }}-webapp
         app.kubernetes.io/instance: {{ .Release.Name }}
         release: {{ .Release.Name | quote }}
+        {{ with .Values.frontend.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
       annotations:
         {{- include "bdba.configchecksum" . | nindent 8 }}
+      {{ with .Values.frontend.podAnnotations}}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
     spec:
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
     {{- end }}
+      {{- with .Values.frontend.initContainers }}
+      initContainers:
+      {{ toYaml . | nindent 8 }}
+      {{- end }}
+
       containers:
         - name: {{ .Chart.Name }}-webapp
           image: "{{ .Values.frontend.repository }}:{{ .Values.frontend.tag }}"
@@ -134,10 +145,23 @@ spec:
         configMap:
           name: {{ include "bdba.fullname" . }}-webapp-fluentbit-config
       {{- end }}
-      {{- with .Values.nodeSelector }}
+      {{- with .Values.frontend.volumes }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+      {{- with .Values.frontend.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- with .Values.frontend.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.frontend.affinity }}
+      {{- with .Values.frontend.affinity }}
+      affinity:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- else }}
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -147,10 +171,7 @@ spec:
                 matchLabels:
                   app.kubernetes.io/name: {{ include "bdba.name" . }}-webapp
               topologyKey: "kubernetes.io/hostname"
-    {{- with .Values.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-    {{- end }}
+      {{- end }}
 ---
 apiVersion: v1
 kind: Service
