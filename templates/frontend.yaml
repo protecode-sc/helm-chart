@@ -127,6 +127,12 @@ spec:
             - name: {{ include "bdba.fullname" . }}-webapp-fluentbit-config
               mountPath: /bdba-fluentbit/
         {{- end }}
+        {{- if .Values.frontend.sidecarContainers }}
+        {{- range $name, $spec := .Values.frontend.sidecarContainers }}
+        - name: {{ $name }}
+          {{ toYaml $spec | nindent 10 }}
+        {{- end }}
+        {{- end }}
       {{- if .Values.frontend.securityContext.enabled }}
       securityContext:
         runAsNonRoot: true
