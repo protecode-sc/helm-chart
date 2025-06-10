@@ -87,7 +87,7 @@ spec:
         {{ with .Values.postgresql.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-      {{ with .Values.postgresql.podAnnotations}}
+      {{ with .Values.postgresql.podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
       {{- end }}

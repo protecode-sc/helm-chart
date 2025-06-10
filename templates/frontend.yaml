@@ -153,9 +153,6 @@ spec:
         configMap:
           name: {{ include "bdba.fullname" . }}-webapp-fluentbit-config
       {{- end }}
-      {{- with .Values.frontend.volumes }}
-      {{- toYaml . | nindent 6 }}
-      {{- end }}
       {{- with .Values.frontend.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
