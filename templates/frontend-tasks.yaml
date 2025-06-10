@@ -151,15 +151,15 @@ spec:
         configMap:
           name: {{ include "bdba.fullname" . }}-tasks-fluentbit-config
       {{- end }}
-      {{- with .Values.nodeSelector }}
+      {{- with .Values.tasks.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-    {{- with .Values.affinity }}
+    {{- with .Values.tasks.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
     {{- end }}
-    {{- with .Values.tolerations }}
+    {{- with .Values.tasks.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
     {{- end }}
