@@ -39,7 +39,6 @@ spec:
         {{ with .Values.memcached.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-
       {{ with .Values.memcached.podAnnotations}}
       annotations:
         {{- toYaml . | nindent 8 }}

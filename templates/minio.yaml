@@ -54,16 +54,24 @@ spec:
       labels:
         app: "minio"
         release: {{ .Release.Name }}
+        {{ with .Values.minio.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{ with .Values.minio.podAnnotations}}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
     spec:
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
     {{- end }}
-      {{- if .Values.minio.securityContext.enabled }}
-      securityContext:
-        runAsUser: 1000
-        runAsGroup: 1000
-        fsGroup: 1000
+      {{- if .Values.minio.initContainers }}
+      initContainers:
+      {{- range $name, $spec := .Values.minio.initContainers }}
+        - name: {{ $name }}
+          {{ toYaml $spec | nindent 10 }}
+      {{- end }}
       {{- end }}
       containers:
         - name: "minio"
@@ -106,6 +114,13 @@ spec:
             failureThreshold: 3
           resources:
             {{- toYaml .Values.minio.resources | nindent 12 }}
+        {{- if .Values.minio.sidecarContainers }}
+        {{- range $name, $spec := .Values.minio.sidecarContainers }}
+        - name: {{ $name }}
+          {{ toYaml $spec | nindent 10 }}
+        {{- end }}
+        {{- end }}
+
       volumes:
         - name: export
         {{- if .Values.minio.persistence.enabled }}
@@ -114,4 +129,23 @@ spec:
         {{- else }}
           emptyDir: {}
         {{- end }}
+      {{- if .Values.minio.securityContext.enabled }}
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      {{- end }}
+      {{- with .Values.minio.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.minio.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.minio.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
 {{- end }}

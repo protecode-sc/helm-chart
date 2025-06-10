@@ -49,6 +49,14 @@ spec:
         app: "rabbitmq"
         release: {{ .Release.Name }}
         role: master
+        {{ with .Values.rabbitmq.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{ with .Values.rabbitmq.podAnnotations}}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -62,6 +70,13 @@ spec:
           volumeMounts:
             - name: data
               mountPath: "/var/lib/rabbitmq"
+      {{- if .Values.rabbitmq.initContainers }}
+      {{- range $name, $spec := .Values.rabbitmq.initContainers }}
+        - name: {{ $name }}
+          {{ toYaml $spec | nindent 10 }}
+      {{- end }}
+      {{- end }}
+
       containers:
         - name: {{ template "bdba.rabbitmq.fullname" . }}
           image: "{{ .Values.rabbitmq.image.repository }}:{{ .Values.rabbitmq.image.tag }}"
@@ -111,6 +126,13 @@ spec:
             - name: {{ template "bdba.rabbitmq.fullname" . }}-configuration
               mountPath: "/conf"
               readOnly: true
+        {{- if .Values.rabbitmq.sidecarContainers }}
+        {{- range $name, $spec := .Values.rabbitmq.sidecarContainers }}
+        - name: {{ $name }}
+          {{ toYaml $spec | nindent 10 }}
+        {{- end }}
+        {{- end }}
+
       {{- if .Values.rabbitmq.securityContext.enabled }}
       securityContext:
         runAsNonRoot: true
@@ -121,6 +143,19 @@ spec:
         - name: {{ template "bdba.rabbitmq.fullname" . }}-configuration
           configMap:
             name: {{ template "bdba.rabbitmq.fullname" . }}-configuration
+      {{- with .Values.rabbitmq.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.rabbitmq.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.rabbitmq.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
 {{- if .Values.rabbitmq.persistence.existingClaim }}
         - name: data
           persistentVolumeClaim:

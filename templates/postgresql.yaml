@@ -84,6 +84,14 @@ spec:
         app: "postgresql"
         release: {{ .Release.Name }}
         role: master
+        {{ with .Values.postgresql.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{ with .Values.postgresql.podAnnotations}}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -116,6 +124,13 @@ spec:
           volumeMounts:
             - name: data
               mountPath: "/pgvolume"
+      {{- if .Values.postgresql.initContainers }}
+      {{- range $name, $spec := .Values.postgresql.initContainers }}
+        - name: {{ $name }}
+          {{ toYaml $spec | nindent 10 }}
+      {{- end }}
+      {{- end }}
+
       {{- end }}
       containers:
         - name: {{ template "bdba.postgresql.fullname" . }}
@@ -179,6 +194,13 @@ spec:
             - "postgres"
             - "-c"
             - "config_file=/pgconf/postgresql.conf"
+        {{- if .Values.postgresql.sidecarContainers }}
+        {{- range $name, $spec := .Values.postgresql.sidecarContainers }}
+        - name: {{ $name }}
+          {{ toYaml $spec | nindent 10 }}
+        {{- end }}
+        {{- end }}
+
       {{- if .Values.postgresql.securityContext.enabled }}
       securityContext:
         runAsNonRoot: true
@@ -189,6 +211,19 @@ spec:
         - name: {{ template "bdba.postgresql.fullname" . }}-configuration
           configMap:
             name: {{ template "bdba.postgresql.fullname" . }}-configuration
+      {{- with .Values.postgresql.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.postgresql.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.postgresql.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
 {{- if .Values.postgresql.persistence.existingClaim }}
         - name: data
           persistentVolumeClaim:
