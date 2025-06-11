@@ -153,14 +153,31 @@ spec:
         configMap:
           name: {{ include "bdba.fullname" . }}-webapp-fluentbit-config
       {{- end }}
+
+      {{- if .Values.frontend.nodeSelector }}
       {{- with .Values.frontend.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- else }}
+      {{- with .Values.frontend.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- end }}
+
+      {{- if .Values.frontend.tolerations }}
       {{- with .Values.frontend.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- else }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- end }}
+
       {{- if .Values.frontend.affinity }}
       {{- with .Values.frontend.affinity }}
       affinity:
@@ -177,6 +194,7 @@ spec:
                   app.kubernetes.io/name: {{ include "bdba.name" . }}-webapp
               topologyKey: "kubernetes.io/hostname"
       {{- end }}
+
 ---
 apiVersion: v1
 kind: Service
