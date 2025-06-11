@@ -155,15 +155,39 @@ spec:
           name: {{ include "bdba.fullname" . }}-updater-fluentbit-config
       {{- end }}
 
-      {{- with .Values.updater.nodeSelector }}
+    {{- if .Values.updater.nodeSelector }}
+    {{- with .Values.updater.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
-      {{- end }}
-    {{- with .Values.updater.affinity }}
-      affinity:
+    {{- end }}
+    {{- else }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
         {{- toYaml . | nindent 8 }}
     {{- end }}
+    {{- end }}
+
+    {{- if .Values.updater.tolerations }}
     {{- with .Values.updater.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
     {{- end }}
+    {{- else }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- end }}
+
+    {{- if .Values.updater.affinity }}
+    {{- with .Values.updater.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- else }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- end }}
+

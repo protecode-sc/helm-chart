@@ -303,11 +303,19 @@ spec:
         configMap:
           name: {{ include "bdba.fullname" . }}-worker-fluentbit-config
       {{- end }}
+
+      {{- if .Values.worker.nodeSelector}}
       {{- with .Values.worker.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-
+      {{- else }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- end }}
+ 
       {{- if .Values.worker.affinity }}
       {{- with .Values.worker.affinity }}
       affinity:
@@ -342,10 +350,20 @@ spec:
                   app: minio
               topologyKey: "kubernetes.io/hostname"
       {{- end }}
+
+    {{- if .Values.worker.tolerations}}
     {{- with .Values.worker.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
     {{- end }}
+    {{- else }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- end }}
+
+
   {{- if .Values.worker.storageClass }}
   volumeClaimTemplates:
     - metadata:

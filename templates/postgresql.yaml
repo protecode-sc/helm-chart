@@ -211,14 +211,17 @@ spec:
         - name: {{ template "bdba.postgresql.fullname" . }}-configuration
           configMap:
             name: {{ template "bdba.postgresql.fullname" . }}-configuration
+
       {{- with .Values.postgresql.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+
       {{- with .Values.postgresql.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+
       {{- with .Values.postgresql.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
