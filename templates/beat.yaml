@@ -17,13 +17,26 @@ spec:
         app.kubernetes.io/name: {{ include "bdba.name" . }}-beat
         app.kubernetes.io/instance: {{ .Release.Name }}
         release: {{ .Release.Name | quote }}
+        {{ with .Values.beat.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
       annotations:
         {{- include "bdba.configchecksum" . | nindent 8 }}
+        {{ with .Values.beat.podAnnotations}}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
     {{- end }}
+      {{- if .Values.beat.initContainers }}
+      initContainers:
+      {{- range $name, $spec := .Values.beat.initContainers }}
+        - name: {{ $name }}
+          {{ toYaml $spec | nindent 10 }}
+      {{- end }}
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}-beat
           image: "{{ .Values.frontend.repository }}:{{ .Values.frontend.tag }}"
@@ -58,6 +71,13 @@ spec:
             readOnlyRootFilesystem: true
           resources:
             {{- toYaml .Values.beat.resources | nindent 12 }}
+        {{- if .Values.beat.sidecarContainers }}
+        {{- range $name, $spec := .Values.beat.sidecarContainers }}
+        - name: {{ $name }}
+          {{ toYaml $spec | nindent 10 }}
+        {{- end }}
+        {{- end }}
+
       {{- if .Values.frontend.securityContext.enabled }}
       securityContext:
         runAsNonRoot: true
@@ -67,15 +87,39 @@ spec:
       {{- end }}
       volumes:
       {{- include "bdba.frontendvolumes" . | indent 8 }}
-      {{- with .Values.nodeSelector }}
+
+    {{- if .Values.beat.nodeSelector }}
+    {{- with .Values.beat.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
-      {{- end }}
-    {{- with .Values.affinity }}
+    {{- end }}
+    {{- else }}
+    {{ with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- end }}
+
+    {{- if .Values.beat.affinity }}
+    {{- with .Values.beat.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
     {{- end }}
-    {{- with .Values.tolerations }}
+    {{- else }}
+    {{ with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- end }}
+
+    {{- if .Values.beat.tolerations }}
+    {{- with .Values.beat.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- else }}
+    {{ with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
     {{- end }}

@@ -96,7 +96,15 @@ frontend:
     serviceMonitor:
       enabled: false
   # disableEc2Metadata: true
-
+  # Extra init and sidecar containers can be added to all deployments and
+  # statefulsets using following syntax:
+  # initContainers:
+  #   extrainit:
+  #     image: "repo/image:tag"
+  #     ...
+  # sidecarContainers:
+  #   extracontainer:
+  #     image: "repo/image:tag"
 # rootCASecret:
 
 beat:

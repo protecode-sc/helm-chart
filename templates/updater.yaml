@@ -54,8 +54,14 @@ spec:
         app.kubernetes.io/name: {{ include "bdba.name" . }}-updater
         app.kubernetes.io/instance: {{ .Release.Name }}
         release: {{ .Release.Name | quote }}
+        {{ with .Values.updater.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
       annotations:
         {{- include "bdba.configchecksum" . | nindent 8 }}
+        {{ with .Values.updater.podAnnotations}}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -73,6 +79,12 @@ spec:
           {{- include "bdba.frontendmounts" . | indent 12 }}
             - name: {{ include "bdba.fullname" . }}-updater-applog
               mountPath: /app-log
+      {{- if .Values.updater.initContainers }}
+      {{- range $name, $spec := .Values.updater.initContainers }}
+        - name: {{ $name }}
+          {{ toYaml $spec | nindent 10 }}
+      {{- end }}
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}-updater
           image: "{{ .Values.frontend.repository }}:{{ .Values.frontend.tag }}"
@@ -119,6 +131,13 @@ spec:
             - name: {{ include "bdba.fullname" . }}-updater-fluentbit-config
               mountPath: /bdba-fluentbit/
         {{- end }}
+        {{- if .Values.updater.sidecarContainers }}
+        {{- range $name, $spec := .Values.updater.sidecarContainers }}
+        - name: {{ $name }}
+          {{ toYaml $spec | nindent 10 }}
+        {{- end }}
+        {{- end }}
+
       {{- if .Values.frontend.securityContext.enabled }}
       securityContext:
         runAsNonRoot: true
@@ -136,15 +155,39 @@ spec:
           name: {{ include "bdba.fullname" . }}-updater-fluentbit-config
       {{- end }}
 
-      {{- with .Values.nodeSelector }}
+    {{- if .Values.updater.nodeSelector }}
+    {{- with .Values.updater.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
-      {{- end }}
-    {{- with .Values.affinity }}
-      affinity:
+    {{- end }}
+    {{- else }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
         {{- toYaml . | nindent 8 }}
     {{- end }}
+    {{- end }}
+
+    {{- if .Values.updater.tolerations }}
+    {{- with .Values.updater.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- else }}
     {{- with .Values.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
     {{- end }}
+    {{- end }}
+
+    {{- if .Values.updater.affinity }}
+    {{- with .Values.updater.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- else }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- end }}
+
