@@ -4,6 +4,9 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster by using the H
 
 ## Changes
 
+### 2025.6.0
+* Added support for configuring SAML SSO.
+
 ### 2025.3.3
 * Added support for standard helm template feature (podLabels, podAnnotations, initContainers,
   sidecarContainers, nodeSelector, tolaritions and affinity) can be set for all deployments and
