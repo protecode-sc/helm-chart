@@ -4,8 +4,13 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster by using the H
 
 ## Changes
 
-### 2025.6.0
-* Added support for configuring SAML SSO.
+### 2025.3.3
+* Added support for standard helm template feature (podLabels, podAnnotations, initContainers,
+  sidecarContainers, nodeSelector, tolaritions and affinity) can be set for all deployments and
+  stateful sets individually.
+
+### 2025.3.2
+* Fixed rabbitmq erlang cookie permissions.
 
 ### 2025.3.1
 * Bump frontend container to 2025.3.1.
@@ -962,6 +967,32 @@ to figure out proper ingressclass and add the parameter for helm installation co
 ```
 
 By default, this is "openshift-default". You can also use `--set ingress.class=""` to use the default as well.
+
+### Common flags for all deployments and statefulsets.
+
+Parameter                   | Description                                  | Default
+--------------------------- | -------------------------------------------- | --------------------
+<PREFIX>.podLabels          | Additional labels for pods.                  | null
+<PREFIX>.podAnnotations     | Additional annotations for pods.             | null  
+<PREFIX>.initContainers     | Additional initContianers for pods           | null
+<PREFIX>.sidecarContainers  | Additional sidecars for pods                 | null
+<PREFIX>.nodeSelector       | Nodeselector for pods                        | null
+<PREFIX>.tolerations        | Tolerations for pods                         | null
+<PREFIX>.affinity           | Affinity for pods                            | null
+
+<PREFIX> can be `frontend`, `tasks`, `taskslong`, `updater`, `postgresql`, `worker`, `rabbitmq`,
+`minio` or `memcached`.
+
+Format for both `.initContainers` and `.sidecarContainers` is as follows:
+
+```
+<prefix>:
+   <name-of-first>:
+      image: ....
+   <name-of-seconds>:
+      image: ...
+```
+
 
 ### Airgapped Installation
 
