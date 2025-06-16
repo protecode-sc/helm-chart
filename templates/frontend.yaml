@@ -59,13 +59,26 @@ spec:
         app.kubernetes.io/name: {{ include "bdba.name" . }}-webapp
         app.kubernetes.io/instance: {{ .Release.Name }}
         release: {{ .Release.Name | quote }}
+        {{ with .Values.frontend.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
       annotations:
         {{- include "bdba.configchecksum" . | nindent 8 }}
+        {{ with .Values.frontend.podAnnotations}}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
     {{- end }}
+      {{- if .Values.frontend.initContainers }}
+      initContainers:
+      {{- range $name, $spec := .Values.frontend.initContainers }}
+        - name: {{ $name }}
+          {{ toYaml $spec | nindent 10 }}
+      {{- end }}
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}-webapp
           image: "{{ .Values.frontend.repository }}:{{ .Values.frontend.tag }}"
@@ -116,6 +129,12 @@ spec:
             - name: {{ include "bdba.fullname" . }}-webapp-fluentbit-config
               mountPath: /bdba-fluentbit/
         {{- end }}
+        {{- if .Values.frontend.sidecarContainers }}
+        {{- range $name, $spec := .Values.frontend.sidecarContainers }}
+        - name: {{ $name }}
+          {{ toYaml $spec | nindent 10 }}
+        {{- end }}
+        {{- end }}
       {{- if .Values.frontend.securityContext.enabled }}
       securityContext:
         runAsNonRoot: true
@@ -134,10 +153,37 @@ spec:
         configMap:
           name: {{ include "bdba.fullname" . }}-webapp-fluentbit-config
       {{- end }}
+
+      {{- if .Values.frontend.nodeSelector }}
+      {{- with .Values.frontend.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- else }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- end }}
+
+      {{- if .Values.frontend.tolerations }}
+      {{- with .Values.frontend.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- else }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- end }}
+
+      {{- if .Values.frontend.affinity }}
+      {{- with .Values.frontend.affinity }}
+      affinity:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- else }}
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -147,10 +193,8 @@ spec:
                 matchLabels:
                   app.kubernetes.io/name: {{ include "bdba.name" . }}-webapp
               topologyKey: "kubernetes.io/hostname"
-    {{- with .Values.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-    {{- end }}
+      {{- end }}
+
 ---
 apiVersion: v1
 kind: Service

@@ -148,9 +148,22 @@ spec:
         app.kubernetes.io/name: {{ include "bdba.name" . }}-fluentd
         app.kubernetes.io/instance: {{ .Release.Name }}
         release: {{ .Release.Name | quote }}
+        {{ with .Values.fluentd.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
       annotations:
         {{- include "bdba.configchecksum" . | nindent 8 }}
+        {{ with .Values.fluentd.podAnnotations}}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
+      {{- if .Values.fluentd.initContainers }}
+      initContainers:
+      {{- range $name, $spec := .Values.fluentd.initContainers }}
+        - name: {{ $name }}
+          {{ toYaml $spec | nindent 10 }}
+      {{- end }}
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}-fluentd
           image: "{{ .Values.fluentd.repository }}:{{ .Values.fluentd.tag }}"
@@ -199,6 +212,12 @@ spec:
               mountPath: /bdba-fluentd/
           resources:
             {{- toYaml .Values.fluentd.resources | nindent 12 }}
+        {{- if .Values.fluentd.sidecarContainers }}
+        {{- range $name, $spec := .Values.fluentd.sidecarContainers }}
+        - name: {{ $name }}
+          {{ toYaml $spec | nindent 10 }}
+        {{- end }}
+        {{- end }}
 
       {{- if .Values.fluentd.securityContext.enabled }}
       securityContext:
@@ -213,6 +232,42 @@ spec:
       - name: {{ include "bdba.fullname" . }}-fluentd-config
         configMap:
           name: {{ include "bdba.fullname" . }}-fluentd-config
+
+      {{- if .Values.fluentd.nodeSelector }}
+      {{- with .Values.fluentd.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- else }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- end }}
+
+      {{- if .Values.fluentd.tolerations }}
+      {{- with .Values.fluentd.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- else }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- end }}
+
+      {{- if .Values.fluentd.affinity }}
+      {{- with .Values.fluentd.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- else }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- end }}
 ---
 apiVersion: v1
 kind: Service

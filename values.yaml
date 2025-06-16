@@ -56,6 +56,21 @@ frontend:
     #  nestedSearch: "true"
     #  searchOptReferrals: "true"
     #  userEmailMatch: "false"
+  saml:
+    enabled: false
+    #  spEntityId: "https://bdba.local/saml/metadata"
+    #  idpMetadataUrl: "https://idp.example.com/metadata"
+    #  idpMetadata: |
+    #    <EntityDescriptor entityID="https://idp.example.com/metadata">
+    #      ...
+    #    </EntityDescriptor>
+    #  slug: "bdba"
+    #  createUsers: true
+    #  groupAttrName: "user-groups"
+    #  roleGroupAttrName: "role-groups"
+    #  poweruserGroupName: "BDBA Powerusers"
+    #  adminGroupName: "BDBA Admins"
+    #  usernameAttrName: "user-email"
   licensing:
     username: ""
     password: ""
@@ -81,7 +96,15 @@ frontend:
     serviceMonitor:
       enabled: false
   # disableEc2Metadata: true
-
+  # Extra init and sidecar containers can be added to all deployments and
+  # statefulsets using following syntax:
+  # initContainers:
+  #   extrainit:
+  #     image: "repo/image:tag"
+  #     ...
+  # sidecarContainers:
+  #   extracontainer:
+  #     image: "repo/image:tag"
 # rootCASecret:
 
 beat:
@@ -133,7 +156,7 @@ worker:
 #      memory: "8Gi"
 #      cpu: "2"
 #      ephemeral-storage: "30Gi"
-  
+
 fluentd:
   repository: docker.io/blackducksoftware/bdba-fluentd
   tag: "2025.3.1"
@@ -204,7 +227,7 @@ postgresql:
       # memory
   # If postgresql volume is created using postgresql 15 or later, this can be enabled. Default is "md5" for
   # backwards compatibility with database volumes created with older postgres versions.
-  # authScheme: "scram-sha-256" 
+  # authScheme: "scram-sha-256"
   #
   securityContext:
     enabled: true
@@ -341,7 +364,7 @@ s3Region: ""
 brokerUrl: ""
 brokerTls: false
 brokerClientSecretName: "" # tls secret for rabbitmq client certificate
-brokerRootCASecretName: "" # tls secret for rabbitmq root certificate  
+brokerRootCASecretName: "" # tls secret for rabbitmq root certificate
 
 # External memcached
 memcachedHostPort: ""

@@ -68,14 +68,27 @@ spec:
         app.kubernetes.io/name: {{ include "bdba.name" . }}-worker
         app.kubernetes.io/instance: {{ .Release.Name }}
         release: {{ .Release.Name | quote }}
+        {{ with .Values.worker.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmap-user.yaml") . | sha256sum }}
         checksum/services: {{ include (print $.Template.BasePath "/configmap-services.yaml") . | sha256sum }}
+        {{ with .Values.worker.podAnnotations}}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
     {{- end }}
+      {{- if .Values.worker.initContainers }}
+      initContainers:
+      {{- range $name, $spec := .Values.worker.initContainers }}
+        - name: {{ $name }}
+          {{ toYaml $spec | nindent 10 }}
+      {{- end }}
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}-worker
           image: "{{ .Values.worker.repository }}:{{ .Values.worker.tag }}"
@@ -242,6 +255,13 @@ spec:
             - name: {{ include "bdba.fullname" . }}-worker-fluentbit-config
               mountPath: /bdba-fluentbit/
         {{- end }}
+        {{- if .Values.worker.sidecarContainers }}
+        {{- range $name, $spec := .Values.worker.sidecarContainers }}
+        - name: {{ $name }}
+          {{ toYaml $spec | nindent 10 }}
+        {{- end }}
+        {{- end }}
+
       # Termination graceperiod needs to be long for worker to be able to finish
       terminationGracePeriodSeconds: {{ .Values.worker.terminationGracePeriodSeconds }}
       {{- if .Values.worker.securityContext.enabled }}
@@ -283,10 +303,25 @@ spec:
         configMap:
           name: {{ include "bdba.fullname" . }}-worker-fluentbit-config
       {{- end }}
+
+      {{- if .Values.worker.nodeSelector}}
+      {{- with .Values.worker.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- else }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- end }}
+ 
+      {{- if .Values.worker.affinity }}
+      {{- with .Values.worker.affinity }}
+      affinity:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- else }}
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -314,10 +349,21 @@ spec:
                 matchLabels:
                   app: minio
               topologyKey: "kubernetes.io/hostname"
+      {{- end }}
+
+    {{- if .Values.worker.tolerations}}
+    {{- with .Values.worker.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- else }}
     {{- with .Values.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
     {{- end }}
+    {{- end }}
+
+
   {{- if .Values.worker.storageClass }}
   volumeClaimTemplates:
     - metadata:
