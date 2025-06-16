@@ -487,6 +487,31 @@ secret/bdba-ldap-root created
 
 To use this as the root certificate, add `--set frontend.ldap.rootCASecret=bdba-ldap-root` to the Helm command line.
 
+#### SAML Authentication
+
+Black Duck Binary Analysis supports SAML-based Single Sign-On.
+
+Parameter                          | Description                                         | Default
+---------------------------------- | ----------------------------------------------------|-------
+`frontend.saml.enabled`            | Enable SAML                                         | false
+`frontend.saml.spEntityId`         | Service provider entity ID                          |
+`frontend.saml.idpMetadataUrl`     | URL to the identity provider metadata               | ""
+`frontend.saml.idpMetadata`        | Identity provider metadata                          | ""
+`frontend.saml.slug`               | Single sign-on URL slug                             | ""
+`frontend.saml.createUsers`        | Create user accounts automatically on initial login | true
+`frontend.saml.groupAttrName`      | Attribute name used by the IdP for user groups      | ""
+`frontend.saml.roleGroupAttrName`  | Attribute name used by the IdP for role groups      | ""
+`frontend.saml.poweruserGroupName` | Role group name for poweruser assignment            | ""
+`frontend.saml.adminGroupName`     | Role group name for administrator assignment        | ""
+`frontend.saml.usernameAttrName`   | Attribute name used by the IdP for email/username   | ""
+
+To provide the Identity provider metadata, set either `frontend.saml.idpMetadataUrl` or include the metadata
+by setting `frontend.saml.idpMetadata`. The latter can also be set directly from a file by adding
+```console
+--set-file frontend.saml.idpMetadata="./path/to/our-metadata.xml"
+```
+to the Helm command line.
+
 #### Monitoring
 
 BDBA webapp can expose several prometheus gauges via `/metrics` endpoint.
