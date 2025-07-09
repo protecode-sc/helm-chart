@@ -618,7 +618,7 @@ Parameter       | Description                   | Default
 #### External PostgreSQL
 
 Black Duck Binary Analysis supports external PostgreSQL. Black Duck Binary Analysis is tested against PostgreSQL 9.6 and 11. There
-are no specific version restrictions as long as it is 9.6 or newer.
+are no specific version restrictions as long as it is 13 or newer.
 
 To configure external PostgreSQL, the following parameters are supported. To omit
 installing PostgreSQL and use external instead, specify:
@@ -651,6 +651,11 @@ secret/bdba-pgclient created
 ```
 
 Possible values for `postgresqlSslMode` are specified in https://www.postgresql.org/docs/15/libpq-ssl.html.
+
+It is recommended to change the default postgresql paramater values for better performance.
+
+* `work_mem = 8MB` to set postgresql working memory from default 4MB to 8MB.
+* `random_page_cost = 1.0` to make query planner prefer index instead of sequential scanning on large queries.
 
 #### External RabbitMQ
 
