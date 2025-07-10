@@ -400,11 +400,16 @@ To access the data that Black Duck Binary Analysis needs a username and password
 Without these, automatic data updates will not function. In case you are operating airgapped installation,
 you can omit these.
 
-Parameter                     | Description                      | Default
------------------------------ | -------------------------------- |------------------------
-`frontend.licensing.username` | Username for licensing server.   | ""
-`frontend.licensing.password` | Password for licensing server.   | ""
-`frontend.licensing.upstream` | Upstream server for data updates.| "https://bdba.blackduck.com"
+Parameter                           | Description                                | Default
+----------------------------------- | ------------------------------------------ |------------------------
+`frontend.licensing.username`       | Username for licensing server.             | ""
+`frontend.licensing.password`       | Password for licensing server.             | ""
+`frontend.licensing.upstream`       | Upstream server for data updates.          | "https://bdba.blackduck.com"
+`frontend.licensing.existingSecret` | Existing secret for licensing credentials. | nil
+
+Licensing credentials can be passed either via `frontend.licensing.username` and `frontend.licensing.password`,
+or via `frontend.licensing.existingSecret` when they are read from a secret not managed by BDBA Helm chart.
+Existing secret should contain keys `username` and `password`.
 
 #### RabbitMQ Configuration
 
@@ -452,16 +457,22 @@ if BDBA is running behind a load balancer that does not send X-Forwarded-Proto -
 Black Duck Binary Analysis can send emails, for example, to invite new users or to send vulnerability
 notifications.
 
-Parameter                     | Description                                       | Default
------------------------------ | ------------------------------------------------- | -----------------------
-`frontend.email.enabled`      | Enable sending email.                             | false
-`frontend.email.smtpHost`     | Email SMTP host.                                  | ""
-`frontend.email.smtpPort`     | Email SMTP port.                                  | "25"
-`frontend.email.smtpUser`     | Email SMTP hostname.                              | ""
-`frontend.email.smtpPassword` | Email SMTP password.                              | ""
-`frontend.email.from`         | Sender of email.                                  | "noreply@protecode-sc.local"
-`frontend.email.security`     | Email security mode. "none", "ssl", or "starttls".| "none"
-`frontend.email.verify`       | Verify email certificate.                         | "false"
+Parameter                       | Description                                       | Default
+------------------------------- | ------------------------------------------------- | -----------------------
+`frontend.email.enabled`        | Enable sending email.                             | false
+`frontend.email.smtpHost`       | Email SMTP host.                                  | ""
+`frontend.email.smtpPort`       | Email SMTP port.                                  | "25"
+`frontend.email.smtpUser`       | Email SMTP hostname.                              | ""
+`frontend.email.smtpPassword`   | Email SMTP password.                              | ""
+`frontend.email.from`           | Sender of email.                                  | "noreply@protecode-sc.local"
+`frontend.email.security`       | Email security mode. "none", "ssl", or "starttls".| "none"
+`frontend.email.verify`         | Verify email certificate.                         | "false"
+`frontend.email.existingSecret` | Secret containing key "smtpPassword".             | nil
+
+Authentication to SMTP server can be passed via `frontend.email.smtpPassword` which will be stored in
+BDBA helm chart managed secret. If you don't want BDBA helm chart to manage smtpPassword, you can
+provide Kubernetes secret via `frontend.email.existingSecret` and the password will be read from
+key `smtpPassword`.
 
 #### LDAP Authentication
 
@@ -486,6 +497,11 @@ Parameter                            | Description                             |
 `frontend.ldap.nestedSearch`         | User nested group search.               | "false"
 `frontend.ldap.searchOptReferrals`   | Follow LDAP referrals.                  | "true"
 `frontend.ldap.userEmailMatch`       | Try also email when finding local user. | "false"
+`frontend.ldap.existingSecret`.      | Secret containing key "bindPassword"    | nil
+
+Authentication to LDAP server can be passed via `frontend.ldap.bindPassword` which will be stored in
+BDBA helm chart -managed secret. If you don't want BDBA helm chart to manage smtpPassword, you can provide
+Kubernetes secret via `frontend.ldap.existingSecret` and the password will be read from key `bindPassword`.
 
 To setup root certificate for LDAP, issues:
 
