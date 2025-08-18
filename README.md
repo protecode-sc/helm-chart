@@ -4,6 +4,9 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster by using the H
 
 ## Changes
 
+### 2026.6.3
+* Upgrade containers to 2025.6.3.
+
 ### 2026.6.1
 * BDBA 2025.6.1.
 * Changed default postgresql `work_mem` and `random_page_cost` to optimize database performance.
