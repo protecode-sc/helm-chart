@@ -144,6 +144,63 @@ envFrom:
       name: {{ include "bdba.fullname" . }}-services-configmap
   - configMapRef:
       name: {{ include "bdba.fullname" . }}-user-configmap
+  {{- if .Values.frontend.email.existingSecret }}
+  - name: EMAIL_HOST_PASSWORD
+    valueFrom: 
+      secretKeyRef:
+        name: {{ .Values.frontend.email.existingSecret }}
+        key: smtpPassword
+  {{ else }}
+  {{- if .Values.frontend.email.smtpPassword }}
+  - name: EMAIL_HOST_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: {{ include "bdba.fullname" . }}-user-secrets
+        key: EMAIL_HOST_PASSWORD
+  {{- end }}
+  {{- end }}
+  {{- if .Values.frontend.ldap.existingSecret }}
+  - name: LDAP_BIND_PASSWORD
+    valueFrom: 
+      secretKeyRef:
+        name: {{ .Values.frontend.ldap.existingSecret }}
+        key: bindPassword
+  {{ else }}
+  {{- if .Values.frontend.ldap.bindPassword }}
+  - name: LDAP_BIND_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: {{ include "bdba.fullname" . }}-user-secrets
+        key: LDAP_BIND_PASSWORD
+  {{- end }}
+  {{- end }}
+  {{- if .Values.frontend.licensing.existingSecret }}
+  - name: LICENSING_USERNAME
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Values.frontend.licensing.existingSecret }}
+        key: username
+  - name: LICENSING_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Values.frontend.licensing.existingSecret }}
+        key: password
+  {{ else }}
+  {{- if .Values.frontend.licensing.username }}
+  - name: LICENSING_USERNAME
+    valueFrom:
+      secretKeyRef:
+        name: {{ include "bdba.fullname" . }}-user-secrets
+        key: LICENSING_USERNAME
+  {{- end }}
+  {{- if .Values.frontend.licensing.username }}
+  - name: LICENSING_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: {{ include "bdba.fullname" . }}-user-secrets
+        key: LICENSING_PASSWORD
+  {{- end }}
+  {{- end }}
   - secretRef:
       name: {{ include "bdba.fullname" . }}-user-secrets
   {{- if not .Values.minio.enabled }}
