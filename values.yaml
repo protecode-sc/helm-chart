@@ -194,7 +194,7 @@ tasks:
 
 fluentbit:
   repository: fluent/fluent-bit
-  tag: 3.2.2
+  tag: 4.0.9
   pullPolicy: IfNotPresent
 
 global:
@@ -210,7 +210,7 @@ pgupgrader:
 postgresql:
   image:
     repository: "docker.io/library/postgres"
-    tag: "15.10-bookworm"
+    tag: "15.14-bookworm"
   enabled: true
   postgresqlUsername: bdba
   postgresqlPassword: CHANGEME
@@ -251,7 +251,7 @@ memcached:
   enabled: true
   image:
     repository: memcached
-    tag: 1.6.32-bookworm
+    tag: 1.6.39-trixie
   replicaCount: 1
   pdbMinAvailable: 1
   resources:
@@ -291,7 +291,7 @@ rabbitmq:
   image:
     repository: "docker.io/library/rabbitmq"
     # Suffix this with -management if access to rabbitmq management is needed
-    tag: "4.0.4"
+    tag: "4.0.9"
   enabled: true
   rabbitmq:
     username: bdba
