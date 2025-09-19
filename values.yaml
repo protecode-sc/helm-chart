@@ -6,6 +6,7 @@ frontend:
   serviceAccount:
     create: true
     name: ""
+    annotations: {}
   createSecrets: true
   repository: docker.io/blackducksoftware/bdba-frontend
   tag: "2025.6.3"
