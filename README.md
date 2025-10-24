@@ -389,6 +389,36 @@ Parameter                   | Description                     | Default
 
 To use alternative object storage, minio needs to be disabled.
 
+#### VersityGW as S3-Compatible Storage
+
+VersityGW is an S3-compatible object storage gateway that can be used as a drop-in replacement for minio. It provides enhanced compatibility with S3 protocols and can be a good alternative when you need more advanced S3 features while maintaining control over your storage infrastructure.
+
+Parameter                            | Description                           | Default
+------------------------------------ | ------------------------------------- | ---------------
+`versitygw.enabled`                  | Enable VersityGW instead of minio.   | false
+`versitygw.image.repository`         | VersityGW image repository.          | "versity/versitygw"
+`versitygw.image.tag`                | VersityGW image tag.                 | "latest"
+`versitygw.persistence.enabled`      | Enable persistent storage.           | true
+`versitygw.persistence.size`         | Size of VersityGW storage claim.     | "300Gi"
+`versitygw.persistence.storageClass` | StorageClass for VersityGW.          | ""
+
+To use VersityGW:
+
+1. Set `versitygw.enabled: true` and `minio.enabled: false`
+2. Ensure the unified object store secret exists:
+   ```bash
+   kubectl create secret generic bdba-objstore-secret \
+     --from-literal=accesskey=your-access-key \
+     --from-literal=secretkey=your-secret-key
+   ```
+3. Configure any additional VersityGW-specific settings as needed
+
+**Important**: MinIO and VersityGW are mutually exclusive. The chart will fail to install if both are enabled simultaneously.
+
+**Note**: VersityGW uses the same unified secret (`bdba-objstore-secret`) as MinIO. The application code will automatically provision or copy this secret from the existing `bdba-minio-secret` when needed.
+
+When VersityGW is enabled, it will automatically be used for all S3 operations, replacing minio functionality completely.
+
 If using native S3, you need to consider the following:
 
 * Bucket names need to be unique (globally).

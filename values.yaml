@@ -266,6 +266,8 @@ memcached:
     enabled: true
 
 minio:
+  # Set to false when using VersityGW or external S3
+  # NOTE: minio.enabled and versitygw.enabled are mutually exclusive
   enabled: true
   image:
     repository: minio/minio
@@ -287,6 +289,84 @@ minio:
 #    limits:
 #      cpu:
 #      memory:
+
+# VersityGW - S3-compatible object storage gateway
+# When enabled, this will be used instead of minio for S3 storage
+# To use VersityGW: set versitygw.enabled=true and minio.enabled=false
+versitygw:
+  # NOTE: minio.enabled and versitygw.enabled are mutually exclusive
+  enabled: false
+  image:
+    repository: versity/versitygw
+    tag: v1.0.18
+    pullPolicy: IfNotPresent
+  service:
+    port: 9000
+  # Data storage path inside container
+  dataPath: /data
+  # Authentication configuration
+  auth:
+    enabled: true
+  # Note: Uses the unified bdba-objstore-secret (same as minio)
+  # Application code will provision or copy from bdba-minio-secret
+  # Additional environment variables
+  extraEnv: []
+  # - name: EXAMPLE_VAR
+  #   value: "example-value"
+  # Custom command and args (optional)
+  command: []
+  args: []
+  # Storage persistence
+  persistence:
+    enabled: true
+    size: 300Gi
+    # storageClass: ""
+    # existingClaim: ""
+  # Configuration file support
+  config:
+    enabled: false
+    configMapName: ""
+  # Health checks
+  livenessProbe:
+    enabled: true
+    path: /
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    timeoutSeconds: 5
+    failureThreshold: 3
+    successThreshold: 1
+  readinessProbe:
+    enabled: true
+    path: /
+    initialDelaySeconds: 5
+    periodSeconds: 15
+    timeoutSeconds: 1
+    failureThreshold: 3
+    successThreshold: 1
+  # Security context
+  securityContext:
+    enabled: true
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+  # Resource limits and requests
+  resources:
+    requests:
+      cpu: "250m"
+      memory: "256Mi"
+#    limits:
+#      cpu: 1
+#      memory: "1Gi"
+  # Pod-level configurations
+  podLabels: {}
+  podAnnotations: {}
+  # Init and sidecar containers
+  initContainers: {}
+  sidecarContainers: {}
+  # Node scheduling
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
 
 rabbitmq:
   image:

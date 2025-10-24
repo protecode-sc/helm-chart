@@ -62,6 +62,19 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
     {{- end -}}
 {{- end -}}
 
+{{- define "bdba.objstore.secretName" -}}
+    {{- printf "bdba-objstore-secret" -}}
+{{- end -}}
+
+{{/*
+Validate object storage configuration - MinIO and VersityGW are mutually exclusive
+*/}}
+{{- define "bdba.objstore.validate" -}}
+{{- if and .Values.minio.enabled .Values.versitygw.enabled -}}
+{{- fail "ERROR: MinIO and VersityGW cannot both be enabled. They are mutually exclusive object storage solutions. Please set either minio.enabled=true OR versitygw.enabled=true, but not both." -}}
+{{- end -}}
+{{- end -}}
+
 {{- define "bdba.frontend.serviceAccountName" -}}
     {{- if .Values.frontend.serviceAccount.name -}}
         {{- printf "%s" .Values.frontend.serviceAccount.name -}}
@@ -76,6 +89,14 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 */}}
 {{- define "bdba.minio.fullname" -}}
 {{- printf "%s-%s" .Release.Name "minio" | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{/*
+Create a default fully qualified app name.
+We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+*/}}
+{{- define "bdba.versitygw.fullname" -}}
+{{- printf "%s-%s" .Release.Name "versitygw" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*
@@ -130,7 +151,10 @@ checksum/s3: {{ include (print $.Template.BasePath "/secrets-s3.yaml") . | sha25
 {{- end }}
 
 {{- define "bdba.s3endpoint" -}}
-  {{- if .Values.minio.enabled -}}
+  {{- if .Values.versitygw.enabled -}}
+    {{ $versitygwhost := include "bdba.versitygw.fullname" . }}
+    {{- printf "http://%s:%s" $versitygwhost (.Values.versitygw.service.port | toString) -}}
+  {{- else if .Values.minio.enabled -}}
     {{ $miniohost := include "bdba.minio.fullname" . }}
     {{- printf "http://%s:%s" $miniohost (.Values.minio.service.port | toString) -}}
   {{- else -}}
@@ -146,7 +170,7 @@ envFrom:
       name: {{ include "bdba.fullname" . }}-user-configmap
   - secretRef:
       name: {{ include "bdba.fullname" . }}-user-secrets
-  {{- if not .Values.minio.enabled }}
+  {{- if and (not .Values.minio.enabled) (not .Values.versitygw.enabled) }}
   - secretRef:
       name: {{ include "bdba.fullname" . }}-s3-secrets
   {{- end }}
@@ -203,12 +227,23 @@ env:
   - name: AWS_ACCESS_KEY_ID
     valueFrom:
       secretKeyRef:
-        name: {{ include "bdba.minio.secretName" . }}
+        name: {{ include "bdba.objstore.secretName" . }}
         key: accesskey
   - name: AWS_SECRET_ACCESS_KEY
     valueFrom:
       secretKeyRef:
-        name: {{ include "bdba.minio.secretName" . }}
+        name: {{ include "bdba.objstore.secretName" . }}
+        key: secretkey
+  {{- else if .Values.versitygw.enabled }}
+  - name: AWS_ACCESS_KEY_ID
+    valueFrom:
+      secretKeyRef:
+        name: {{ include "bdba.objstore.secretName" . }}
+        key: accesskey
+  - name: AWS_SECRET_ACCESS_KEY
+    valueFrom:
+      secretKeyRef:
+        name: {{ include "bdba.objstore.secretName" . }}
         key: secretkey
   {{- end }}
   {{ if .Values.brokerTls }}
@@ -218,7 +253,7 @@ env:
 {{- end }}
 
 {{- define "bdba.s3env" -}}
-{{- if or (.Values.s3Endpoint) (.Values.minio.enabled) }}
+{{- if or (.Values.s3Endpoint) (.Values.minio.enabled) (.Values.versitygw.enabled) }}
 - name: S3_ENDPOINT
   valueFrom:
     configMapKeyRef:
@@ -241,12 +276,23 @@ env:
 - name: AWS_ACCESS_KEY_ID
   valueFrom:
     secretKeyRef:
-      name: {{ include "bdba.minio.secretName" . }}
+      name: {{ include "bdba.objstore.secretName" . }}
       key: accesskey
 - name: AWS_SECRET_ACCESS_KEY
   valueFrom:
     secretKeyRef:
-      name: {{ include "bdba.minio.secretName" . }}
+      name: {{ include "bdba.objstore.secretName" . }}
+      key: secretkey
+{{- else if .Values.versitygw.enabled }}
+- name: AWS_ACCESS_KEY_ID
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "bdba.objstore.secretName" . }}
+      key: accesskey
+- name: AWS_SECRET_ACCESS_KEY
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "bdba.objstore.secretName" . }}
       key: secretkey
 {{- else }}
 {{- if .Values.s3AccessKeyId }}

@@ -82,12 +82,12 @@ spec:
           - name: MINIO_ACCESS_KEY
             valueFrom:
               secretKeyRef:
-                name: {{ .Values.minio.existingSecret }}
+                name: {{ include "bdba.objstore.secretName" . }}
                 key: accesskey
           - name: MINIO_SECRET_KEY
             valueFrom:
               secretKeyRef:
-                name: {{ .Values.minio.existingSecret }}
+                name: {{ include "bdba.objstore.secretName" . }}
                 key: secretkey
           volumeMounts:
           - name: export

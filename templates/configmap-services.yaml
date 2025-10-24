@@ -1,3 +1,7 @@
+{{/*
+Validate object storage configuration
+*/}}
+{{- include "bdba.objstore.validate" . -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
