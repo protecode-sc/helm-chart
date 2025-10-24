@@ -393,8 +393,8 @@ To use alternative object storage, minio needs to be disabled.
 
 VersityGW is an S3-compatible object storage gateway that can be used as a drop-in replacement for minio. It provides enhanced compatibility with S3 protocols and can be a good alternative when you need more advanced S3 features while maintaining control over your storage infrastructure.
 
-Parameter                            | Description                           | Default
------------------------------------- | ------------------------------------- | ---------------
+Parameter                            | Description                          | Default
+------------------------------------ | ------------------------------------ | ---------------
 `versitygw.enabled`                  | Enable VersityGW instead of minio.   | false
 `versitygw.image.repository`         | VersityGW image repository.          | "versity/versitygw"
 `versitygw.image.tag`                | VersityGW image tag.                 | "latest"
