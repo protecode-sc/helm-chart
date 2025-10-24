@@ -38,6 +38,8 @@ data:
   {{- end }}
   {{- if .Values.minio.enabled }}
   S3_ENDPOINT: "http://{{ template "bdba.minio.fullname" . }}:{{ .Values.minio.service.port }}"
+  {{- else if .Values.versitygw.enabled }}
+  S3_ENDPOINT: "http://{{ template "bdba.versitygw.fullname" . }}:{{ .Values.versitygw.service.port }}"
   {{- else if .Values.s3Endpoint }}
   S3_ENDPOINT: {{ .Values.s3Endpoint | quote }}
   {{- end }}

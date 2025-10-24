@@ -1,0 +1,171 @@
+{{/*
+VersityGW S3-Compatible Object Storage Gateway - StatefulSet
+*/}}
+{{- if .Values.versitygw.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "bdba.versitygw.fullname" . }}
+  labels:
+{{ include "bdba.labels" . | indent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.versitygw.service.port }}
+      targetPort: {{ .Values.versitygw.service.port }}
+      protocol: TCP
+      name: versitygw
+  selector:
+    app: "versitygw"
+    release: {{ .Release.Name }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ template "bdba.versitygw.fullname" . }}
+  labels:
+{{ include "bdba.labels" . | indent 4 }}
+spec:
+  serviceName: {{ template "bdba.versitygw.fullname" . }}
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "versitygw"
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      name: {{ template "bdba.versitygw.fullname" . }}
+      labels:
+        app: "versitygw"
+        release: {{ .Release.Name }}
+        {{ with .Values.versitygw.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{ with .Values.versitygw.podAnnotations}}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      {{- if .Values.versitygw.initContainers }}
+      initContainers:
+      {{- range $name, $spec := .Values.versitygw.initContainers }}
+        - name: {{ $name }}
+          {{ toYaml $spec | nindent 10 }}
+      {{- end }}
+      {{- end }}
+      containers:
+        - name: "versitygw"
+          image: "{{ .Values.versitygw.image.repository }}:{{ .Values.versitygw.image.tag }}"
+          imagePullPolicy: {{ .Values.versitygw.image.pullPolicy }}
+          command: [ "/app/versitygw" ]
+          args: ["--health", "/health", "--port", ":{{ .Values.versitygw.service.port }}", "posix", "/data"]
+          env:
+          - name: ROOT_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: {{ include "bdba.objstore.secretName" . }}
+                key: accesskey
+          - name: ROOT_SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                name: {{ include "bdba.objstore.secretName" . }}
+                key: secretkey
+          - name: VGW_REGION
+            value: {{ .Values.s3Region | default "eu-west-1" | quote }}
+          ports:
+          - containerPort: {{ .Values.versitygw.service.port }}
+            name: http
+          volumeMounts:
+          - name: data
+            mountPath: {{ .Values.versitygw.dataPath | default "/data" }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.versitygw.service.port }}
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.versitygw.service.port }}
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 15
+            timeoutSeconds: 1
+            successThreshold: 1
+            failureThreshold: 3
+          resources:
+            {{- toYaml .Values.versitygw.resources | nindent 12 }}
+        {{- if .Values.versitygw.sidecarContainers }}
+        {{- range $name, $spec := .Values.versitygw.sidecarContainers }}
+        - name: {{ $name }}
+          {{ toYaml $spec | nindent 10 }}
+        {{- end }}
+        {{- end }}
+
+      {{- if .Values.versitygw.securityContext.enabled }}
+      securityContext:
+        runAsUser: {{ .Values.versitygw.securityContext.runAsUser | default 1000 }}
+        runAsGroup: {{ .Values.versitygw.securityContext.runAsGroup | default 1000 }}
+        fsGroup: {{ .Values.versitygw.securityContext.fsGroup | default 1000 }}
+      {{- end }}
+
+      {{- if .Values.versitygw.nodeSelector }}
+      {{- with .Values.versitygw.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- else }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- end }}
+
+      {{- if .Values.versitygw.tolerations }}
+      {{- with .Values.versitygw.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- else }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- end }}
+
+      {{- if .Values.versitygw.affinity }}
+      {{- with .Values.versitygw.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- else }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- end }}
+
+  {{- if .Values.versitygw.persistence.enabled }}
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes:
+        - "ReadWriteOnce"
+      resources:
+        requests:
+          storage: {{ .Values.versitygw.persistence.size | quote }}
+      {{- if .Values.versitygw.persistence.storageClass }}
+      storageClassName: "{{ .Values.versitygw.persistence.storageClass }}"
+      {{- end }}
+  {{- end }}
+{{- end }}
