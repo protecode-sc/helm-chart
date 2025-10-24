@@ -75,7 +75,7 @@ spec:
                 name: {{ include "bdba.objstore.secretName" . }}
                 key: secretkey
           - name: VGW_REGION
-            value: {{ .Values.s3Region | default "eu-west-1" | quote }}
+            value: {{ .Values.s3Region | default "us-east-1" | quote }}
           ports:
           - containerPort: {{ .Values.versitygw.service.port }}
             name: http
