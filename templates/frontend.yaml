@@ -112,6 +112,10 @@ spec:
             - name: METRICS
               value: "true"
           {{- end }}
+          {{- if .Values.worker.keda.enabled }}
+            - name: "RETRY_PREFETCHED_JOBS"
+              value: "true"
+          {{- end }}
           volumeMounts:
           {{- include "bdba.frontendmounts" . | indent 12 }}
             - name: {{ include "bdba.fullname" . }}-webapp-applog
