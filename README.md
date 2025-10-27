@@ -248,7 +248,7 @@ and rolling back to 2023.6.0 release.
 
 ## Requirements
 
-BDBA should run on fine on any public cloud provider supporting Kubernetes. Nodes should have 7 gigabytes of memory at minimum. Examples of minimum suitable nodes are
+BDBA should run fine on any public cloud provider supporting Kubernetes. Nodes should have 7 gigabytes of memory at minimum. Examples of minimum suitable nodes are
 
   * AWS: m5.large
   * Azure: Standard_DS2_v2 (See notes below)
@@ -262,7 +262,7 @@ We recommend that production BDBA instances do not contain state. BDBA helm char
 PostgreSQL, RabbitMQ and VersityGW, which are enabled by default for easy installation but larger scale deployments
 should avoid storing state in Kubernetes cluster and use managed postgresql, rabbitmq and S3 -compatible storage.
 
-Consult the scapters "External PostgreSQL", "External RabbitMQ" and "External Object Storage" for more information
+Consult the chapters "External PostgreSQL", "External RabbitMQ" and "External Object Storage" for more information
 and required configuration on external services.
 
 ### Cluster Configuration Notes
@@ -378,9 +378,9 @@ Parameter                              | Description                          | 
 `postgresql.persistence.storageClass`  | storageClass for PostgreSQL.         | ""
 `postgresql.persistence.size`          | Size of PostgreSQL claim.            | 300Gi
 `postgresql.persistence.existingClaim` | Existing claim to use for PostgreSQL.| ""
-`versitygw.persistence.storageClass`   | storageClass for MinIO.              | ""
-`versitygw.persistence.size`           | Size of MinIO claim.                 | 300Gi
-`versitygw.persistence.existingClaim`  | Existing claim to use for MinIO.     | ""
+`versitygw.persistence.storageClass`   | storageClass for VersityGW.          | ""
+`versitygw.persistence.size`           | Size of VersityGW claim.             | 300Gi
+`versitygw.persistence.existingClaim`  | Existing claim to use for VersityGW. | ""
 `rabbitmq.persistence.storageClass`    | storageClass for RabbitMQ.           | ""
 `rabbitmq.persistence.size`            | Size of RabbitMQ claim.              | 8Gi
 `rabbitmq.persistence.existingClaim`   | Existing claim to use for RabbitMQ.  | ""
@@ -397,12 +397,11 @@ Parameter                              | Description                          | 
 
 Black Duck Binary Analysis by default uses minio for storing data to persistent
 volumes. However, Minio can be replaced with any S3-compatible object storage,
-including native S3 from AWS.
+including native S3 from AWS. In those cases, `versitygw.enabled` and `minio.enabled`
+should be set to false.
 
 Parameter                   | Description                     | Default
 --------------------------- | ------------------------------- | ---------------
-`versitygw.enabled`         | Use bundled versitygw.          | false
-`minio.enabled`             | Use bundled minio.              | false
 `frontend.internalBucket`   | Bucket for BDBAs internal use.  | "bdba-internal"
 `frontend.uploadBucket`     | Bucket for storing uploads.     | "bdba-uploads"
 `fluentd.logsBucket`        | Bucket for storing logs.        | "bdba-logs"
