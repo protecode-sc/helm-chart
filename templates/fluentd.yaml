@@ -22,9 +22,13 @@ data:
         s3_region {{ .Values.s3Region }}
         {{- else }}
         s3_endpoint {{ template "bdba.s3endpoint" . }}
-        force_path_style true  # Prevent mangling of http endpoint
+        force_path_style true
         {{- end }}
         path webapp/
+        <format>
+          @type single_value
+          message_key message
+        </format>
         <buffer time>
           @type file
           timekey_wait 10m
@@ -45,9 +49,13 @@ data:
         s3_region {{ .Values.s3Region }}
         {{- else }}
         s3_endpoint {{ template "bdba.s3endpoint" . }}
-        force_path_style true  # Prevent mangling of http endpoint
+        force_path_style true
         {{- end }}
         path updater/
+        <format>
+          @type single_value
+          message_key message
+        </format>
         <buffer time>
           @type file
           timekey_wait 10m
@@ -68,9 +76,13 @@ data:
         s3_region {{ .Values.s3Region }}
         {{- else }}
         s3_endpoint {{ template "bdba.s3endpoint" . }}
-        force_path_style true  # Prevent mangling of http endpoint
+        force_path_style true
         {{- end }}
         path tasks/
+        <format>
+          @type single_value
+          message_key message
+        </format>
         <buffer time>
           @type file
           timekey_wait 10m
@@ -91,9 +103,13 @@ data:
         s3_region {{ .Values.s3Region }}
         {{- else }}
         s3_endpoint {{ template "bdba.s3endpoint" . }}
-        force_path_style true  # Prevent mangling of http endpoint
+        force_path_style true
         {{- end }}
         path longjobs/
+        <format>
+          @type single_value
+          message_key message
+        </format>
         <buffer time>
           @type file
           timekey_wait 10m
@@ -117,6 +133,10 @@ data:
         force_path_style true
         {{- end }}
         path worker/
+        <format>
+          @type single_value
+          message_key message
+        </format>
         <buffer time>
           @type file
           timekey_wait 10m
