@@ -22,6 +22,7 @@ data:
         s3_region {{ .Values.s3Region }}
         {{- else }}
         s3_endpoint {{ template "bdba.s3endpoint" . }}
+        force_path_style true
         {{- end }}
         path webapp/
         <format>
@@ -48,6 +49,7 @@ data:
         s3_region {{ .Values.s3Region }}
         {{- else }}
         s3_endpoint {{ template "bdba.s3endpoint" . }}
+        force_path_style true
         {{- end }}
         path updater/
         <format>
@@ -74,6 +76,7 @@ data:
         s3_region {{ .Values.s3Region }}
         {{- else }}
         s3_endpoint {{ template "bdba.s3endpoint" . }}
+        force_path_style true
         {{- end }}
         path tasks/
         <format>
@@ -100,6 +103,7 @@ data:
         s3_region {{ .Values.s3Region }}
         {{- else }}
         s3_endpoint {{ template "bdba.s3endpoint" . }}
+        force_path_style true
         {{- end }}
         path longjobs/
         <format>
@@ -126,6 +130,7 @@ data:
         s3_region {{ .Values.s3Region }}
         {{- else }}
         s3_endpoint {{ template "bdba.s3endpoint" . }}
+        force_path_style true
         {{- end }}
         path worker/
         <format>
