@@ -4,6 +4,14 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster by using the H
 
 ## Changes
 
+### 2025.x.x
+* Replace minio with versitygw due to new minio policy of not building containers anymore. Minio is still available in
+  helm chart in case switch to versitygw is not possible.
+* Update minimum requirements in documentation.
+* BDBA now expects that bundled versitygw/minio secrets are stored in "bdba-objstore-secrets". 
+  BDBA 2025.12.0 will automatically provision new secret on install/upgrade.
+* Update documentation on external rabbitmq configuration (namely `max_message_size` parameter).
+
 ### 2025.9.0
 * Upgrade containers to 2025.9.0.
 * Added support for annotations from `frontend.serviceAccount`.
@@ -240,15 +248,22 @@ and rolling back to 2023.6.0 release.
 
 ## Requirements
 
-BDBA should run on fine on any public cloud provider supporting Kubernetes. Nodes should have 7 gigabytes of memory at minimum, and preferably there should be 3 nodes. Examples of minimum suitable nodes are
+BDBA should run on fine on any public cloud provider supporting Kubernetes. Nodes should have 7 gigabytes of memory at minimum. Examples of minimum suitable nodes are
 
   * AWS: m5.large
   * Azure: Standard_DS2_v2 (See notes below)
   * GCP: n2-standard-2
 
-BDBA also has been tested on local Kubernetes deployment deployed with kubespray.
+BDBA should run on any supported Kubernetes versions. Onprem BDBA is tested using current version of RKE2.
 
-Supported Kubernetes versions are 1.19 and later.
+### Stateless vs Stateful deployment
+
+We recommend that production BDBA instances do not contain state. BDBA helm chart includes tempalates to deploy
+PostgreSQL, RabbitMQ and VersityGW, which are enabled by default for easy installation but larger scale deployments
+should avoid storing state in Kubernetes cluster and use managed postgresql, rabbitmq and S3 -compatible storage.
+
+Consult the scapters "External PostgreSQL", "External RabbitMQ" and "External Object Storage" for more information
+and required configuration on external services.
 
 ### Cluster Configuration Notes
 
@@ -275,7 +290,7 @@ case node count can be decreased to 2.
 Also, Azure can conflict with some S3/minio operations. This can be resolved
 by settings `frontend.disableEc2Metadata` as `true`.
 
-## Deploying Black Duck Binary Analysis Using the Helm Package Manager
+## Deploying Black Duck Binary Analysis Using the Helm Package Manager (Stateful deployment)
 
 This chart bootstraps Black Duck Binary Analysis deployment on a Kubernetes cluster
 using the Helm package manager.
@@ -363,14 +378,22 @@ Parameter                              | Description                          | 
 `postgresql.persistence.storageClass`  | storageClass for PostgreSQL.         | ""
 `postgresql.persistence.size`          | Size of PostgreSQL claim.            | 300Gi
 `postgresql.persistence.existingClaim` | Existing claim to use for PostgreSQL.| ""
-`minio.persistence.storageClass`       | storageClass for MinIO.              | ""
-`minio.persistence.size`               | Size of MinIO claim.                 | 300Gi
-`minio.persistence.existingClaim`      | Existing claim to use for MinIO.     | ""
+`versitygw.persistence.storageClass`   | storageClass for MinIO.              | ""
+`versitygw.persistence.size`           | Size of MinIO claim.                 | 300Gi
+`versitygw.persistence.existingClaim`  | Existing claim to use for MinIO.     | ""
 `rabbitmq.persistence.storageClass`    | storageClass for RabbitMQ.           | ""
 `rabbitmq.persistence.size`            | Size of RabbitMQ claim.              | 8Gi
 `rabbitmq.persistence.existingClaim`   | Existing claim to use for RabbitMQ.  | ""
 
-#### Alternative Object Storages
+BDBA also has deprecated minio support, which can be used by disabling versitygw and enabling minio.
+
+Parameter                              | Description                          | Default
+-------------------------------------- | ------------------------------------ | -----------------------
+`minio.persistence.storageClass`       | storageClass for MinIO.              | ""
+`minio.persistence.size`               | Size of MinIO claim.                 | 300Gi
+`minio.persistence.existingClaim`      | Existing claim to use for MinIO.     | ""
+
+#### External Object Storage
 
 Black Duck Binary Analysis by default uses minio for storing data to persistent
 volumes. However, Minio can be replaced with any S3-compatible object storage,
@@ -378,58 +401,30 @@ including native S3 from AWS.
 
 Parameter                   | Description                     | Default
 --------------------------- | ------------------------------- | ---------------
-`minio.enabled`             | Use bundled minio.              | true
+`versitygw.enabled`         | Use bundled versitygw.          | false
+`minio.enabled`             | Use bundled minio.              | false
 `frontend.internalBucket`   | Bucket for BDBAs internal use.  | "bdba-internal"
 `frontend.uploadBucket`     | Bucket for storing uploads.     | "bdba-uploads"
 `fluentd.logsBucket`        | Bucket for storing logs.        | "bdba-logs"
 `s3Endpoint`                | S3 endpoint.                    | ""
 `s3AccessKeyId`             | S3 Access Key Id.               | ""
 `s3SecretAccessKey`         | S3 Secret Access Key.           | ""
-`s3Region`                  | S3 Region.                      | ""
+`s3Region`                  | S3 Region.                      | "us-east-1"
 
-To use alternative object storage, minio needs to be disabled.
+To use alternative object storage, both minio and versitygw needs to be disabled.
 
-#### VersityGW as S3-Compatible Storage
-
-VersityGW is an S3-compatible object storage gateway that can be used as a drop-in replacement for minio. It provides enhanced compatibility with S3 protocols and can be a good alternative when you need more advanced S3 features while maintaining control over your storage infrastructure.
-
-Parameter                            | Description                          | Default
------------------------------------- | ------------------------------------ | ---------------
-`versitygw.enabled`                  | Enable VersityGW instead of minio.   | false
-`versitygw.image.repository`         | VersityGW image repository.          | "versity/versitygw"
-`versitygw.image.tag`                | VersityGW image tag.                 | "latest"
-`versitygw.persistence.enabled`      | Enable persistent storage.           | true
-`versitygw.persistence.size`         | Size of VersityGW storage claim.     | "300Gi"
-`versitygw.persistence.storageClass` | StorageClass for VersityGW.          | ""
-
-To use VersityGW:
-
-1. Set `versitygw.enabled: true` and `minio.enabled: false`
-2. Ensure the unified object store secret exists:
-   ```bash
-   kubectl create secret generic bdba-objstore-secret \
-     --from-literal=accesskey=your-access-key \
-     --from-literal=secretkey=your-secret-key
-   ```
-3. Configure any additional VersityGW-specific settings as needed
-
-**Important**: MinIO and VersityGW are mutually exclusive. The chart will fail to install if both are enabled simultaneously.
-
-**Note**: VersityGW uses the same unified secret (`bdba-objstore-secret`) as MinIO. The application code will automatically provision or copy this secret from the existing `bdba-minio-secret` when needed.
-
-When VersityGW is enabled, it will automatically be used for all S3 operations, replacing minio functionality completely.
-
-If using native S3, you need to consider the following:
+If you are using native AWS S3, you need to consider the following:
 
 * Bucket names need to be unique (globally).
 * S3 Region is needed.
-* To grant permissions, you can either all role for Kubernetes nodes that BDBA,
+* To grant permissions, create role for Kubernetes nodes that allow BDBA nodes to access S3,
   or create AWS user that that can access the buckets and use `s3AccessKeyId`
   and `s3SecretAccessKey` parameters. BDBA is able to use Instance Metadata
-  Service, and access keys are optional if IDMS is available.
+  Service, and access keys are optional if Instance Metadata Service is available.
 
-For other object storage options (like external Minio), `s3Endpoint`,
-`s3AccessKeyId` and `s3SecretAccessKey` are needed.
+For other object storage options (like external Minio or ceph), `s3Endpoint`,
+`s3AccessKeyId` and `s3SecretAccessKey` are needed, and possibly `s3Region` depending
+on the object storage settings.
 
 #### Licensing
 
@@ -442,15 +437,6 @@ Parameter                     | Description                      | Default
 `frontend.licensing.username` | Username for licensing server.   | ""
 `frontend.licensing.password` | Password for licensing server.   | ""
 `frontend.licensing.upstream` | Upstream server for data updates.| "https://bdba.blackduck.com"
-
-#### RabbitMQ Configuration
-
-RabbitMQ requires to know the cluster's domain name. If it is not `cluster.local`,
-you need to provide it.
-
-Parameter                                 | Description                 | Default
------------------------------------------ | --------------------------- | ----------------
-`rabbitmq.rabbitmq.clustering.k8s_domain` | Internal k8s cluster domain.| cluster.local
 
 #### Web Frontend Configuration
 
@@ -659,8 +645,8 @@ Parameter       | Description                   | Default
 
 #### External PostgreSQL
 
-Black Duck Binary Analysis supports external PostgreSQL. Black Duck Binary Analysis is tested against PostgreSQL 9.6 and 11. There
-are no specific version restrictions as long as it is 13 or newer.
+Black Duck Binary Analysis supports external PostgreSQL. 
+Black Duck Binary Analysis is tested against PostgreSQL 14, 15, and 17. There are no specific version restrictions as long as it is 14 or newer.
 
 To configure external PostgreSQL, the following parameters are supported. To omit
 installing PostgreSQL and use external instead, specify:
@@ -694,7 +680,7 @@ secret/bdba-pgclient created
 
 Possible values for `postgresqlSslMode` are specified in https://www.postgresql.org/docs/15/libpq-ssl.html.
 
-It is recommended to change the default postgresql paramater values for better performance.
+*IMPORTANT!*: It is recommended to change the default postgresql paramater values for better performance.
 
 * `work_mem = 8MB` to set postgresql working memory from default 4MB to 8MB.
 * `random_page_cost = 1.0` to make query planner prefer index instead of sequential scanning on large queries.
@@ -706,9 +692,12 @@ such as Amazon MQ.
 
 *IMPORTANT!*: It is mandatory that RabbitMQ is configured with larger than default consumer timeout. Some BDBA
 tasks are longer than RabbitMQ defaults allow and the recommended value for them is `86400000`. Without this value,
-BDBA containers will experience unscheduled restarts and in some cases prematurely killed jobs.
-To set this value, add `consumer_timeout = 86400000` in `/etc/rabbitmq/rabbitmq.conf` if rabbitmq is running
-as a systemd service. With other deployment models, consult the documentation on how to do this.
+BDBA containers will experience unscheduled restarts and in some cases prematurely killed jobs. Similarly,
+rabbitmq since 4.x has decreased the maximum message size value, which needs to be increased.
+
+To set these values, add `consumer_timeout = 86400000` and `max_message_size = 209715200` in 
+`/etc/rabbitmq/rabbitmq.conf` if rabbitmq is running as a systemd service.
+With other deployment models, such as managed rabbitmq, consult the documentation on how to do this.
 
 The configuration values are:
 
