@@ -25,9 +25,9 @@ data:
         force_path_style true
         {{- end }}
         path webapp/
+        # Use json format to output pure JSON payload - each line will be valid JSON
         <format>
-          @type single_value
-          message_key message
+          @type json
         </format>
         <buffer time>
           @type file
@@ -52,9 +52,9 @@ data:
         force_path_style true
         {{- end }}
         path updater/
+        # Use json format to output pure JSON payload - each line will be valid JSON
         <format>
-          @type single_value
-          message_key message
+          @type json
         </format>
         <buffer time>
           @type file
@@ -79,9 +79,9 @@ data:
         force_path_style true
         {{- end }}
         path tasks/
+        # Use json format to output pure JSON payload - each line will be valid JSON
         <format>
-          @type single_value
-          message_key message
+          @type json
         </format>
         <buffer time>
           @type file
@@ -106,9 +106,9 @@ data:
         force_path_style true
         {{- end }}
         path longjobs/
+        # Use json format to output pure JSON payload - each line will be valid JSON
         <format>
-          @type single_value
-          message_key message
+          @type json
         </format>
         <buffer time>
           @type file
@@ -133,9 +133,9 @@ data:
         force_path_style true
         {{- end }}
         path worker/
+        # Use json format to output pure JSON payload - each line will be valid JSON
         <format>
-          @type single_value
-          message_key message
+          @type json
         </format>
         <buffer time>
           @type file
