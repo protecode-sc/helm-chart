@@ -9,7 +9,7 @@ frontend:
     annotations: {}
   createSecrets: true
   repository: docker.io/blackducksoftware/bdba-frontend
-  tag: "2025.9.0"
+  tag: "2025.9.2"
   pullPolicy: IfNotPresent
   database:
     {}
@@ -130,7 +130,7 @@ worker:
   replicas: 1
   concurrency: 1
   repository: docker.io/blackducksoftware/bdba-worker
-  tag: "2025.9.0"
+  tag: "2025.9.2"
   pullPolicy: IfNotPresent
   applicationLogging:
     enabled: true
@@ -160,7 +160,7 @@ worker:
 
 fluentd:
   repository: docker.io/blackducksoftware/bdba-fluentd
-  tag: "2025.9.0"
+  tag: "2025.9.2"
   pullPolicy: IfNotPresent
   resources:
     requests:
@@ -206,7 +206,7 @@ pgupgrader:
   enabled: true
   image:
     repository: "docker.io/blackducksoftware/bdba-pgupgrader"
-    tag: "2025.9.0"
+    tag: "2025.9.2"
 
 postgresql:
   image:
