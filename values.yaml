@@ -211,7 +211,8 @@ pgupgrader:
 postgresql:
   image:
     repository: "docker.io/library/postgres"
-    tag: "15.14-bookworm"
+    # Upgrading to trixie would upgrade glibc, which causes issues with collaction.
+    tag: "15.15-bookworm"
   enabled: true
   postgresqlUsername: bdba
   postgresqlPassword: CHANGEME
