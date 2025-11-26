@@ -45,6 +45,7 @@ data:
   {{- end }}
   {{- if .Values.s3Region }}
   S3_REGION: {{ .Values.s3Region | quote }}
+  AWS_DEFAULT_REGION: {{ .Values.s3Region | quote }}
   {{- end }}
   INTERNAL_BUCKET: {{ .Values.frontend.internalBucket | quote }}
   UPLOAD_BUCKET: {{ .Values.frontend.uploadBucket | quote }}

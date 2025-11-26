@@ -194,6 +194,16 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster by using the H
 * Added instructions for populating the database in airgapped deployment
 * `frontend.web.rootUrl` is now used for SSO endpoints as well, instead of guessing from HTTP request.
 
+## Upgrading to 2025.12.0
+
+To add support for helm 4.0, so resources need to be labeled correctly.
+
+```
+kubectl -n <ns> label secret <release>-bdba-django-secrets-generated app.kubernetes.io/managed-by=Helm
+kubectl -n <ns> annotate secret <release>-bdba-django-secrets-generated meta.helm.sh/release-name=<release>
+kubectl -n <ns> annotate secret <release>-bdba-django-secrets-generated meta.helm.sh/release-namespace=<ns>
+```
+
 ## Upgrading to 2025.3.0
 
 BDBA helm chart 2025.3.0 moves away from bitnami rabbitmq helm chart to internal one. In case you are
