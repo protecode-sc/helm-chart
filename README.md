@@ -196,7 +196,7 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster by using the H
 
 ## Upgrading to 2025.12.0
 
-To add support for helm 4.0, so resources need to be labeled correctly.
+To add support for helm 4.0, some resources need to be labeled correctly.
 
 ```
 kubectl -n <ns> label secret <release>-bdba-django-secrets-generated app.kubernetes.io/managed-by=Helm
