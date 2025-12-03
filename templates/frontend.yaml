@@ -84,6 +84,10 @@ spec:
           image: "{{ .Values.frontend.repository }}:{{ .Values.frontend.tag }}"
           imagePullPolicy: {{ .Values.frontend.pullPolicy }}
           args: [ "web" ]
+          {{- if .Values.frontend.web.readinessProbe }}
+          readinessProbe:
+            {{ .Values.frontend.web.readinessProbe | toYaml | nindent 12 }}
+          {{- else }}
           readinessProbe:
             httpGet:
               port: 8000
@@ -93,6 +97,11 @@ spec:
             periodSeconds: 30
             failureThreshold: 3
             successThreshold: 1
+          {{- end }}
+          {{- if .Values.frontend.web.livenessProbe }}
+          livenessProbe:
+            {{ .Values.frontend.web.livenessProbe | toYaml | nindent 12 }}
+          {{- else }}
           livenessProbe:
             httpGet:
               port: 8000
@@ -102,6 +111,7 @@ spec:
             periodSeconds: 30
             failureThreshold: 3
             successThreshold: 1
+          {{- end }}
           resources:
             {{- toYaml .Values.frontend.resources | nindent 12 }}
           {{- include "bdba.frontendenv" . | nindent 10 }}
