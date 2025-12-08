@@ -84,33 +84,27 @@ spec:
           image: "{{ .Values.frontend.repository }}:{{ .Values.frontend.tag }}"
           imagePullPolicy: {{ .Values.frontend.pullPolicy }}
           args: [ "web" ]
-          {{- if .Values.frontend.web.readinessProbe }}
-          readinessProbe:
-            {{ .Values.frontend.web.readinessProbe | toYaml | nindent 12 }}
-          {{- else }}
+          {{- if .Values.frontend.readinessProbe.enabled }}
           readinessProbe:
             httpGet:
               port: 8000
               path: /healthz
-            timeoutSeconds: 3
-            initialDelaySeconds: 2
-            periodSeconds: 30
-            failureThreshold: 3
-            successThreshold: 1
+            timeoutSeconds: {{ .Values.frontend.readinessProbe.timeoutSeconds }}
+            initialDelaySeconds: {{ .Values.frontend.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.frontend.readinessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.frontend.readinessProbe.failureThreshold }}
+            successThreshold: {{ .Values.frontend.readinessProbe.successThreshold }}
           {{- end }}
-          {{- if .Values.frontend.web.livenessProbe }}
-          livenessProbe:
-            {{ .Values.frontend.web.livenessProbe | toYaml | nindent 12 }}
-          {{- else }}
+          {{- if .Values.frontend.livenessProbe.enabled }}
           livenessProbe:
             httpGet:
               port: 8000
               path: /healthz/liveness
-            timeoutSeconds: 3
-            initialDelaySeconds: 10
-            periodSeconds: 30
-            failureThreshold: 3
-            successThreshold: 1
+            timeoutSeconds: {{ .Values.frontend.livenessProbe.timeoutSeconds }}
+            initialDelaySeconds: {{ .Values.frontend.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.frontend.livenessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.frontend.livenessProbe.failureThreshold }}
+            successThreshold: {{ .Values.frontend.livenessProbe.successThreshold }}
           {{- end }}
           resources:
             {{- toYaml .Values.frontend.resources | nindent 12 }}
