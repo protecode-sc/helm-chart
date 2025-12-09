@@ -3,6 +3,13 @@
 You can deploy Black Duck Binary Analysis on a Kubernetes cluster by using the Helm package manager.
 
 ## Changes
+### 2025.9.2
+* Upgrade frontend container to 2025.9.4
+* Webapp healthchecks are now configurable.
+
+### 2025.9.1
+* Upgrade frontend container to 2025.9.2 and worker container to 2025.9.2.
+* Increased keep-alive timeouts in Ingress.
 
 ### 2025.x.x
 * Replace minio with versitygw due to new minio policy of not building containers anymore. Minio is still available in
