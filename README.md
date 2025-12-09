@@ -318,15 +318,35 @@ Before starting, you will need:
 
   * A Kubernetes cluster with:
     * storageClass that allows persistent volumes configured.
-    * NGINX Ingress Controller (not needed with OpenShift)
+    * Traefik or ingress-nginx installed into cluster (not needed with OpenShift)
     * The cluster should have enough memory, preferably at least 16 gigabytes.
       A good entry level deployment, for example, would be two n1-standard
       nodes on GCP.
   * Helm 3
 
+#### Traefik configuration
+
+Traefik limits HTTP connection durations to one minute by default. This is not enough
+for large uploads in most cases, so additional configuration is needed for Traefik.
+When installing Traefik, add the following values to Traefik configuration when
+installing with Helm using chart from https://traefik.github.io/charts:
+
+```console
+ports:
+  websecure:
+    transport:
+      respondingTimeouts:
+        readTimeout: 1800s
+        writeTimeout: 1800s
+        idleTimeout: 180s
+```
+
+This will set the HTTP request duration to 1800s (30 minutes), which should be enough
+for most use cases.
+
 ### Install Blackduck Repo
 
-``` console
+```console
 $ helm repo add blackduck https://repo.blackduck.com/artifactory/sig-cloudnative/
 ```
 
