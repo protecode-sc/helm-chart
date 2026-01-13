@@ -61,7 +61,7 @@ spec:
         - name: "versitygw"
           image: "{{ .Values.versitygw.image.repository }}:{{ .Values.versitygw.image.tag }}"
           imagePullPolicy: {{ .Values.versitygw.image.pullPolicy }}
-          command: [ "/app/versitygw" ]
+          command: [ "/usr/local/bin/docker-entrypoint.sh" ]
           args: ["--health", "/health", "--port", ":{{ .Values.versitygw.service.port }}", "posix", "/data"]
           env:
           - name: ROOT_ACCESS_KEY
