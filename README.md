@@ -3,6 +3,17 @@
 You can deploy Black Duck Binary Analysis on a Kubernetes cluster by using the Helm package manager.
 
 ## Changes
+
+### 2025.12.0
+
+* IMPORTANT! Read ["Upgrading to 2025.12.0"](#upgrading-to-2025.12.0) section in the documentation before upgrading.
+* Replace minio with versitygw due to new minio policy of not building containers anymore. Minio is still available in
+  helm chart in case switch to versitygw is not possible.
+* Update minimum requirements in documentation.
+* BDBA now expects that bundled versitygw/minio secrets are stored in "bdba-objstore-secrets". 
+  BDBA 2025.12.0 will automatically provision new secret on install/upgrade.
+* Update documentation on external rabbitmq configuration (namely `max_message_size` parameter).
+
 ### 2025.9.2
 * Upgrade frontend container to 2025.9.4
 * Webapp healthchecks are now configurable.
@@ -10,14 +21,6 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster by using the H
 ### 2025.9.1
 * Upgrade frontend container to 2025.9.2 and worker container to 2025.9.2.
 * Increased keep-alive timeouts in Ingress.
-
-### 2025.x.x
-* Replace minio with versitygw due to new minio policy of not building containers anymore. Minio is still available in
-  helm chart in case switch to versitygw is not possible.
-* Update minimum requirements in documentation.
-* BDBA now expects that bundled versitygw/minio secrets are stored in "bdba-objstore-secrets". 
-  BDBA 2025.12.0 will automatically provision new secret on install/upgrade.
-* Update documentation on external rabbitmq configuration (namely `max_message_size` parameter).
 
 ### 2025.9.0
 * Upgrade containers to 2025.9.0.
@@ -203,13 +206,19 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster by using the H
 
 ## Upgrading to 2025.12.0
 
-To add support for helm 4.0, some resources need to be labeled correctly.
+### Helm 4.0 compatible labels
 
+Some secrets in previous installations were not labelled correctly. You need to manually label them for update to work first.
 ```
 kubectl -n <ns> label secret <release>-bdba-django-secrets-generated app.kubernetes.io/managed-by=Helm
 kubectl -n <ns> annotate secret <release>-bdba-django-secrets-generated meta.helm.sh/release-name=<release>
 kubectl -n <ns> annotate secret <release>-bdba-django-secrets-generated meta.helm.sh/release-namespace=<ns>
 ```
+### Transition to VersityGW
+
+If you are using bundled object storage, the old minio is now deprecated (though still usable). New object storage
+bundled with BDBA is VersityGW. If you are not using external S3 storage, set `minio.enabled=true` and
+`versitygw.enabled=false` to continue using minio. Otherwise BDBA will be deployed as VersityGW as object storage.
 
 ## Upgrading to 2025.3.0
 
