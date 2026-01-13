@@ -6,7 +6,7 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster by using the H
 
 ### 2025.12.0
 
-* IMPORTANT! Read ["Upgrading to 2025.12.0"](#upgrading-to-2025.12.0) section in the documentation before upgrading.
+* IMPORTANT! Read ["Upgrading to 2025.12.0"](#upgrading-to-2025120) section in the documentation before upgrading.
 * Replace minio with versitygw due to new minio policy of not building containers anymore. Minio is still available in
   helm chart in case switch to versitygw is not possible.
 * Update minimum requirements in documentation.
