@@ -10,7 +10,7 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster by using the H
 * Replace minio with versitygw due to new minio policy of not building containers anymore. Minio is still available in
   helm chart in case switch to versitygw is not possible.
 * Update minimum requirements in documentation.
-* BDBA now expects that bundled versitygw/minio secrets are stored in "bdba-objstore-secrets". 
+* BDBA now expects that bundled versitygw/minio secrets are stored in "bdba-objstore-secret". 
   BDBA 2025.12.0 will automatically provision new secret on install/upgrade.
 * Update documentation on external rabbitmq configuration (namely `max_message_size` parameter).
 
@@ -218,7 +218,7 @@ kubectl -n <ns> annotate secret <release>-bdba-django-secrets-generated meta.hel
 
 If you are using bundled object storage, the old minio is now deprecated (though still usable). New object storage
 bundled with BDBA is VersityGW. If you are not using external S3 storage, set `minio.enabled=true` and
-`versitygw.enabled=false` to continue using minio. Otherwise BDBA will be deployed as VersityGW as object storage.
+`versitygw.enabled=false` to continue using minio. Otherwise BDBA will be deployed with VersityGW as object storage.
 
 ## Upgrading to 2025.3.0
 
@@ -422,7 +422,7 @@ Parameter                              | Description                          | 
 #### External Object Storage
 
 Black Duck Binary Analysis by default uses minio for storing data to persistent
-volumes. However, Minio can be replaced with any S3-compatible object storage,
+volumes. However, VersityGW or Minio can be replaced with any S3-compatible object storage,
 including native S3 from AWS. In those cases, `versitygw.enabled` and `minio.enabled`
 should be set to false.
 
