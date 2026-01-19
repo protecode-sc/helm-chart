@@ -17,7 +17,9 @@ metadata:
     kubernetes.io/ingress.class: {{ .Values.ingress.class }}
     {{- end }}
 spec:
+  {{- if .Values.ingress.class }}
   ingressClassName: {{ .Values.ingress.class }}
+  {{- end }}
 {{- if .Values.ingress.tls.enabled }}
   tls:
     - hosts:
@@ -59,7 +61,9 @@ metadata:
     {{- end }}
 spec:
 {{- if .Values.ingress.tls.enabled }}
+  {{- if .Values.ingress.class }}
   ingressClassName: {{ .Values.ingress.class }}
+  {{- end }}
   tls:
     - hosts:
         - {{ .Values.ingress.host | quote }}
