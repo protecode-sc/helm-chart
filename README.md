@@ -4,6 +4,9 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster by using the H
 
 ## Changes
 
+### 2025.12.2
+* Upgrade frontend container to 2025.12.3 and worker container to 2025.12.3.
+
 ### 2025.12.1
 * Helm chart location has been changed to https://repo.blackduck.com/artifactory/cloudnative/. Migrate to new repo using
   "helm repo rm blackduck; helm repo add blackduck https://repo.blackduck.com/artifactory/cloudnative".
