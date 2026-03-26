@@ -4,6 +4,11 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster by using the H
 
 ## Changes
 
+### 2026.3.0
+* Upgrade frontend container to 2026.3.0 and worker container to 2026.3.0.
+* Upgrades service containers (postgresql 15.17, memcached 1.6.41, rabbitmq 4.1.8).
+* Documentation now includes how to congifure BDBA to use Traefik as ingress controller.
+
 ### 2025.12.2
 * Upgrade frontend container to 2025.12.3 and worker container to 2025.12.3.
 
