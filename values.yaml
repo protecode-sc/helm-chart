@@ -226,7 +226,7 @@ postgresql:
   image:
     repository: "docker.io/library/postgres"
     # Upgrading to trixie would upgrade glibc, which causes issues with collaction.
-    tag: "15.15-bookworm"
+    tag: "15.17-bookworm"
   enabled: true
   postgresqlUsername: bdba
   postgresqlPassword: CHANGEME
@@ -267,7 +267,7 @@ memcached:
   enabled: true
   image:
     repository: memcached
-    tag: 1.6.39-trixie
+    tag: 1.6.41-trixie
   replicaCount: 1
   pdbMinAvailable: 1
   resources:
@@ -376,7 +376,7 @@ rabbitmq:
   image:
     repository: "docker.io/library/rabbitmq"
     # Suffix this with -management if access to rabbitmq management is needed
-    tag: "4.0.9"
+    tag: "4.1.8"
   enabled: true
   rabbitmq:
     username: bdba
