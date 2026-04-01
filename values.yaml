@@ -76,6 +76,7 @@ frontend:
     #  roleGroupAttrName: "role-groups"
     #  poweruserGroupName: "BDBA Powerusers"
     #  adminGroupName: "BDBA Admins"
+    #  globalProjectViewerGroupName: "BDBA Global Project Viewers"
     #  usernameAttrName: "user-email"
   licensing:
     username: ""
