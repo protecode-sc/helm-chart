@@ -4,6 +4,9 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster by using the H
 
 ## Changes
 
+### 2026.6.0
+* Automatic Global project viewer -permission assignment on login can now be configured with `frontend.saml.globalProjectViewerGroupName`.
+
 ### 2026.3.0
 * Upgrade frontend container to 2026.3.0 and worker container to 2026.3.0.
 * Upgrades service containers (postgresql 15.17, memcached 1.6.41, rabbitmq 4.1.8).
