@@ -4,6 +4,9 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster by using the H
 
 ## Changes
 
+### 2026.6.0
+* Automatic Global project viewer -permission assignment on login can now be configured with `frontend.saml.globalProjectViewerGroupName`.
+
 ### 2026.3.0
 * Upgrade frontend container to 2026.3.0 and worker container to 2026.3.0.
 * Upgrades service containers (postgresql 15.17, memcached 1.6.41, rabbitmq 4.1.8).
@@ -23,7 +26,7 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster by using the H
 * Replace minio with versitygw due to new minio policy of not building containers anymore. Minio is still available in
   helm chart in case switch to versitygw is not possible.
 * Update minimum requirements in documentation.
-* BDBA now expects that bundled versitygw/minio secrets are stored in "bdba-objstore-secret". 
+* BDBA now expects that bundled versitygw/minio secrets are stored in "bdba-objstore-secret".
   BDBA 2025.12.0 will automatically provision new secret on install/upgrade.
 * Update documentation on external rabbitmq configuration (namely `max_message_size` parameter).
 
@@ -581,19 +584,20 @@ To use this as the root certificate, add `--set frontend.ldap.rootCASecret=bdba-
 
 Black Duck Binary Analysis supports SAML-based Single Sign-On.
 
-Parameter                          | Description                                         | Default
----------------------------------- | ----------------------------------------------------|-------
-`frontend.saml.enabled`            | Enable SAML                                         | false
-`frontend.saml.spEntityId`         | Service provider entity ID                          |
-`frontend.saml.idpMetadataUrl`     | URL to the identity provider metadata               | ""
-`frontend.saml.idpMetadata`        | Identity provider metadata                          | ""
-`frontend.saml.slug`               | Single sign-on URL slug                             | ""
-`frontend.saml.createUsers`        | Create user accounts automatically on initial login | true
-`frontend.saml.groupAttrName`      | Attribute name used by the IdP for user groups      | ""
-`frontend.saml.roleGroupAttrName`  | Attribute name used by the IdP for role groups      | ""
-`frontend.saml.poweruserGroupName` | Role group name for poweruser assignment            | ""
-`frontend.saml.adminGroupName`     | Role group name for administrator assignment        | ""
-`frontend.saml.usernameAttrName`   | Attribute name used by the IdP for email/username   | ""
+Parameter                                    | Description                                                     | Default
+-------------------------------------------- | --------------------------------------------------------------- | -------
+`frontend.saml.enabled`                      | Enable SAML                                                     | false
+`frontend.saml.spEntityId`                   | Service provider entity ID                                      |
+`frontend.saml.idpMetadataUrl`               | URL to the identity provider metadata                           | ""
+`frontend.saml.idpMetadata`                  | Identity provider metadata                                      | ""
+`frontend.saml.slug`                         | Single sign-on URL slug                                         | ""
+`frontend.saml.createUsers`                  | Create user accounts automatically on initial login             | true
+`frontend.saml.groupAttrName`                | Attribute name used by the IdP for user groups                  | ""
+`frontend.saml.roleGroupAttrName`            | Attribute name used by the IdP for role groups                  | ""
+`frontend.saml.poweruserGroupName`           | Role group name for poweruser assignment                        | ""
+`frontend.saml.adminGroupName`               | Role group name for administrator assignment                    | ""
+`frontend.saml.globalProjectViewerGroupName` | Role group name for global project viewer permission assignment | ""
+`frontend.saml.usernameAttrName`             | Attribute name used by the IdP for email/username               | ""
 
 To provide the Identity provider metadata, set either `frontend.saml.idpMetadataUrl` or include the metadata
 by setting `frontend.saml.idpMetadata`. The latter can also be set directly from a file by adding
@@ -703,7 +707,7 @@ Parameter       | Description                   | Default
 
 #### External PostgreSQL
 
-Black Duck Binary Analysis supports external PostgreSQL. 
+Black Duck Binary Analysis supports external PostgreSQL.
 Black Duck Binary Analysis is tested against PostgreSQL 14, 15, and 17. There are no specific version restrictions as long as it is 14 or newer.
 
 To configure external PostgreSQL, the following parameters are supported. To omit
@@ -753,7 +757,7 @@ tasks are longer than RabbitMQ defaults allow and the recommended value for them
 BDBA containers will experience unscheduled restarts and in some cases prematurely killed jobs. Similarly,
 rabbitmq since 4.x has decreased the maximum message size value, which needs to be increased.
 
-To set these values, add `consumer_timeout = 86400000` and `max_message_size = 209715200` in 
+To set these values, add `consumer_timeout = 86400000` and `max_message_size = 209715200` in
 `/etc/rabbitmq/rabbitmq.conf` if rabbitmq is running as a systemd service.
 With other deployment models, such as managed rabbitmq, consult the documentation on how to do this.
 
@@ -1071,7 +1075,7 @@ By default, this is "openshift-default". You can also use `--set ingress.class="
 Parameter                   | Description                                  | Default
 --------------------------- | -------------------------------------------- | --------------------
 <PREFIX>.podLabels          | Additional labels for pods.                  | null
-<PREFIX>.podAnnotations     | Additional annotations for pods.             | null  
+<PREFIX>.podAnnotations     | Additional annotations for pods.             | null
 <PREFIX>.initContainers     | Additional initContianers for pods           | null
 <PREFIX>.sidecarContainers  | Additional sidecars for pods                 | null
 <PREFIX>.nodeSelector       | Nodeselector for pods                        | null
@@ -1198,4 +1202,3 @@ $ kubectl create secret generic -n <namespace> bdba-rabbitmq-broker-url \
 $ kubectl create secret generic -n <namespace> bdba-rabbitmq-erlang-cookie-secret \
   --from-literal=rabbitmq-erlang-cookie=<random string>
 ```
-
