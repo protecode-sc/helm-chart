@@ -4,6 +4,11 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster by using the H
 
 ## Changes
 
+### 2026.3.0
+* Upgrade frontend container to 2026.3.0 and worker container to 2026.3.0.
+* Upgrade service containers (postgresql 15.17, memcached 1.6.41, rabbitmq 4.1.8).
+* Documentation now includes instructions on how to congifure BDBA to use Traefik as ingress controller.
+
 ### 2025.12.3
 * Upgrade frontend container to 2025.12.6.
 
@@ -21,7 +26,7 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster by using the H
 * Replace minio with versitygw due to new minio policy of not building containers anymore. Minio is still available in
   helm chart in case switch to versitygw is not possible.
 * Update minimum requirements in documentation.
-* BDBA now expects that bundled versitygw/minio secrets are stored in "bdba-objstore-secret". 
+* BDBA now expects that bundled versitygw/minio secrets are stored in "bdba-objstore-secret".
   BDBA 2025.12.0 will automatically provision new secret on install/upgrade.
 * Update documentation on external rabbitmq configuration (namely `max_message_size` parameter).
 
@@ -338,11 +343,31 @@ Before starting, you will need:
 
   * A Kubernetes cluster with:
     * storageClass that allows persistent volumes configured.
-    * NGINX Ingress Controller (not needed with OpenShift)
+    * Traefik or ingress-nginx installed into cluster (not needed with OpenShift)
     * The cluster should have enough memory, preferably at least 16 gigabytes.
       A good entry level deployment, for example, would be two n1-standard
       nodes on GCP.
   * Helm 3
+
+#### Traefik configuration
+
+Traefik limits HTTP connection durations to one minute by default. This is not enough
+for large uploads in most cases, so additional configuration is needed for Traefik.
+When installing Traefik, add the following values to Traefik configuration when
+installing with Helm using chart from https://traefik.github.io/charts:
+
+```console
+ports:
+  websecure:
+    transport:
+      respondingTimeouts:
+        readTimeout: 1800s
+        writeTimeout: 1800s
+        idleTimeout: 180s
+```
+
+This will set the HTTP request duration to 1800s (30 minutes), which should be enough
+for most use cases.
 
 ### Install Blackduck Repo
 
@@ -681,7 +706,7 @@ Parameter       | Description                   | Default
 
 #### External PostgreSQL
 
-Black Duck Binary Analysis supports external PostgreSQL. 
+Black Duck Binary Analysis supports external PostgreSQL.
 Black Duck Binary Analysis is tested against PostgreSQL 14, 15, and 17. There are no specific version restrictions as long as it is 14 or newer.
 
 To configure external PostgreSQL, the following parameters are supported. To omit
@@ -731,7 +756,7 @@ tasks are longer than RabbitMQ defaults allow and the recommended value for them
 BDBA containers will experience unscheduled restarts and in some cases prematurely killed jobs. Similarly,
 rabbitmq since 4.x has decreased the maximum message size value, which needs to be increased.
 
-To set these values, add `consumer_timeout = 86400000` and `max_message_size = 209715200` in 
+To set these values, add `consumer_timeout = 86400000` and `max_message_size = 209715200` in
 `/etc/rabbitmq/rabbitmq.conf` if rabbitmq is running as a systemd service.
 With other deployment models, such as managed rabbitmq, consult the documentation on how to do this.
 
@@ -1049,7 +1074,7 @@ By default, this is "openshift-default". You can also use `--set ingress.class="
 Parameter                   | Description                                  | Default
 --------------------------- | -------------------------------------------- | --------------------
 <PREFIX>.podLabels          | Additional labels for pods.                  | null
-<PREFIX>.podAnnotations     | Additional annotations for pods.             | null  
+<PREFIX>.podAnnotations     | Additional annotations for pods.             | null
 <PREFIX>.initContainers     | Additional initContianers for pods           | null
 <PREFIX>.sidecarContainers  | Additional sidecars for pods                 | null
 <PREFIX>.nodeSelector       | Nodeselector for pods                        | null
@@ -1176,4 +1201,3 @@ $ kubectl create secret generic -n <namespace> bdba-rabbitmq-broker-url \
 $ kubectl create secret generic -n <namespace> bdba-rabbitmq-erlang-cookie-secret \
   --from-literal=rabbitmq-erlang-cookie=<random string>
 ```
-
