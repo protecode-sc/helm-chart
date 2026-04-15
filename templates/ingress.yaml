@@ -10,12 +10,6 @@ metadata:
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
-    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
-    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
-    nginx.ingress.kubernetes.io/upstream-keepalive-time: "600"
-    {{- if .Values.ingress.class }}
-    kubernetes.io/ingress.class: {{ .Values.ingress.class }}
-    {{- end }}
 spec:
   {{- if .Values.ingress.class }}
   ingressClassName: {{ .Values.ingress.class }}
@@ -46,24 +40,20 @@ metadata:
   name: {{ $fullName }}-api
   labels:
 {{ include "bdba.labels" . | indent 4 }}
-  {{- with .Values.ingress.annotations }}
+  {{- if or .Values.ingress.annotations .Values.ingress.apiConnLimit }}
   annotations:
+    {{- with .Values.ingress.annotations }}
     {{- toYaml . | nindent 4 }}
-  {{- end }}
-    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
-    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
-    nginx.ingress.kubernetes.io/upstream-keepalive-time: "600"
+    {{- end }}
     {{- if .Values.ingress.apiConnLimit }}
     nginx.ingress.kubernetes.io/limit-connections: {{ .Values.ingress.apiConnLimit | quote }}
     {{- end }}
-    {{- if .Values.ingress.class }}
-    kubernetes.io/ingress.class: {{ .Values.ingress.class }}
-    {{- end }}
+  {{- end }}
 spec:
-{{- if .Values.ingress.tls.enabled }}
   {{- if .Values.ingress.class }}
   ingressClassName: {{ .Values.ingress.class }}
   {{- end }}
+{{- if .Values.ingress.tls.enabled }}
   tls:
     - hosts:
         - {{ .Values.ingress.host | quote }}
