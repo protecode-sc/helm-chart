@@ -50,10 +50,10 @@ metadata:
     {{- end }}
   {{- end }}
 spec:
-{{- if .Values.ingress.tls.enabled }}
   {{- if .Values.ingress.class }}
   ingressClassName: {{ .Values.ingress.class }}
   {{- end }}
+{{- if .Values.ingress.tls.enabled }}
   tls:
     - hosts:
         - {{ .Values.ingress.host | quote }}
