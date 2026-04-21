@@ -1,0 +1,50 @@
+ingressClass:
+  name: traefik
+providers:
+  kubernetesCRD:
+    ingressClass: traefik
+  kubernetesIngress:
+    ingressClass: traefik
+
+ports:
+  # Defines the HTTP entry point named 'web'
+  web:
+    port: 80
+    http:
+      redirections:
+        to: websecure
+        scheme: https
+        permanent: true
+  
+  # Defines the HTTPS entry point named 'websecure'
+  websecure:
+    port: 443
+    transport:
+      respondingTimeouts:
+        readTimeout: 1800s
+        writeTimeout: 1800s
+        idleTimeout: 180s
+      lifeCycle:
+        requestAcceptGraceTimeout: 10s
+        graceTimeOut: 10s
+
+
+# Enable access logs to see detailed request information
+logs:
+  general:
+    level: INFO  # Can be DEBUG for even more detail
+  access:
+    enabled: true
+    format: json
+    fields:
+      defaultMode: keep
+      names:
+        ClientUsername: drop
+      headers:
+        defaultMode: keep
+
+# Force HTTP/1.1 only by removing h2 from ALPN negotiation
+tlsOptions:
+  default:
+    alpnProtocols:
+      - http/1.1

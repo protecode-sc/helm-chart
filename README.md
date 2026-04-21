@@ -4,8 +4,11 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster by using the H
 
 ## Changes
 
+### 2026.3.2
+* Added documentation about configuring Ingress for improved upload performance.
+
 ### 2026.3.1
-* Fix ingress config so it works without TLS enabled.
+* Fix ingress config so it workd without TLS enabled.
 
 ### 2026.3.0
 * Upgrade frontend container to 2026.3.0 and worker container to 2026.3.0.
@@ -371,6 +374,30 @@ ports:
 
 This will set the HTTP request duration to 1800s (30 minutes), which should be enough
 for most use cases.
+
+Also, if connection to BDBA is with high latency (for example if BDBA is hosted in cloud
+provider), file uploads over HTTP2 tend to be rather slow due to flow control in HTTP2.
+It is recommended to disable HTTP2 when running BDBA. To achieve this in traefik, add the
+following to Traefik values.
+
+```console
+# Force HTTP/1.1 only by removing h2 from ALPN negotiation
+tlsOptions:
+  default:
+    alpnProtocols:
+      - http/1.1
+```
+
+This disables HTTP/2 from TLS ALPN negotiation and make clients use HTTP/1.1. 
+
+Additionally, if BDBA is behind L4 network load balancer, you may need to disable
+HTTP/2 ALPN on load balancer level. On AWS, this can be achieved invoking
+
+```console
+$ aws elbv2 modify-listener --listener-arn <arn> --alpn-policy HTTP1Only
+```
+
+There is an example values file for traefik helm chart (https://traefik.github.io/charts) in `contrib/traefik/traefik-values.yaml`.
 
 ### Install Blackduck Repo
 
