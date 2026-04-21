@@ -8,7 +8,7 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster by using the H
 * Added documentation about configuring Ingress for improved upload performance.
 
 ### 2026.3.1
-* Fix ingress config so it workd without TLS enabled.
+* Fix ingress config so it works without TLS enabled.
 
 ### 2026.3.0
 * Upgrade frontend container to 2026.3.0 and worker container to 2026.3.0.
