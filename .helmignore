@@ -1,3 +1,4 @@
 .git
 .helmignore
 *.tgz
+.pre-commit-hook.yaml

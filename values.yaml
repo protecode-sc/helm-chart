@@ -6,9 +6,10 @@ frontend:
   serviceAccount:
     create: true
     name: ""
+    annotations: {}
   createSecrets: true
   repository: docker.io/blackducksoftware/bdba-frontend
-  tag: "2025.6.0"
+  tag: "2026.3.0"
   pullPolicy: IfNotPresent
   database:
     {}
@@ -77,6 +78,20 @@ frontend:
     upstream: "https://protecode-sc.com/"
   applicationLogging:
     enabled: true
+  readinessProbe:
+    enabled: true
+    timeoutSeconds: 3
+    initialDelaySeconds: 2
+    periodSeconds: 30
+    failureThreshold: 3
+    successThreshold: 1
+  livenessProbe:
+    enabled: true
+    timeoutSeconds: 3
+    initialDelaySeconds: 10
+    periodSeconds: 30
+    failureThreshold: 3
+    successThreshold: 1
   resources:
     requests:
       memory: "1Gi"
@@ -129,7 +144,7 @@ worker:
   replicas: 1
   concurrency: 1
   repository: docker.io/blackducksoftware/bdba-worker
-  tag: "2025.6.0"
+  tag: "2026.3.0"
   pullPolicy: IfNotPresent
   applicationLogging:
     enabled: true
@@ -159,7 +174,7 @@ worker:
 
 fluentd:
   repository: docker.io/blackducksoftware/bdba-fluentd
-  tag: "2025.6.0"
+  tag: "2026.3.0"
   pullPolicy: IfNotPresent
   resources:
     requests:
@@ -194,7 +209,7 @@ tasks:
 
 fluentbit:
   repository: fluent/fluent-bit
-  tag: 3.2.2
+  tag: 4.0.9
   pullPolicy: IfNotPresent
 
 global:
@@ -205,12 +220,13 @@ pgupgrader:
   enabled: true
   image:
     repository: "docker.io/blackducksoftware/bdba-pgupgrader"
-    tag: "2025.6.0"
+    tag: "2026.3.0"
 
 postgresql:
   image:
     repository: "docker.io/library/postgres"
-    tag: "15.10-bookworm"
+    # Upgrading to trixie would upgrade glibc, which causes issues with collaction.
+    tag: "15.17-bookworm"
   enabled: true
   postgresqlUsername: bdba
   postgresqlPassword: CHANGEME
@@ -251,7 +267,7 @@ memcached:
   enabled: true
   image:
     repository: memcached
-    tag: 1.6.32-bookworm
+    tag: 1.6.41-trixie
   replicaCount: 1
   pdbMinAvailable: 1
   resources:
@@ -265,7 +281,9 @@ memcached:
     enabled: true
 
 minio:
-  enabled: true
+  # Set to false when using VersityGW or external S3
+  # NOTE: minio.enabled and versitygw.enabled are mutually exclusive
+  enabled: false
   image:
     repository: minio/minio
     tag: RELEASE.2021-04-22T15-44-28Z
@@ -287,11 +305,78 @@ minio:
 #      cpu:
 #      memory:
 
+# VersityGW - S3-compatible object storage gateway
+# When enabled, this will be used instead of minio for S3 storage
+# To use VersityGW: set versitygw.enabled=true and minio.enabled=false
+versitygw:
+  # NOTE: minio.enabled and versitygw.enabled are mutually exclusive
+  enabled: true
+  image:
+    repository: versity/versitygw
+    tag: v1.0.20
+    pullPolicy: IfNotPresent
+  service:
+    port: 9001
+  # Data storage path inside container
+  dataPath: /data
+  # Note: Uses the unified bdba-objstore-secret (same as minio)
+  # Application code will provision or copy from bdba-minio-secret
+  # Additional environment variables
+  extraEnv: []
+  # - name: EXAMPLE_VAR
+  #   value: "example-value"
+  # Storage persistence
+  persistence:
+    enabled: true
+    size: 300Gi
+    # storageClass: ""
+    # existingClaim: ""
+  livenessProbe:
+    enabled: true
+    path: /
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    timeoutSeconds: 5
+    failureThreshold: 3
+    successThreshold: 1
+  readinessProbe:
+    enabled: true
+    path: /
+    initialDelaySeconds: 5
+    periodSeconds: 15
+    timeoutSeconds: 1
+    failureThreshold: 3
+    successThreshold: 1
+  # Security context
+  securityContext:
+    enabled: true
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+  # Resource limits and requests
+  resources:
+    requests:
+      cpu: "250m"
+      memory: "256Mi"
+#    limits:
+#      cpu: 1
+#      memory: "1Gi"
+  # Pod-level configurations
+  podLabels: {}
+  podAnnotations: {}
+  # Init and sidecar containers
+  initContainers: {}
+  sidecarContainers: {}
+  # Node scheduling
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
 rabbitmq:
   image:
     repository: "docker.io/library/rabbitmq"
     # Suffix this with -management if access to rabbitmq management is needed
-    tag: "4.0.4"
+    tag: "4.1.8"
   enabled: true
   rabbitmq:
     username: bdba

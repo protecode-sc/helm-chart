@@ -22,9 +22,13 @@ data:
         s3_region {{ .Values.s3Region }}
         {{- else }}
         s3_endpoint {{ template "bdba.s3endpoint" . }}
-        force_path_style true  # Prevent mangling of http endpoint
+        force_path_style true
         {{- end }}
         path webapp/
+        # Use json format to output pure JSON payload - each line will be valid JSON
+        <format>
+          @type json
+        </format>
         <buffer time>
           @type file
           timekey_wait 10m
@@ -45,9 +49,13 @@ data:
         s3_region {{ .Values.s3Region }}
         {{- else }}
         s3_endpoint {{ template "bdba.s3endpoint" . }}
-        force_path_style true  # Prevent mangling of http endpoint
+        force_path_style true
         {{- end }}
         path updater/
+        # Use json format to output pure JSON payload - each line will be valid JSON
+        <format>
+          @type json
+        </format>
         <buffer time>
           @type file
           timekey_wait 10m
@@ -68,9 +76,13 @@ data:
         s3_region {{ .Values.s3Region }}
         {{- else }}
         s3_endpoint {{ template "bdba.s3endpoint" . }}
-        force_path_style true  # Prevent mangling of http endpoint
+        force_path_style true
         {{- end }}
         path tasks/
+        # Use json format to output pure JSON payload - each line will be valid JSON
+        <format>
+          @type json
+        </format>
         <buffer time>
           @type file
           timekey_wait 10m
@@ -91,9 +103,13 @@ data:
         s3_region {{ .Values.s3Region }}
         {{- else }}
         s3_endpoint {{ template "bdba.s3endpoint" . }}
-        force_path_style true  # Prevent mangling of http endpoint
+        force_path_style true
         {{- end }}
         path longjobs/
+        # Use json format to output pure JSON payload - each line will be valid JSON
+        <format>
+          @type json
+        </format>
         <buffer time>
           @type file
           timekey_wait 10m
@@ -117,6 +133,10 @@ data:
         force_path_style true
         {{- end }}
         path worker/
+        # Use json format to output pure JSON payload - each line will be valid JSON
+        <format>
+          @type json
+        </format>
         <buffer time>
           @type file
           timekey_wait 10m

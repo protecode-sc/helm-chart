@@ -1,3 +1,7 @@
+{{/*
+Validate object storage configuration
+*/}}
+{{- include "bdba.objstore.validate" . -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -34,11 +38,14 @@ data:
   {{- end }}
   {{- if .Values.minio.enabled }}
   S3_ENDPOINT: "http://{{ template "bdba.minio.fullname" . }}:{{ .Values.minio.service.port }}"
+  {{- else if .Values.versitygw.enabled }}
+  S3_ENDPOINT: "http://{{ template "bdba.versitygw.fullname" . }}:{{ .Values.versitygw.service.port }}"
   {{- else if .Values.s3Endpoint }}
   S3_ENDPOINT: {{ .Values.s3Endpoint | quote }}
   {{- end }}
   {{- if .Values.s3Region }}
   S3_REGION: {{ .Values.s3Region | quote }}
+  AWS_DEFAULT_REGION: {{ .Values.s3Region | quote }}
   {{- end }}
   INTERNAL_BUCKET: {{ .Values.frontend.internalBucket | quote }}
   UPLOAD_BUCKET: {{ .Values.frontend.uploadBucket | quote }}

@@ -4,6 +4,50 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster by using the H
 
 ## Changes
 
+### 2026.3.1
+* Fix ingress config so it works without TLS enabled.
+
+### 2026.3.0
+* Upgrade frontend container to 2026.3.0 and worker container to 2026.3.0.
+* Upgrade service containers (postgresql 15.17, memcached 1.6.41, rabbitmq 4.1.8).
+* Documentation now includes instructions on how to congifure BDBA to use Traefik as ingress controller.
+
+### 2025.12.3
+* Upgrade frontend container to 2025.12.6.
+
+### 2025.12.2
+* Upgrade frontend container to 2025.12.3 and worker container to 2025.12.3.
+
+### 2025.12.1
+* Helm chart location has been changed to https://repo.blackduck.com/artifactory/cloudnative/. Migrate to new repo using
+  "helm repo rm blackduck; helm repo add blackduck https://repo.blackduck.com/artifactory/cloudnative".
+* Do not set ingressClassName in case it is not configured.
+
+### 2025.12.0
+
+* IMPORTANT! Read ["Upgrading to 2025.12.0"](#upgrading-to-2025120) section in the documentation before upgrading.
+* Replace minio with versitygw due to new minio policy of not building containers anymore. Minio is still available in
+  helm chart in case switch to versitygw is not possible.
+* Update minimum requirements in documentation.
+* BDBA now expects that bundled versitygw/minio secrets are stored in "bdba-objstore-secret".
+  BDBA 2025.12.0 will automatically provision new secret on install/upgrade.
+* Update documentation on external rabbitmq configuration (namely `max_message_size` parameter).
+
+### 2025.9.2
+* Upgrade frontend container to 2025.9.4
+* Webapp healthchecks are now configurable.
+
+### 2025.9.1
+* Upgrade frontend container to 2025.9.2 and worker container to 2025.9.2.
+* Increased keep-alive timeouts in Ingress.
+
+### 2025.9.0
+* Upgrade containers to 2025.9.0.
+* Added support for annotations from `frontend.serviceAccount`.
+
+### 2026.6.3
+* Upgrade containers to 2025.6.3.
+
 ### 2026.6.1
 * BDBA 2025.6.1.
 * Changed default postgresql `work_mem` and `random_page_cost` to optimize database performance.
@@ -179,6 +223,22 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster by using the H
 * Added instructions for populating the database in airgapped deployment
 * `frontend.web.rootUrl` is now used for SSO endpoints as well, instead of guessing from HTTP request.
 
+## Upgrading to 2025.12.0
+
+### Helm 4.0 compatible labels
+
+Some secrets in previous installations were not labelled correctly. You need to manually label them for update to work first.
+```
+kubectl -n <ns> label secret <release>-bdba-django-secrets-generated app.kubernetes.io/managed-by=Helm
+kubectl -n <ns> annotate secret <release>-bdba-django-secrets-generated meta.helm.sh/release-name=<release>
+kubectl -n <ns> annotate secret <release>-bdba-django-secrets-generated meta.helm.sh/release-namespace=<ns>
+```
+### Transition to VersityGW
+
+If you are using bundled object storage, the old minio is now deprecated (though still usable). New object storage
+bundled with BDBA is VersityGW. If you are not using external S3 storage, set `minio.enabled=true` and
+`versitygw.enabled=false` to continue using minio. Otherwise BDBA will be deployed with VersityGW as object storage.
+
 ## Upgrading to 2025.3.0
 
 BDBA helm chart 2025.3.0 moves away from bitnami rabbitmq helm chart to internal one. In case you are
@@ -233,15 +293,22 @@ and rolling back to 2023.6.0 release.
 
 ## Requirements
 
-BDBA should run on fine on any public cloud provider supporting Kubernetes. Nodes should have 7 gigabytes of memory at minimum, and preferably there should be 3 nodes. Examples of minimum suitable nodes are
+BDBA should run fine on any public cloud provider supporting Kubernetes. Nodes should have 7 gigabytes of memory at minimum. Examples of minimum suitable nodes are
 
   * AWS: m5.large
   * Azure: Standard_DS2_v2 (See notes below)
   * GCP: n2-standard-2
 
-BDBA also has been tested on local Kubernetes deployment deployed with kubespray.
+BDBA should run on any supported Kubernetes versions. Onprem BDBA is tested using current version of RKE2.
 
-Supported Kubernetes versions are 1.19 and later.
+### Stateless vs Stateful deployment
+
+We recommend that production BDBA instances do not contain state. BDBA helm chart includes tempalates to deploy
+PostgreSQL, RabbitMQ and VersityGW, which are enabled by default for easy installation but larger scale deployments
+should avoid storing state in Kubernetes cluster and use managed postgresql, rabbitmq and S3 -compatible storage.
+
+Consult the chapters "External PostgreSQL", "External RabbitMQ" and "External Object Storage" for more information
+and required configuration on external services.
 
 ### Cluster Configuration Notes
 
@@ -268,7 +335,7 @@ case node count can be decreased to 2.
 Also, Azure can conflict with some S3/minio operations. This can be resolved
 by settings `frontend.disableEc2Metadata` as `true`.
 
-## Deploying Black Duck Binary Analysis Using the Helm Package Manager
+## Deploying Black Duck Binary Analysis Using the Helm Package Manager (Stateful deployment)
 
 This chart bootstraps Black Duck Binary Analysis deployment on a Kubernetes cluster
 using the Helm package manager.
@@ -279,16 +346,36 @@ Before starting, you will need:
 
   * A Kubernetes cluster with:
     * storageClass that allows persistent volumes configured.
-    * NGINX Ingress Controller (not needed with OpenShift)
+    * Traefik or ingress-nginx installed into cluster (not needed with OpenShift)
     * The cluster should have enough memory, preferably at least 16 gigabytes.
       A good entry level deployment, for example, would be two n1-standard
       nodes on GCP.
   * Helm 3
 
+#### Traefik configuration
+
+Traefik limits HTTP connection durations to one minute by default. This is not enough
+for large uploads in most cases, so additional configuration is needed for Traefik.
+When installing Traefik, add the following values to Traefik configuration when
+installing with Helm using chart from https://traefik.github.io/charts:
+
+```console
+ports:
+  websecure:
+    transport:
+      respondingTimeouts:
+        readTimeout: 1800s
+        writeTimeout: 1800s
+        idleTimeout: 180s
+```
+
+This will set the HTTP request duration to 1800s (30 minutes), which should be enough
+for most use cases.
+
 ### Install Blackduck Repo
 
 ``` console
-$ helm repo add blackduck https://repo.blackduck.com/artifactory/sig-cloudnative/
+$ helm repo add blackduck https://repo.blackduck.com/artifactory/cloudnative/
 ```
 
 ### Install the Chart
@@ -356,43 +443,52 @@ Parameter                              | Description                          | 
 `postgresql.persistence.storageClass`  | storageClass for PostgreSQL.         | ""
 `postgresql.persistence.size`          | Size of PostgreSQL claim.            | 300Gi
 `postgresql.persistence.existingClaim` | Existing claim to use for PostgreSQL.| ""
-`minio.persistence.storageClass`       | storageClass for MinIO.              | ""
-`minio.persistence.size`               | Size of MinIO claim.                 | 300Gi
-`minio.persistence.existingClaim`      | Existing claim to use for MinIO.     | ""
+`versitygw.persistence.storageClass`   | storageClass for VersityGW.          | ""
+`versitygw.persistence.size`           | Size of VersityGW claim.             | 300Gi
+`versitygw.persistence.existingClaim`  | Existing claim to use for VersityGW. | ""
 `rabbitmq.persistence.storageClass`    | storageClass for RabbitMQ.           | ""
 `rabbitmq.persistence.size`            | Size of RabbitMQ claim.              | 8Gi
 `rabbitmq.persistence.existingClaim`   | Existing claim to use for RabbitMQ.  | ""
 
-#### Alternative Object Storages
+BDBA also has deprecated minio support, which can be used by disabling versitygw and enabling minio.
+
+Parameter                              | Description                          | Default
+-------------------------------------- | ------------------------------------ | -----------------------
+`minio.persistence.storageClass`       | storageClass for MinIO.              | ""
+`minio.persistence.size`               | Size of MinIO claim.                 | 300Gi
+`minio.persistence.existingClaim`      | Existing claim to use for MinIO.     | ""
+
+#### External Object Storage
 
 Black Duck Binary Analysis by default uses minio for storing data to persistent
-volumes. However, Minio can be replaced with any S3-compatible object storage,
-including native S3 from AWS.
+volumes. However, VersityGW or Minio can be replaced with any S3-compatible object storage,
+including native S3 from AWS. In those cases, `versitygw.enabled` and `minio.enabled`
+should be set to false.
 
 Parameter                   | Description                     | Default
 --------------------------- | ------------------------------- | ---------------
-`minio.enabled`             | Use bundled minio.              | true
 `frontend.internalBucket`   | Bucket for BDBAs internal use.  | "bdba-internal"
 `frontend.uploadBucket`     | Bucket for storing uploads.     | "bdba-uploads"
 `fluentd.logsBucket`        | Bucket for storing logs.        | "bdba-logs"
 `s3Endpoint`                | S3 endpoint.                    | ""
 `s3AccessKeyId`             | S3 Access Key Id.               | ""
 `s3SecretAccessKey`         | S3 Secret Access Key.           | ""
-`s3Region`                  | S3 Region.                      | ""
+`s3Region`                  | S3 Region.                      | "us-east-1"
 
-To use alternative object storage, minio needs to be disabled.
+To use alternative object storage, both minio and versitygw needs to be disabled.
 
-If using native S3, you need to consider the following:
+If you are using native AWS S3, you need to consider the following:
 
 * Bucket names need to be unique (globally).
 * S3 Region is needed.
-* To grant permissions, you can either all role for Kubernetes nodes that BDBA,
+* To grant permissions, create role for Kubernetes nodes that allow BDBA nodes to access S3,
   or create AWS user that that can access the buckets and use `s3AccessKeyId`
   and `s3SecretAccessKey` parameters. BDBA is able to use Instance Metadata
-  Service, and access keys are optional if IDMS is available.
+  Service, and access keys are optional if Instance Metadata Service is available.
 
-For other object storage options (like external Minio), `s3Endpoint`,
-`s3AccessKeyId` and `s3SecretAccessKey` are needed.
+For other object storage options (like external Minio or ceph), `s3Endpoint`,
+`s3AccessKeyId` and `s3SecretAccessKey` are needed, and possibly `s3Region` depending
+on the object storage settings.
 
 #### Licensing
 
@@ -410,15 +506,6 @@ Parameter                           | Description                               
 Licensing credentials can be passed either via `frontend.licensing.username` and `frontend.licensing.password`,
 or via `frontend.licensing.existingSecret` when they are read from a secret not managed by BDBA Helm chart.
 Existing secret should contain keys `username` and `password`.
-
-#### RabbitMQ Configuration
-
-RabbitMQ requires to know the cluster's domain name. If it is not `cluster.local`,
-you need to provide it.
-
-Parameter                                 | Description                 | Default
------------------------------------------ | --------------------------- | ----------------
-`rabbitmq.rabbitmq.clustering.k8s_domain` | Internal k8s cluster domain.| cluster.local
 
 #### Web Frontend Configuration
 
@@ -638,8 +725,8 @@ Parameter       | Description                   | Default
 
 #### External PostgreSQL
 
-Black Duck Binary Analysis supports external PostgreSQL. Black Duck Binary Analysis is tested against PostgreSQL 9.6 and 11. There
-are no specific version restrictions as long as it is 13 or newer.
+Black Duck Binary Analysis supports external PostgreSQL.
+Black Duck Binary Analysis is tested against PostgreSQL 14, 15, and 17. There are no specific version restrictions as long as it is 14 or newer.
 
 To configure external PostgreSQL, the following parameters are supported. To omit
 installing PostgreSQL and use external instead, specify:
@@ -673,7 +760,7 @@ secret/bdba-pgclient created
 
 Possible values for `postgresqlSslMode` are specified in https://www.postgresql.org/docs/15/libpq-ssl.html.
 
-It is recommended to change the default postgresql paramater values for better performance.
+*IMPORTANT!*: It is recommended to change the default postgresql paramater values for better performance.
 
 * `work_mem = 8MB` to set postgresql working memory from default 4MB to 8MB.
 * `random_page_cost = 1.0` to make query planner prefer index instead of sequential scanning on large queries.
@@ -685,9 +772,12 @@ such as Amazon MQ.
 
 *IMPORTANT!*: It is mandatory that RabbitMQ is configured with larger than default consumer timeout. Some BDBA
 tasks are longer than RabbitMQ defaults allow and the recommended value for them is `86400000`. Without this value,
-BDBA containers will experience unscheduled restarts and in some cases prematurely killed jobs.
-To set this value, add `consumer_timeout = 86400000` in `/etc/rabbitmq/rabbitmq.conf` if rabbitmq is running
-as a systemd service. With other deployment models, consult the documentation on how to do this.
+BDBA containers will experience unscheduled restarts and in some cases prematurely killed jobs. Similarly,
+rabbitmq since 4.x has decreased the maximum message size value, which needs to be increased.
+
+To set these values, add `consumer_timeout = 86400000` and `max_message_size = 209715200` in
+`/etc/rabbitmq/rabbitmq.conf` if rabbitmq is running as a systemd service.
+With other deployment models, such as managed rabbitmq, consult the documentation on how to do this.
 
 The configuration values are:
 
@@ -1003,7 +1093,7 @@ By default, this is "openshift-default". You can also use `--set ingress.class="
 Parameter                   | Description                                  | Default
 --------------------------- | -------------------------------------------- | --------------------
 <PREFIX>.podLabels          | Additional labels for pods.                  | null
-<PREFIX>.podAnnotations     | Additional annotations for pods.             | null  
+<PREFIX>.podAnnotations     | Additional annotations for pods.             | null
 <PREFIX>.initContainers     | Additional initContianers for pods           | null
 <PREFIX>.sidecarContainers  | Additional sidecars for pods                 | null
 <PREFIX>.nodeSelector       | Nodeselector for pods                        | null
@@ -1130,4 +1220,3 @@ $ kubectl create secret generic -n <namespace> bdba-rabbitmq-broker-url \
 $ kubectl create secret generic -n <namespace> bdba-rabbitmq-erlang-cookie-secret \
   --from-literal=rabbitmq-erlang-cookie=<random string>
 ```
-
