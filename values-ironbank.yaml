@@ -1,12 +1,12 @@
 frontend:
-  tag: "2023.12.2"
-  repository: "registry1.dso.mil/synopsys/bdba/bdba-frontend"
+  tag: "2026.3.0"
+  repository: "registry1.dso.mil/blackduck/bdba/bdba-frontend"
   applicationLogging:
     enabled: false
 
 worker:
-  tag: "2023.12.2"
-  repository: "registry1.dso.mil/synopsys/bdba/bdba-worker"
+  tag: "2026.3.0"
+  repository: "registry1.dso.mil/blackduck/bdba/bdba-worker"
   applicationLogging:
     enabled: false
 
@@ -21,8 +21,8 @@ pgupgrader:
 rabbitmq:
   image:
     registry: "registry1.dso.mil/ironbank"
-    repository: "bitnami/rabbitmq"
-    tag: "3.12.12"
+    repository: "opensource/rabbitmq"
+    tag: "4.3.0"
   global:
     imagePullSecrets: []
   # Ironbank image removes curl, which probes depend on.
@@ -34,7 +34,7 @@ rabbitmq:
 memcached:
   image:
     repository: "registry1.dso.mil/ironbank/opensource/memcached/memcached"
-    tag: "1.6.23"
+    tag: "1.6.41"
 
 minio:
   image:
