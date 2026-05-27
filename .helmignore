@@ -1,4 +1,7 @@
 .git
 .helmignore
 *.tgz
-.pre-commit-hook.yaml
+.pre-commit-config.yaml
+.python-version
+.vscode
+.claude
