@@ -170,7 +170,7 @@ automatically based on file size.
 |---|---|---|
 | `s3:GetObject` | upload, internal, logs | Download binaries, read internal state, read log files for support bundles; also covers `HeadObject` used to check file existence |
 | `s3:PutObject` | upload, internal, logs | Binary uploads, analysis results, internal state writes; fluentd writes structured log objects to the logs bucket |
-| `s3:DeleteObject` | upload, internal, logs | Post-processing cleanup; log retention enforcement (`clean_k8s_logs`) |
+| `s3:DeleteObject` | upload, internal, logs | Post-processing cleanup; log retention enforcement |
 | `s3:ListBucket` | upload, internal, logs | Log enumeration by prefix (`bucket.objects.filter`); `HeadBucket` checks in the `s3buckets` management command |
 | `s3:CreateMultipartUpload` | upload | Multipart threshold is 16 MB — any upload over this size uses multipart |
 | `s3:UploadPart` | upload | Multipart upload parts |
@@ -187,9 +187,7 @@ The worker accesses two buckets:
 
 - **Upload bucket** — downloads the binary to scan (`s3:GetObject`) and uploads result
   bundles back (`s3:PutObject` + multipart)
-- **Internal bucket** — reads signature files (`s3:GetObject`); the frontend embeds
-  `s3://<internal-bucket>/worker-data/<file>` URLs in the scan job and the worker
-  fetches them directly (in container mode `S3_SIGNATURE_BUCKET = S3_INTERNAL_BUCKET`)
+- **Internal bucket** — reads signature files (`s3:GetObject`).
 
 It does not touch the logs bucket.
 
