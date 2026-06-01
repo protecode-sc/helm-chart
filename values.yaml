@@ -177,6 +177,10 @@ worker:
 #      ephemeral-storage: "30Gi"
 
 fluentd:
+  serviceAccount:
+    create: true
+    name: ""
+    annotations: {}
   repository: docker.io/blackducksoftware/bdba-fluentd
   tag: "2026.3.3"
   pullPolicy: IfNotPresent

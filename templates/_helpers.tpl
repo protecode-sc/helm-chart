@@ -99,6 +99,14 @@ Validate object storage configuration - MinIO and VersityGW are mutually exclusi
     {{- end -}}
 {{- end -}}
 
+{{- define "bdba.fluentd.serviceAccountName" -}}
+    {{- if .Values.fluentd.serviceAccount.name -}}
+        {{- printf "%s" .Values.fluentd.serviceAccount.name -}}
+    {{- else -}}
+        {{- printf "%s-fluentd" (include "bdba.fullname" .) -}}
+    {{- end -}}
+{{- end -}}
+
 {{/*
 Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).

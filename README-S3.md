@@ -231,10 +231,10 @@ least-privilege isolation, give the worker its own IAM role with this smaller po
 }
 ```
 
-### Wiring a dedicated worker service account
+### Wiring dedicated service accounts
 
-The chart creates a dedicated service account for the worker, mirroring the
-`frontend.serviceAccount` pattern. Annotate it with the worker IAM role ARN:
+The chart creates dedicated service accounts for the worker and fluentd, mirroring
+the `frontend.serviceAccount` pattern. Annotate each with its IAM role ARN:
 
 ```yaml
 worker:
@@ -242,11 +242,18 @@ worker:
     create: true
     annotations:
       eks.amazonaws.com/role-arn: "arn:aws:iam::123456789012:role/bdba-worker-s3-role"
+
+fluentd:
+  serviceAccount:
+    create: true
+    annotations:
+      eks.amazonaws.com/role-arn: "arn:aws:iam::123456789012:role/bdba-fluentd-s3-role"
 ```
 
-The worker pod will automatically use this service account. Leave
-`s3AccessKeyId` and `s3SecretAccessKey` empty so boto3 picks up the IRSA
-token rather than the static credentials.
+The fluentd IAM role only needs write access to the logs bucket (`s3:PutObject`);
+the frontend role covers the read/delete side used when bundling support archives.
+Leave `s3AccessKeyId` and `s3SecretAccessKey` empty so boto3 picks up the IRSA
+token rather than static credentials.
 
 ### Initial bucket creation (optional)
 

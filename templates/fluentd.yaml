@@ -177,6 +177,9 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
+      {{- if .Values.fluentd.serviceAccount.create }}
+      serviceAccountName: {{ template "bdba.fluentd.serviceAccountName" . }}
+      {{- end }}
       {{- if .Values.fluentd.initContainers }}
       initContainers:
       {{- range $name, $spec := .Values.fluentd.initContainers }}

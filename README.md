@@ -4,6 +4,11 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster by using the H
 
 ## Changes
 
+### 2026.3.4
+* Helm chart now supports creating service accounts for worker and fluentd, enabling IRSA role binding per component.
+* Added `s3ExistingSecret` to reference a pre-existing Kubernetes Secret for S3 credentials instead of storing them in `values.yaml`.
+* Added `README-S3.md` documenting how to configure Amazon S3 as object storage, including IAM policies and authentication options.
+
 ### 2026.3.3
 * Upgrade frontend container to 2026.3.3.
 
@@ -495,6 +500,8 @@ If you are using native AWS S3, you need to consider the following:
 For other object storage options (like external Minio or ceph), `s3Endpoint`,
 `s3AccessKeyId` and `s3SecretAccessKey` are needed, and possibly `s3Region` depending
 on the object storage settings.
+
+For further imformation how to configure S3, please consult `README-S3.md`.
 
 #### Licensing
 
