@@ -7,11 +7,11 @@ This document covers switching to Amazon S3 and the required IAM permissions.
 
 BDBA uses three buckets, configured independently:
 
-| `values.yaml` key | Environment variable | Default name | Purpose |
+| `values.yaml` key | Default name | Purpose |
 |---|---|---|---|
-| `frontend.uploadBucket` | `UPLOAD_BUCKET` | `bdba-uploads` | Uploaded binaries and analysis results |
-| `frontend.internalBucket` | `INTERNAL_BUCKET` | `bdba-internal` | Internal state and signature data |
-| `fluentd.logsBucket` | `LOGS_BUCKET` | `bdba-logs` | Application log archives |
+| `frontend.uploadBucket` | `bdba-uploads` | Uploaded binaries and analysis results |
+| `frontend.internalBucket` | `bdba-internal` | Internal state and signature data |
+| `fluentd.logsBucket` | `bdba-logs` | Application log archives |
 
 Create all three buckets before installing the chart. 
 
@@ -183,14 +183,19 @@ automatically based on file size.
 
 ## Worker IAM role (optional)
 
-The worker only accesses the upload bucket: it downloads binaries to scan
-(`s3:GetObject`) and uploads result bundles back (`s3:PutObject` + multipart).
-It does not touch the internal or logs buckets.
+The worker accesses two buckets:
+
+- **Upload bucket** — downloads the binary to scan (`s3:GetObject`) and uploads result
+  bundles back (`s3:PutObject` + multipart)
+- **Internal bucket** — reads signature files (`s3:GetObject`); the frontend embeds
+  `s3://<internal-bucket>/worker-data/<file>` URLs in the scan job and the worker
+  fetches them directly (in container mode `S3_SIGNATURE_BUCKET = S3_INTERNAL_BUCKET`)
+
+It does not touch the logs bucket.
 
 By default, the worker pod uses the same credentials as the frontend (injected via
-the shared `bdba.s3env` template and the `default` namespace service account), so
-it inherits the full policy above. If you want least-privilege isolation, give the
-worker its own IAM role with this smaller policy:
+the shared `bdba.s3env` template), so it inherits the full policy above. If you want
+least-privilege isolation, give the worker its own IAM role with this smaller policy:
 
 ```json
 {
@@ -210,6 +215,16 @@ worker its own IAM role with this smaller policy:
       "Resource": [
         "arn:aws:s3:::my-bdba-uploads",
         "arn:aws:s3:::my-bdba-uploads/*"
+      ]
+    },
+    {
+      "Sid": "WorkerInternalBucket",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Resource": [
+        "arn:aws:s3:::my-bdba-internal/*"
       ]
     }
   ]
