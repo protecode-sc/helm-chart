@@ -49,7 +49,7 @@ the older IRSA annotation. No static credentials are stored in the cluster.
 1. Create an IAM role with the policy described in the [IAM permissions](#iam-permissions)
    section below and configure its trust policy to allow the service account to assume it.
 
-2. Annotate the service account via `values.yaml`:
+2. Annotate the service accounts via `values.yaml`:
 
 ```yaml
 frontend:
@@ -57,6 +57,18 @@ frontend:
     create: true
     annotations:
       eks.amazonaws.com/role-arn: "arn:aws:iam::123456789012:role/bdba-s3-role"
+
+worker:
+  serviceAccount:
+    create: true
+    annotations:
+      eks.amazonaws.com/role-arn: "arn:aws:iam::123456789012:role/bdba-worker-s3-role"
+
+fluentd:
+  serviceAccount:
+    create: true
+    annotations:
+      eks.amazonaws.com/role-arn: "arn:aws:iam::123456789012:role/bdba-fluentd-s3-role"
 ```
 
 3. If the cluster nodes themselves also have an instance profile that must not be used,
@@ -229,24 +241,7 @@ least-privilege isolation, give the worker its own IAM role with this smaller po
 }
 ```
 
-### Wiring dedicated service accounts
-
-The chart creates dedicated service accounts for the worker and fluentd, mirroring
-the `frontend.serviceAccount` pattern. Annotate each with its IAM role ARN:
-
-```yaml
-worker:
-  serviceAccount:
-    create: true
-    annotations:
-      eks.amazonaws.com/role-arn: "arn:aws:iam::123456789012:role/bdba-worker-s3-role"
-
-fluentd:
-  serviceAccount:
-    create: true
-    annotations:
-      eks.amazonaws.com/role-arn: "arn:aws:iam::123456789012:role/bdba-fluentd-s3-role"
-```
+### Fluentd IAM role
 
 Fluentd only writes log objects to the logs bucket, so its IAM role can be
 scoped to just `s3:PutObject`:
