@@ -8,7 +8,7 @@ This document covers switching to Amazon S3 and the required IAM permissions.
 BDBA uses three buckets, configured independently:
 
 | `values.yaml` key | Default name | Purpose |
-|---|---|---|---|
+|---|---|---|
 | `frontend.uploadBucket` | `bdba-uploads` | Uploaded binaries and analysis results |
 | `frontend.internalBucket` | `bdba-internal` | Internal state and signature data |
 | `fluentd.logsBucket` | `bdba-logs` | Application log archives |
