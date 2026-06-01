@@ -67,7 +67,7 @@ frontend:
   disableEc2Metadata: true
 ```
 
-Leave `s3AccessKeyId` and `s3SecretAccessKey` empty — boto3 will pick up credentials
+Leave `s3AccessKeyId` and `s3SecretAccessKey` empty — credentials are picked up
 automatically from the pod's projected service account token.
 
 ### Option B — Pre-existing Secret (recommended for static credentials)
@@ -107,7 +107,7 @@ and fluentd** pods. The worker needs a subset of these; see the
 [Worker IAM role](#worker-iam-role-optional) section.
 
 Files larger than 16 MB are uploaded using S3 multipart upload, so the multipart
-actions are required even if you do not expect large files — boto3 uses multipart
+actions are required even if you do not expect large files — multipart is used
 automatically based on file size.
 
 ```json
@@ -172,7 +172,7 @@ automatically based on file size.
 | `s3:PutObject` | upload, internal, logs | Binary uploads, analysis results, internal state writes; fluentd writes structured log objects to the logs bucket |
 | `s3:DeleteObject` | upload, internal, logs | Post-processing cleanup; log retention enforcement (`clean_k8s_logs`) |
 | `s3:ListBucket` | upload, internal, logs | Log enumeration by prefix (`bucket.objects.filter`); `HeadBucket` checks in the `s3buckets` management command |
-| `s3:CreateMultipartUpload` | upload | boto3 TransferConfig threshold is 16 MB — any upload over this size uses multipart |
+| `s3:CreateMultipartUpload` | upload | Multipart threshold is 16 MB — any upload over this size uses multipart |
 | `s3:UploadPart` | upload | Multipart upload parts |
 | `s3:CompleteMultipartUpload` | upload | Finalise multipart upload |
 | `s3:AbortMultipartUpload` | upload | Clean up incomplete multipart uploads |
@@ -250,10 +250,30 @@ fluentd:
       eks.amazonaws.com/role-arn: "arn:aws:iam::123456789012:role/bdba-fluentd-s3-role"
 ```
 
-The fluentd IAM role only needs write access to the logs bucket (`s3:PutObject`);
-the frontend role covers the read/delete side used when bundling support archives.
-Leave `s3AccessKeyId` and `s3SecretAccessKey` empty so boto3 picks up the IRSA
-token rather than static credentials.
+Fluentd only writes log objects to the logs bucket, so its IAM role can be
+scoped to just `s3:PutObject`:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "FluentdLogsBucket",
+      "Effect": "Allow",
+      "Action": [
+        "s3:PutObject"
+      ],
+      "Resource": [
+        "arn:aws:s3:::my-bdba-logs/*"
+      ]
+    }
+  ]
+}
+```
+
+The frontend role covers the read/delete side of the logs bucket used when bundling
+support archives. Leave `s3AccessKeyId` and `s3SecretAccessKey` empty so the IRSA
+token is used rather than static credentials.
 
 ### Initial bucket creation (optional)
 
