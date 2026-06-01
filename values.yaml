@@ -141,6 +141,10 @@ updater:
       cpu: 2
 
 worker:
+  serviceAccount:
+    create: true
+    name: ""
+    annotations: {}
   replicas: 1
   concurrency: 1
   repository: docker.io/blackducksoftware/bdba-worker
@@ -444,6 +448,11 @@ s3Endpoint: ""
 s3AccessKeyId: ""
 s3SecretAccessKey: ""
 s3Region: ""
+# Provide a pre-existing Secret name instead of storing credentials in values.yaml.
+# The secret must contain keys AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY.
+# When set, s3AccessKeyId and s3SecretAccessKey are ignored and no chart-managed
+# Secret is created.
+s3ExistingSecret: ""
 
 # External rabbitmq url (amqp://<user>:<password>@<host>:<port>/<vhost>)
 brokerUrl: ""

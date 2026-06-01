@@ -78,6 +78,9 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
+      {{- if .Values.worker.serviceAccount.create }}
+      serviceAccountName: {{ template "bdba.worker.serviceAccountName" . }}
+      {{- end }}
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}

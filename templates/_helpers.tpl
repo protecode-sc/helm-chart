@@ -66,6 +66,14 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
     {{- printf "bdba-objstore-secret" -}}
 {{- end -}}
 
+{{- define "bdba.s3.secretName" -}}
+    {{- if .Values.s3ExistingSecret -}}
+        {{- printf "%s" .Values.s3ExistingSecret -}}
+    {{- else -}}
+        {{- printf "%s-s3-secrets" (include "bdba.fullname" .) -}}
+    {{- end -}}
+{{- end -}}
+
 {{/*
 Validate object storage configuration - MinIO and VersityGW are mutually exclusive
 */}}
@@ -80,6 +88,14 @@ Validate object storage configuration - MinIO and VersityGW are mutually exclusi
         {{- printf "%s" .Values.frontend.serviceAccount.name -}}
     {{- else -}}
         {{- printf "%s-manage-secrets" (include "bdba.fullname" .) -}}
+    {{- end -}}
+{{- end -}}
+
+{{- define "bdba.worker.serviceAccountName" -}}
+    {{- if .Values.worker.serviceAccount.name -}}
+        {{- printf "%s" .Values.worker.serviceAccount.name -}}
+    {{- else -}}
+        {{- printf "%s-worker" (include "bdba.fullname" .) -}}
     {{- end -}}
 {{- end -}}
 
@@ -172,7 +188,7 @@ envFrom:
       name: {{ include "bdba.fullname" . }}-user-secrets
   {{- if and (not .Values.minio.enabled) (not .Values.versitygw.enabled) }}
   - secretRef:
-      name: {{ include "bdba.fullname" . }}-s3-secrets
+      name: {{ include "bdba.s3.secretName" . }}
   {{- end }}
   - secretRef:
       {{- if .Values.frontend.web.secretKey }}
@@ -295,18 +311,18 @@ env:
       name: {{ include "bdba.objstore.secretName" . }}
       key: secretkey
 {{- else }}
-{{- if .Values.s3AccessKeyId }}
+{{- if or .Values.s3AccessKeyId .Values.s3ExistingSecret }}
 - name: AWS_ACCESS_KEY_ID
   valueFrom:
     secretKeyRef:
-      name: {{ include "bdba.fullname" . }}-s3-secrets
+      name: {{ include "bdba.s3.secretName" . }}
       key: AWS_ACCESS_KEY_ID
 {{- end }}
-{{- if .Values.s3SecretAccessKey }}
+{{- if or .Values.s3SecretAccessKey .Values.s3ExistingSecret }}
 - name: AWS_SECRET_ACCESS_KEY
   valueFrom:
     secretKeyRef:
-      name: {{ include "bdba.fullname" . }}-s3-secrets
+      name: {{ include "bdba.s3.secretName" . }}
       key: AWS_SECRET_ACCESS_KEY
 {{- end }}
 {{- end }}
