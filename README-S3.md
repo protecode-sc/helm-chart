@@ -151,7 +151,11 @@ automatically based on file size.
         "s3:GetObject",
         "s3:PutObject",
         "s3:DeleteObject",
-        "s3:ListBucket"
+        "s3:ListBucket",
+        "s3:CreateMultipartUpload",
+        "s3:UploadPart",
+        "s3:CompleteMultipartUpload",
+        "s3:AbortMultipartUpload"
       ],
       "Resource": [
         "arn:aws:s3:::my-bdba-internal",
@@ -165,7 +169,11 @@ automatically based on file size.
         "s3:GetObject",
         "s3:PutObject",
         "s3:DeleteObject",
-        "s3:ListBucket"
+        "s3:ListBucket",
+        "s3:CreateMultipartUpload",
+        "s3:UploadPart",
+        "s3:CompleteMultipartUpload",
+        "s3:AbortMultipartUpload"
       ],
       "Resource": [
         "arn:aws:s3:::my-bdba-logs",
@@ -184,10 +192,10 @@ automatically based on file size.
 | `s3:PutObject` | upload, internal, logs | Binary uploads, analysis results, internal state writes; fluentd writes structured log objects to the logs bucket |
 | `s3:DeleteObject` | upload, internal, logs | Post-processing cleanup; log retention enforcement |
 | `s3:ListBucket` | upload, internal, logs | Log enumeration by prefix (`bucket.objects.filter`); `HeadBucket` checks in the `s3buckets` management command |
-| `s3:CreateMultipartUpload` | upload | Multipart threshold is 16 MB — any upload over this size uses multipart |
-| `s3:UploadPart` | upload | Multipart upload parts |
-| `s3:CompleteMultipartUpload` | upload | Finalise multipart upload |
-| `s3:AbortMultipartUpload` | upload | Clean up incomplete multipart uploads |
+| `s3:CreateMultipartUpload` | upload, internal, logs | Multipart threshold is 16 MB — any upload over this size uses multipart |
+| `s3:UploadPart` | upload, internal, logs | Multipart upload parts |
+| `s3:CompleteMultipartUpload` | upload, internal, logs | Finalise multipart upload |
+| `s3:AbortMultipartUpload` | upload, internal, logs | Clean up incomplete multipart uploads |
 
 > `s3:ListBucket` must be granted on the bucket ARN (`arn:aws:s3:::bucket-name`),
 > not the object ARN (`arn:aws:s3:::bucket-name/*`). The policy above handles this
@@ -254,7 +262,11 @@ scoped to just `s3:PutObject`:
       "Sid": "FluentdLogsBucket",
       "Effect": "Allow",
       "Action": [
-        "s3:PutObject"
+        "s3:PutObject",
+        "s3:CreateMultipartUpload",
+        "s3:UploadPart",
+        "s3:CompleteMultipartUpload",
+        "s3:AbortMultipartUpload"
       ],
       "Resource": [
         "arn:aws:s3:::my-bdba-logs/*"
