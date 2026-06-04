@@ -4,6 +4,9 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster by using the H
 
 ## Changes
 
+### 2026.3.5
+* Upgrade worker container to 2026.3.3.
+
 ### 2026.3.4
 * Helm chart now supports creating service accounts for worker and fluentd, enabling IRSA role binding per component.
 * Added `s3ExistingSecret` to reference a pre-existing Kubernetes Secret for S3 credentials instead of storing them in `values.yaml`.
