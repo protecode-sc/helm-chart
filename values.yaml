@@ -148,7 +148,7 @@ worker:
   replicas: 1
   concurrency: 1
   repository: docker.io/blackducksoftware/bdba-worker
-  tag: "2026.3.3"
+  tag: "2026.3.4"
   pullPolicy: IfNotPresent
   applicationLogging:
     enabled: true
