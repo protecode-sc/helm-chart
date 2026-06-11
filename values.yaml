@@ -83,7 +83,7 @@ frontend:
     existingSecret: ""              # Existing secret for licensing credentials (overrides username/password)
     existingSecretUsernameKey: "licensing-username"  # Key within existingSecret for username
     existingSecretPasswordKey: "licensing-password"  # Key within existingSecret for password
-    upstream: "https://protecode-sc.com/"
+    upstream: "https://bdba.blackduck.com/"
   applicationLogging:
     enabled: true
   readinessProbe:
