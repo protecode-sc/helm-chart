@@ -70,7 +70,7 @@ data:
   {{- if .Values.frontend.ldap.userDNTemplate }}
   LDAP_USER_DN_TEMPLATE: {{ .Values.frontend.ldap.userDNTemplate | quote }}
   {{- end }}
-  {{- if .Values.frontend.ldap.bindDN }}
+  {{- if and .Values.frontend.ldap.bindDN (not .Values.frontend.ldap.existingSecret) }}
   LDAP_BIND_DN: {{ .Values.frontend.ldap.bindDN | quote }}
   {{- end }}
   {{- if .Values.frontend.ldap.bindAsAuthenticating }}

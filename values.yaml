@@ -39,6 +39,8 @@ frontend:
     #  smtpPassword: secretpassword
     #  security: "none"
     #  verify: "false"
+    existingSecret: ""          # Existing secret for SMTP password (overrides smtpPassword)
+    existingSecretKey: "smtp-password"  # Key within existingSecret
   ldap:
     enabled: false
     #  serverUri: 'ldap(s)://your-ldap-server'
@@ -57,6 +59,9 @@ frontend:
     #  nestedSearch: "true"
     #  searchOptReferrals: "true"
     #  userEmailMatch: "false"
+    existingSecret: ""              # Existing secret for LDAP bind credentials (overrides bindDN/bindPassword)
+    existingSecretBindDNKey: "ldap-bind-dn"      # Key within existingSecret for bind DN
+    existingSecretKey: "ldap-bind-password"      # Key within existingSecret for bind password
   saml:
     enabled: false
     #  spEntityId: "https://bdba.local/saml/metadata"
@@ -75,6 +80,9 @@ frontend:
   licensing:
     username: ""
     password: ""
+    existingSecret: ""              # Existing secret for licensing credentials (overrides username/password)
+    existingSecretUsernameKey: "licensing-username"  # Key within existingSecret for username
+    existingSecretPasswordKey: "licensing-password"  # Key within existingSecret for password
     upstream: "https://protecode-sc.com/"
   applicationLogging:
     enabled: true

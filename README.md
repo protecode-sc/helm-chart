@@ -518,9 +518,12 @@ you can omit these.
 
 Parameter                     | Description                      | Default
 ----------------------------- | -------------------------------- |------------------------
-`frontend.licensing.username` | Username for licensing server.   | ""
-`frontend.licensing.password` | Password for licensing server.   | ""
-`frontend.licensing.upstream` | Upstream server for data updates.| "https://bdba.blackduck.com"
+`frontend.licensing.username`              | Username for licensing server.                                             | ""
+`frontend.licensing.password`              | Password for licensing server.                                             | ""
+`frontend.licensing.existingSecret`        | Existing secret for licensing credentials (overrides username/password).   | ""
+`frontend.licensing.existingSecretUsernameKey` | Key in `existingSecret` for username.                                  | "licensing-username"
+`frontend.licensing.existingSecretPasswordKey` | Key in `existingSecret` for password.                                  | "licensing-password"
+`frontend.licensing.upstream`              | Upstream server for data updates.                                          | "https://bdba.blackduck.com"
 
 #### Web Frontend Configuration
 
@@ -565,8 +568,10 @@ Parameter                     | Description                                     
 `frontend.email.smtpHost`     | Email SMTP host.                                  | ""
 `frontend.email.smtpPort`     | Email SMTP port.                                  | "25"
 `frontend.email.smtpUser`     | Email SMTP hostname.                              | ""
-`frontend.email.smtpPassword` | Email SMTP password.                              | ""
-`frontend.email.from`         | Sender of email.                                  | "noreply@protecode-sc.local"
+`frontend.email.smtpPassword`      | Email SMTP password.                                                  | ""
+`frontend.email.existingSecret`    | Existing secret for SMTP password (overrides smtpPassword).           | ""
+`frontend.email.existingSecretKey` | Key in `existingSecret` for SMTP password.                            | "smtp-password"
+`frontend.email.from`              | Sender of email.                                                      | "noreply@protecode-sc.local"
 `frontend.email.security`     | Email security mode. "none", "ssl", or "starttls".| "none"
 `frontend.email.verify`       | Verify email certificate.                         | "false"
 
@@ -581,7 +586,11 @@ Parameter                            | Description                             |
 `frontend.ldap.userDNTemplate`       | LDAP DN template for user.              | ""
 `frontend.ldap.bindAsAuthenticating` | Bind as authenticating user.            | "true"
 `frontend.ldap.bindDN`               | LDAP bind DN (generic bind, optional).  | nil
-`frontend.ldap.bindPassword`         | LDAP bind password (generic bind).      | nil
+`frontend.ldap.bindDN`               | LDAP bind DN (generic bind, optional).                                      | nil
+`frontend.ldap.bindPassword`         | LDAP bind password (generic bind).                                          | nil
+`frontend.ldap.existingSecret`       | Existing secret for LDAP bind credentials (overrides bindDN/bindPassword).  | ""
+`frontend.ldap.existingSecretBindDNKey` | Key in `existingSecret` for bind DN.                                     | "ldap-bind-dn"
+`frontend.ldap.existingSecretKey`    | Key in `existingSecret` for bind password.                                  | "ldap-bind-password"
 `frontend.ldap.startTLS`             | User STARTTLS for securing LDAP.        | "false"
 `frontend.ldap.verify`               | Verify LDAP server certificate.         | "false"
 `frontend.ldap.rootCASecret`         | Secret for LDAP root certificate.       | nil

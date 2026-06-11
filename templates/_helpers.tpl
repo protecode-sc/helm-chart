@@ -192,8 +192,10 @@ envFrom:
       name: {{ include "bdba.fullname" . }}-services-configmap
   - configMapRef:
       name: {{ include "bdba.fullname" . }}-user-configmap
+  {{- if or (and .Values.frontend.email.smtpPassword (not .Values.frontend.email.existingSecret)) (and .Values.frontend.ldap.bindPassword (not .Values.frontend.ldap.existingSecret)) (not .Values.frontend.licensing.existingSecret) }}
   - secretRef:
       name: {{ include "bdba.fullname" . }}-user-secrets
+  {{- end }}
   {{- if and (not .Values.minio.enabled) (not .Values.versitygw.enabled) }}
   - secretRef:
       name: {{ include "bdba.s3.secretName" . }}
@@ -273,6 +275,37 @@ env:
   {{ if .Values.brokerTls }}
   - name: BROKER_USE_SSL
     value: {{ .Values.brokerTls | quote }}
+  {{- end }}
+  {{- if .Values.frontend.email.existingSecret }}
+  - name: EMAIL_HOST_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Values.frontend.email.existingSecret }}
+        key: {{ .Values.frontend.email.existingSecretKey }}
+  {{- end }}
+  {{- if .Values.frontend.ldap.existingSecret }}
+  - name: LDAP_BIND_DN
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Values.frontend.ldap.existingSecret }}
+        key: {{ .Values.frontend.ldap.existingSecretBindDNKey }}
+  - name: LDAP_BIND_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Values.frontend.ldap.existingSecret }}
+        key: {{ .Values.frontend.ldap.existingSecretKey }}
+  {{- end }}
+  {{- if .Values.frontend.licensing.existingSecret }}
+  - name: LICENSING_USERNAME
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Values.frontend.licensing.existingSecret }}
+        key: {{ .Values.frontend.licensing.existingSecretUsernameKey }}
+  - name: LICENSING_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Values.frontend.licensing.existingSecret }}
+        key: {{ .Values.frontend.licensing.existingSecretPasswordKey }}
   {{- end }}
 {{- end }}
 
