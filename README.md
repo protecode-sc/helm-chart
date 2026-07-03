@@ -4,6 +4,11 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster by using the H
 
 ## Changes
 
+### 2026.6.0
+* Update containers to 2026.6.0.
+* Update optional service containers to new versions.
+* Support configuring SMTP, Licensing and LDAP using existing secrets instead of specifying credentials in helm values.
+
 ### 2026.3.6
 * Upgrade worker container to 2026.3.4.
 * Fix fluentbit configuration so that timestamps propagate correctly for application logs.

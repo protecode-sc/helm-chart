@@ -1,5 +1,5 @@
 apiVersion: v2
-appVersion: "2026.3.6"
+appVersion: "2026.6.0"
 description: BDBA Helm chart
 name: bdba
-version: "2026.3.6"
+version: "2026.6.0"
