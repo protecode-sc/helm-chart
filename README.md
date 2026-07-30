@@ -497,12 +497,12 @@ should be set to false.
 Parameter                   | Description                     | Default
 --------------------------- | ------------------------------- | ---------------
 `frontend.internalBucket`   | Bucket for BDBAs internal use.  | "bdba-internal"
-`frontend.uploadBucket`     | Bucket for storing uploads.     | "bdba-uploads"
-`fluentd.logsBucket`        | Bucket for storing logs.        | "bdba-logs"
-`s3Endpoint`                | S3 endpoint.                    | ""
-`s3AccessKeyId`             | S3 Access Key Id.               | ""
+`frontend.uploadBucket`     | Bucket for storing uploads.     | "bdba-uploads"
+`fluentd.logsBucket`        | Bucket for storing logs.        | "bdba-logs"
+`s3Endpoint`                | S3 endpoint.                    | ""
+`s3AccessKeyId`             | S3 Access Key Id.               | ""
 `s3SecretAccessKey`         | S3 Secret Access Key.           | ""
-`s3Region`                  | S3 Region.                      | "us-east-1"
+`s3Region`                  | S3 Region.                      | "us-east-1"
 
 To use alternative object storage, both minio and versitygw needs to be disabled.
 
@@ -665,8 +665,8 @@ There is included grafana dashboard in `contrib/bdba-metrics-grafana.json` which
 `kube-prometheus-stack` deployment using kubectl. For example:
 
 ```console
-$ kubectl create configmap bdba-dashboard -n <prometheus-namespace> --file=contrib/bdba-metrics-grafana.json -o yaml --dry-run|kubectl apply -f -
-$ kubectl label configmap bdba-dashboard -n <prometheus-namespace> grafana_dashboard=1
+$ kubectl create configmap bdba-dashboard -n <prometheus-namespace> --file=contrib/bdba-metrics-grafana.json -o yaml --dry-run|kubectl apply -f -
+$ kubectl label configmap bdba-dashboard -n <prometheus-namespace> grafana_dashboard=1
 ```
 
 #### Logging
@@ -692,7 +692,7 @@ can be disabled.
 
 Parameter                     | Description                              | Default
 ----------------------------- | ---------------------------------------- | --------------
-`frontend.disableEc2Metadata` | Disables user of EC2 metadata service    | false
+`frontend.disableEc2Metadata` | Disables user of EC2 metadata service    | false
 
 
 #### Worker Scaling
@@ -807,11 +807,11 @@ The configuration values are:
 
 Parameter                | Description                                      | Default
 ------------------------ | ------------------------------------------------ | --------------------
-`rabbitmq.enabled`       | Enable internal RabbitMQ                         | true
+`rabbitmq.enabled`       | Enable internal RabbitMQ                         | true
 `brokerUrl`              | URL for broker                                   | ""
-`brokerTls`              | Enable TLS                                       | false
-`brokerRootCASecretName` | Kubernetes secret for root certificate           | ""
-`brokerClientSecretName` | Kubernetes secret name for client authentication | ""
+`brokerTls`              | Enable TLS                                       | false
+`brokerRootCASecretName` | Kubernetes secret for root certificate           | ""
+`brokerClientSecretName` | Kubernetes secret name for client authentication | ""
 
 `rabbitmq.enabled` needs to be set as `false` to enable external RabbitMQ.
 
@@ -827,7 +827,7 @@ the root certificate that RabbitMQ uses unless the RabbitMQ server certificate i
 
 To populate the CA secret, run:
 ```console
-$ kubectl create secret -n bdba generic rabbitmq-ca --from-file=ca.pem
+$ kubectl create secret -n bdba generic rabbitmq-ca --from-file=ca.pem
 ```
 
 Note that the filename MUST be ca.pem. In this case, `brokerRootCASecretName` would be `rabbitmq-ca`.
@@ -838,7 +838,7 @@ If the RabbitMQ server requires mTLS client authentication, you can pass the cli
 
 To populate the client certificate and the key, run:
 ```console
-$ kubectl create secret tls -n dev rabbitmq-client-cert --key="client-key.pem" --cert="client.pem"
+$ kubectl create secret tls -n dev rabbitmq-client-cert --key="client-key.pem" --cert="client.pem"
 ```
 
 In this case, `brokerClientSecretName` would be `rabbitmq-client-cert`.
@@ -855,7 +855,7 @@ Parameter                      | Description                                    
 `memcachedHostPort`            | Host:port pair of memcached service              | ""
 `memcachedTls`                 | Enable TLS for memcached                         | false
 `memcachedRootCASecretName`    | Kubernetes secret for root certificate           | ""
-`memcachedTlsClientSecretName` | Kubernetes secret name for client authentication | ""
+`memcachedTlsClientSecretName` | Kubernetes secret name for client authentication | ""
 
 `memcached.enabled` needs to be set as `false` to enable external memcached.
 
@@ -868,7 +868,7 @@ the root certificate that memcached uses, unless the memcached server certificat
 
 To populate the CA secret, run:
 ```
-$ kubectl create secret -n bdba generic memcached-ca --from-file=ca.pem
+$ kubectl create secret -n bdba generic memcached-ca --from-file=ca.pem
 ```
 
 Note that the filename MUST be ca.pem. In this case, `memcachedRootCASecretName` would be `memcached-ca`.
@@ -879,7 +879,7 @@ If the memcached server requires mTLS client authentication, you can pass the cl
 
 To populate the client certificate and the key, run:
 ```
-$ kubectl create secret tls -n dev memcached-client-cert --key="client-key.pem" --cert="client.pem"
+$ kubectl create secret tls -n dev memcached-client-cert --key="client-key.pem" --cert="client.pem"
 ```
 
 In this case, the `memcachedClientSecretName` would be `memcached-client-cert`.
@@ -938,7 +938,7 @@ To use this as the root certificate, add `--set rootCASecret=bdba-root` to the H
 To take backup of internal postgresql if external postgresql is not in use, you can use kubectl and pg_dump.
 
 ```
-$ kubectl exec -it -n bdba bdba-postgresql-0 -- sh -c 'PGPASSWORD=$POSTGRES_PASSWORD pg_dump -Fc -d bdba -U bdba' >backup.pgdump
+$ kubectl exec -it -n bdba bdba-postgresql-0 -- sh -c 'PGPASSWORD=$POSTGRES_PASSWORD pg_dump -Fc -d bdba -U bdba' >backup.pgdump
 ```
 
 This will create `backup.pgdump` which is standard postgresql custom-format archive that can be restored using pg_restore.
@@ -1219,8 +1219,8 @@ Service account relevant parameters are
 
 Parameter                        | Description                                     | Default
 -------------------------------- | ----------------------------------------------- | ------------------
-`frontend.serviceAccount.create` | Create the service account                      | true
-`frontend.serviceAccount.name`   | Name of the service account                     | <autogenerated>
+`frontend.serviceAccount.create` | Create the service account                      | true
+`frontend.serviceAccount.name`   | Name of the service account                     | <autogenerated>
 `frontend.createSecrets`         | Automatically create minio and rabbitmq secrets | true
 
 To disable automatic secrets creation, set `frontend.createSecrets` as false.
@@ -1229,7 +1229,7 @@ Following secrets then need to be created manually
 
 1) (If using embedded minio)
 ```
-$ kubectl create secret generic -n namespace bdba-minio-secret \
+$ kubectl create secret generic -n namespace bdba-minio-secret \
   --from-literal=accesskey=<random string> --from-literal=secretkey=<random-string>
 ```
 
