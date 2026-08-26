@@ -42,7 +42,7 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster by using the H
 ### 2026.3.0
 * Upgrade frontend container to 2026.3.0 and worker container to 2026.3.0.
 * Upgrade service containers (postgresql 15.17, memcached 1.6.41, rabbitmq 4.1.8).
-* Documentation now includes instructions on how to congifure BDBA to use Traefik as ingress controller.
+* Documentation now includes instructions on how to configure BDBA to use Traefik as ingress controller.
 
 ### 2025.12.3
 * Upgrade frontend container to 2025.12.6.
@@ -522,12 +522,12 @@ For other object storage options (like external Minio or ceph), `s3Endpoint`,
 `s3AccessKeyId` and `s3SecretAccessKey` are needed, and possibly `s3Region` depending
 on the object storage settings.
 
-For further imformation how to configure S3, please consult `README-S3.md`.
+For further information on how to configure S3, please consult `README-S3.md`.
 
 #### Licensing
 
 To access the data that Black Duck Binary Analysis needs a username and password for the licensing server are required. These are credentials needed for accessing onprem updates from Black Duck Community.
-Without these, automatic data updates will not function. In case you are operating airgapped installation,
+Without these, automatic data updates will not function. In case you are operating an airgapped installation,
 you can omit these.
 
 Parameter                     | Description                      | Default
@@ -787,7 +787,7 @@ secret/bdba-pgclient created
 
 Possible values for `postgresqlSslMode` are specified in https://www.postgresql.org/docs/15/libpq-ssl.html.
 
-*IMPORTANT!*: It is recommended to change the default postgresql paramater values for better performance.
+*IMPORTANT!*: It is recommended to change the default postgresql parameter values for better performance.
 
 * `work_mem = 8MB` to set postgresql working memory from default 4MB to 8MB.
 * `random_page_cost = 1.0` to make query planner prefer index instead of sequential scanning on large queries.
@@ -1121,7 +1121,7 @@ Parameter                   | Description                                  | Def
 --------------------------- | -------------------------------------------- | --------------------
 <PREFIX>.podLabels          | Additional labels for pods.                  | null
 <PREFIX>.podAnnotations     | Additional annotations for pods.             | null
-<PREFIX>.initContainers     | Additional initContianers for pods           | null
+<PREFIX>.initContainers     | Additional initContainers for pods           | null
 <PREFIX>.sidecarContainers  | Additional sidecars for pods                 | null
 <PREFIX>.nodeSelector       | Nodeselector for pods                        | null
 <PREFIX>.tolerations        | Tolerations for pods                         | null
@@ -1197,14 +1197,14 @@ The difference with this file to bootstrap -variant is that it contains only del
 As BDBA has varied workloads by nature, there can be no absolute guidance for configuration for example for X scans / day
 and how machines should be provisioned.
 
-BDBA inherintly is an application that processes workloads using queues, stores data in PostgreSQL and provides a web interface.
+BDBA inherently is an application that processes workloads using queues, stores data in PostgreSQL and provides a web interface.
 In practice this means that all the components except PostgreSQL can be horizontally scaled and distributed among many hardware
 instances. PostgreSQL is the only thing that scales only vertically.
 
 Therefore, primary focus on scaling should be placed on PostgreSQL performance. Running PostgreSQL with enough memory and
 fast disks is advisable. In larger deployments external PostgreSQL should be used.
 
-In case of BDBA workloads getting stuck, increasing replicas help. Different symptons on slowness can be for example
+In case of BDBA workloads getting stuck, increasing replicas help. Different symptoms on slowness can be for example
 
 * Web application is slow -> increase web application replicas with `frontend.web.replicas` parameter.
 * Scan jobs stay in the queue for long time -> increase number of workers, either enabling keda or with `worker.replicas` parameter.
