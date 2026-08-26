@@ -4,6 +4,8 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster by using the H
 
 ## Changes
 
+* Add support for setting credentials vie helm charts for the Black Duck Portal licensing service.
+
 ### 2026.6.3
 * Update containers to 2026.6.3.
 
