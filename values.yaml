@@ -80,7 +80,7 @@ frontend:
   licensing:
     username: ""
     password: ""
-    existingSecret: ""              # Existing secret for licensing credentials (overrides username/password)
+    existingSecret: ""  # Existing secret for licensing credentials (overrides username/password or portal credentials)
     existingSecretUsernameKey: "licensing-username"  # Key within existingSecret for username
     existingSecretPasswordKey: "licensing-password"  # Key within existingSecret for password
     upstream: "https://bdba.blackduck.com/"
@@ -89,7 +89,6 @@ frontend:
       tenantId: ""
       clientId: ""
       clientSecret: ""
-      existingSecret: ""  # Existing secret for licensing credentials (overrides tenantId/clientId/clientSecret)
       existingSecretTenantIdKey: "licensing-bdportal-tenant-id"  # Key within existingSecret for tenant ID
       existingSecretClientIdKey: "licensing-bdportal-client-id"  # Key within existingSecret for client ID
       existingSecretClientSecretKey: "licensing-bdportal-client-secret"  # Key within existingSecret for client secret

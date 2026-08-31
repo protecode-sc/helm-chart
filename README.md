@@ -540,13 +540,12 @@ Parameter                     | Description                      | Default
 `frontend.licensing.existingSecretUsernameKey` | Key in `existingSecret` for username.                                  | "licensing-username"
 `frontend.licensing.existingSecretPasswordKey` | Key in `existingSecret` for password.                                  | "licensing-password"
 `frontend.licensing.upstream`              | Upstream server for data updates.                                          | "https://bdba.blackduck.com"
-`frontend.licensing.bdportal.tenantId`                   | Tenant ID for Black Duck Portal licensing server.            | ""
-`frontend.licensing.bdportal.clientId`                   | Client ID for Black Duck Portal licensing server.            | ""
-`frontend.licensing.bdportal.clientSecret`               | Client secret for Black Duck Portal licensing server.        | ""
-`frontend.licensing.bdportal.existingSecret`             | Existing secret for Black Duck Portal credentials.           | ""
-`frontend.licensing.bdportal.existingSecretTenantId`     | Key in `bdportal.existingSecret` for tenant ID.              | "licensing-bdportal-tenant-id"
-`frontend.licensing.bdportal.existingSecretClientId`     | Key in `bdportal.existingSecret` for client ID.              | "licensing-bdportal-client-id"
-`frontend.licensing.bdportal.existingSecretClientSecret` | Key in `bdportal.existingSecret` for client secret.          | "licensing-bdportal-client-secret"
+`frontend.licensing.bdportal.tenantId`                      | Tenant ID for Black Duck Portal licensing server.         | ""
+`frontend.licensing.bdportal.clientId`                      | Client ID for Black Duck Portal licensing server.         | ""
+`frontend.licensing.bdportal.clientSecret`                  | Client secret for Black Duck Portal licensing server.     | ""
+`frontend.licensing.bdportal.existingSecretTenantIdKey`     | Key in `existingSecret` for tenant ID.                    | "licensing-bdportal-tenant-id"
+`frontend.licensing.bdportal.existingSecretClientIdKey`     | Key in `existingSecret` for client ID.                    | "licensing-bdportal-client-id"
+`frontend.licensing.bdportal.existingSecretClientSecretKey` | Key in `existingSecret` for client secret.                | "licensing-bdportal-client-secret"
 
 #### Web Frontend Configuration
 
