@@ -296,6 +296,21 @@ env:
         key: {{ .Values.frontend.ldap.existingSecretKey }}
   {{- end }}
   {{- if .Values.frontend.licensing.existingSecret }}
+  - name: BDPORTAL_TENANT_ID
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Values.frontend.licensing.existingSecret }}
+        key: {{ .Values.frontend.licensing.bdportal.existingSecretTenantIdKey }}
+  - name: BDPORTAL_CLIENT_ID
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Values.frontend.licensing.existingSecret }}
+        key: {{ .Values.frontend.licensing.bdportal.existingSecretClientIdKey }}
+  - name: BDPORTAL_CLIENT_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Values.frontend.licensing.existingSecret }}
+        key: {{ .Values.frontend.licensing.bdportal.existingSecretClientSecretKey }}
   - name: LICENSING_USERNAME
     valueFrom:
       secretKeyRef:
