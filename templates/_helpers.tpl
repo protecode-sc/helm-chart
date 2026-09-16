@@ -192,7 +192,12 @@ envFrom:
       name: {{ include "bdba.fullname" . }}-services-configmap
   - configMapRef:
       name: {{ include "bdba.fullname" . }}-user-configmap
-  {{- if or (and .Values.frontend.email.smtpPassword (not .Values.frontend.email.existingSecret)) (and .Values.frontend.ldap.bindPassword (not .Values.frontend.ldap.existingSecret)) (not .Values.frontend.licensing.existingSecret) }}
+  {{- if or
+    (and .Values.frontend.email.smtpPassword (not .Values.frontend.email.existingSecret))
+    (and .Values.frontend.ldap.bindPassword (not .Values.frontend.ldap.existingSecret))
+    (and .Values.frontend.licensing.username .Values.frontend.licensing.password (not .Values.frontend.licensing.existingSecret))
+    (and .Values.frontend.licensing.bdportal.tenantId .Values.frontend.licensing.bdportal.clientId .Values.frontend.licensing.bdportal.clientSecret (not .Values.frontend.licensing.existingSecret))
+  }}
   - secretRef:
       name: {{ include "bdba.fullname" . }}-user-secrets
   {{- end }}
@@ -301,26 +306,31 @@ env:
       secretKeyRef:
         name: {{ .Values.frontend.licensing.existingSecret }}
         key: {{ .Values.frontend.licensing.bdportal.existingSecretTenantIdKey }}
+        optional: true
   - name: BDPORTAL_CLIENT_ID
     valueFrom:
       secretKeyRef:
         name: {{ .Values.frontend.licensing.existingSecret }}
         key: {{ .Values.frontend.licensing.bdportal.existingSecretClientIdKey }}
+        optional: true
   - name: BDPORTAL_CLIENT_SECRET
     valueFrom:
       secretKeyRef:
         name: {{ .Values.frontend.licensing.existingSecret }}
         key: {{ .Values.frontend.licensing.bdportal.existingSecretClientSecretKey }}
+        optional: true
   - name: LICENSING_USERNAME
     valueFrom:
       secretKeyRef:
         name: {{ .Values.frontend.licensing.existingSecret }}
         key: {{ .Values.frontend.licensing.existingSecretUsernameKey }}
+        optional: true
   - name: LICENSING_PASSWORD
     valueFrom:
       secretKeyRef:
         name: {{ .Values.frontend.licensing.existingSecret }}
         key: {{ .Values.frontend.licensing.existingSecretPasswordKey }}
+        optional: true
   {{- end }}
 {{- end }}
 
