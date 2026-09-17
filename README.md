@@ -4,6 +4,8 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster by using the H
 
 ## Changes
 
+* Moved hard-coded nginx ingress annotations to configurable `ingress.annotations` in values.yaml.
+* Removed deprecated `kubernetes.io/ingress.class` annotation from ingress templates.
 * Add support for setting credentials vie helm charts for the Black Duck Portal licensing service.
 * Automatic Global project viewer -permission assignment on login can now be configured with `frontend.saml.globalProjectViewerGroupName`.
 
