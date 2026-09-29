@@ -44,9 +44,6 @@ metadata:
 {{ include "bdba.labels" . | indent 4 }}
 spec:
   replicas: 1
-  strategy:
-    # Recreate to updater to ensure old updater is not running while we start.
-    type: Recreate
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ include "bdba.name" . }}-updater

@@ -4,6 +4,9 @@ You can deploy Black Duck Binary Analysis on a Kubernetes cluster by using the H
 
 ## Changes
 
+### 2026.9.0
+* Updated application container (frontend 2026.9.1 and worker 2026.9.0).
+* Updated service containers.
 * Add support for setting credentials vie helm charts for the Black Duck Portal licensing service.
 * Automatic Global project viewer -permission assignment on login can now be configured with `frontend.saml.globalProjectViewerGroupName`.
 
