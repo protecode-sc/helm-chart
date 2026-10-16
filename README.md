@@ -597,7 +597,7 @@ Parameter                     | Description                                     
 `frontend.email.smtpPassword`      | Email SMTP password.                                                  | ""
 `frontend.email.existingSecret`    | Existing secret for SMTP password (overrides smtpPassword).           | ""
 `frontend.email.existingSecretKey` | Key in `existingSecret` for SMTP password.                            | "smtp-password"
-`frontend.email.from`              | Sender of email.                                                      | "noreply@protecode-sc.local"
+`frontend.email.from`              | Sender of email.                                                      | "noreply@bdba.local"
 `frontend.email.security`     | Email security mode. "none", "ssl", or "starttls".| "none"
 `frontend.email.verify`       | Verify email certificate.                         | "false"
 
@@ -1160,14 +1160,14 @@ BDBA Kubernetes can operate in airgapped mode. However, it needs manual work to 
 
 #### Populating Database
 
-By default, when BDBA is given licensing username and password, it is able to fetch
-data updates from https://protecode-sc.com/. However, when installation is airgapped, this
+By default, when BDBA is given licensing credentials, it is able to fetch
+data updates from https://bdba.blackduck.com/. However, when installation is airgapped, this
 option is not possible. However, it is still possible to manually populate the internal
 vulnerability database and keep it up-to-date.
 
 To populate the database, you can download dataset from `https://bdba.blackduck.com/updates/vulndata/`.
-This requires the same credential that are used for Black Duck Community. You will receive "vulndata.tar.xz"
-which is roughly 500MB.
+This requires the same credentials that are used for licensing. You will receive "vulndata.tar.xz"
+which is roughly 1GB in size.
 
 This can be brought to airgapped network, and inserted into running BDBA kubernetes deployment by
 uploading it to
