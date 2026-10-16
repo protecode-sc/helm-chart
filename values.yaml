@@ -234,7 +234,7 @@ tasks:
 
 fluentbit:
   repository: fluent/fluent-bit
-  tag: 4.2.8
+  tag: 5.1.2
   pullPolicy: IfNotPresent
 
 global:
@@ -401,7 +401,7 @@ rabbitmq:
   image:
     repository: "docker.io/library/rabbitmq"
     # Suffix this with -management if access to rabbitmq management is needed
-    tag: "4.3.5"
+    tag: "4.3.6"
   enabled: true
   rabbitmq:
     username: bdba
