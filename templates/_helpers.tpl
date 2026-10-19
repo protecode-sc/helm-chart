@@ -172,6 +172,7 @@ checksum/services: {{ include (print $.Template.BasePath "/configmap-services.ya
 checksum/config: {{ include (print $.Template.BasePath "/configmap-user.yaml") . | sha256sum }}
 checksum/secrets: {{ include (print $.Template.BasePath "/secrets-user.yaml") . | sha256sum }}
 checksum/s3: {{ include (print $.Template.BasePath "/secrets-s3.yaml") . | sha256sum }}
+checksum/fluentbit: {{ include (print $.Template.BasePath "/configmap-fluentbit.yaml") . | sha256sum }}
 {{- end }}
 
 {{- define "bdba.s3endpoint" -}}

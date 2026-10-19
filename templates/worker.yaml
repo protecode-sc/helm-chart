@@ -1,46 +1,3 @@
-{{- if .Values.worker.applicationLogging.enabled }}
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ include "bdba.fullname" . }}-worker-fluentbit-config
-  labels:
-{{ include "bdba.labels" . | indent 4 }}
-data:
-  fluent-bit.conf: |
-    [SERVICE]
-        Daemon       Off
-        Flush        5
-        Log_Level    info
-        HTTP_Server  Off
-        Parsers_File /bdba-fluentbit/parsers.conf
-
-    [INPUT]
-        Name         tail
-        Tag          worker
-        Path         /app-log/celery.log
-        Parser       json
-        DB           /app-log/celery.db
-
-    [FILTER]
-        Name record_modifier
-        Match *
-        Record hostname ${HOSTNAME}
-
-    [OUTPUT]
-        Name         forward
-        Match        *
-        Host         {{ template "bdba.fluentd.fullname" . }}
-
-  parsers.conf: |
-    [PARSER]
-        Name        json
-        Format      json
-        Time_Key    timestamp
-        Time_Format %Y-%m-%dT%H:%M:%S.%f%z
-        Time_Keep   On
-
----
-{{- end }}
 apiVersion: apps/v1
 {{- if .Values.worker.storageClass }}
 kind: StatefulSet
@@ -75,6 +32,7 @@ spec:
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmap-user.yaml") . | sha256sum }}
         checksum/services: {{ include (print $.Template.BasePath "/configmap-services.yaml") . | sha256sum }}
+        checksum/fluentbit: {{ include (print $.Template.BasePath "/configmap-fluentbit.yaml") . | sha256sum }}
         {{ with .Values.worker.podAnnotations}}
         {{- toYaml . | nindent 8 }}
         {{- end }}

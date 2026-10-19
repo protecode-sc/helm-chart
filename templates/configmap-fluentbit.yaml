@@ -1,0 +1,205 @@
+{{- if .Values.frontend.applicationLogging.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "bdba.fullname" . }}-webapp-fluentbit-config
+  labels:
+{{ include "bdba.labels" . | indent 4 }}
+data:
+  fluent-bit.conf: |
+    [SERVICE]
+        Daemon       Off
+        Flush        5
+        Log_Level    info
+        HTTP_Server  Off
+        Parsers_File /bdba-fluentbit/parsers.conf
+
+    [INPUT]
+        Name         tail
+        Tag          webapp
+        Path         /app-log/app.log
+        Parser       json
+        DB           /app-log/app.db
+
+    [FILTER]
+        Name record_modifier
+        Match *
+        Record hostname ${HOSTNAME}
+
+    [OUTPUT]
+        Name         forward
+        Match        *
+        Host         {{ template "bdba.fluentd.fullname" . }}
+        Retain_Metadata_In_Forward_Mode Off
+
+  parsers.conf: |
+    [PARSER]
+        Name        json
+        Format      json
+        Time_Key    timestamp
+        Time_Format %Y-%m-%dT%H:%M:%S.%f%z
+        Time_Keep   On
+
+---
+{{- end }}
+{{- if .Values.frontend.applicationLogging.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "bdba.fullname" . }}-tasks-fluentbit-config
+  labels:
+{{ include "bdba.labels" . | indent 4 }}
+data:
+  fluent-bit.conf: |
+    [SERVICE]
+        Daemon       Off
+        Flush        5
+        Log_Level    info
+        HTTP_Server  Off
+        Parsers_File /bdba-fluentbit/parsers.conf
+
+    [INPUT]
+        Name         tail
+        Tag          tasks
+        Path         /app-log/app.log
+        Parser       json
+        DB           /app-log/app.db
+
+    [OUTPUT]
+        Name         forward
+        Match        *
+        Host         {{ template "bdba.fluentd.fullname" . }}
+        Retain_Metadata_In_Forward_Mode Off
+
+  parsers.conf: |
+    [PARSER]
+        Name        json
+        Format      json
+        Time_Key    timestamp
+        Time_Format %Y-%m-%dT%H:%M:%S.%f%z
+        Time_Keep   On
+
+---
+{{- end }}
+{{- if .Values.frontend.applicationLogging.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "bdba.fullname" . }}-tasks-long-fluentbit-config
+  labels:
+{{ include "bdba.labels" . | indent 4 }}
+data:
+  fluent-bit.conf: |
+    [SERVICE]
+        Daemon       Off
+        Flush        5
+        Log_Level    info
+        HTTP_Server  Off
+        Parsers_File /bdba-fluentbit/parsers.conf
+
+    [INPUT]
+        Name         tail
+        Tag          longjobs
+        Path         /app-log/app.log
+        Parser       json
+        DB           /app-log/app.db
+
+    [OUTPUT]
+        Name         forward
+        Match        *
+        Host         {{ template "bdba.fluentd.fullname" . }}
+        Retain_Metadata_In_Forward_Mode Off
+
+  parsers.conf: |
+    [PARSER]
+        Name        json
+        Format      json
+        Time_Key    timestamp
+        Time_Format %Y-%m-%dT%H:%M:%S.%f%z
+        Time_Keep   On
+
+---
+{{- end }}
+{{- if .Values.frontend.applicationLogging.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "bdba.fullname" . }}-updater-fluentbit-config
+  labels:
+{{ include "bdba.labels" . | indent 4 }}
+data:
+  fluent-bit.conf: |
+    [SERVICE]
+        Daemon       Off
+        Flush        5
+        Log_Level    info
+        HTTP_Server  Off
+        Parsers_File /bdba-fluentbit/parsers.conf
+
+    [INPUT]
+        Name         tail
+        Tag          updater
+        Path         /app-log/app.log
+        Parser       json
+        DB           /app-log/app.db
+
+    [OUTPUT]
+        Name         forward
+        Match        *
+        Host         {{ template "bdba.fluentd.fullname" . }}
+        Retain_Metadata_In_Forward_Mode Off
+
+  parsers.conf: |
+    [PARSER]
+        Name        json
+        Format      json
+        Time_Key    timestamp
+        Time_Format %Y-%m-%dT%H:%M:%S.%f%z
+        Time_Keep   On
+
+---
+{{- end }}
+{{- if .Values.worker.applicationLogging.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "bdba.fullname" . }}-worker-fluentbit-config
+  labels:
+{{ include "bdba.labels" . | indent 4 }}
+data:
+  fluent-bit.conf: |
+    [SERVICE]
+        Daemon       Off
+        Flush        5
+        Log_Level    info
+        HTTP_Server  Off
+        Parsers_File /bdba-fluentbit/parsers.conf
+
+    [INPUT]
+        Name         tail
+        Tag          worker
+        Path         /app-log/celery.log
+        Parser       json
+        DB           /app-log/celery.db
+
+    [FILTER]
+        Name record_modifier
+        Match *
+        Record hostname ${HOSTNAME}
+
+    [OUTPUT]
+        Name         forward
+        Match        *
+        Host         {{ template "bdba.fluentd.fullname" . }}
+        Retain_Metadata_In_Forward_Mode Off
+
+  parsers.conf: |
+    [PARSER]
+        Name        json
+        Format      json
+        Time_Key    timestamp
+        Time_Format %Y-%m-%dT%H:%M:%S.%f%z
+        Time_Keep   On
+
+---
+{{- end }}
