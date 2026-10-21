@@ -9,7 +9,7 @@ frontend:
     annotations: {}
   createSecrets: true
   repository: docker.io/blackducksoftware/bdba-frontend
-  tag: "2026.9.1"
+  tag: "2026.9.2"
   pullPolicy: IfNotPresent
   database:
     {}
@@ -165,7 +165,7 @@ worker:
   replicas: 1
   concurrency: 1
   repository: docker.io/blackducksoftware/bdba-worker
-  tag: "2026.9.0"
+  tag: "2026.9.1"
   pullPolicy: IfNotPresent
   applicationLogging:
     enabled: true
@@ -234,7 +234,7 @@ tasks:
 
 fluentbit:
   repository: fluent/fluent-bit
-  tag: 5.1.3
+  tag: 5.1.5
   pullPolicy: IfNotPresent
 
 global:
