@@ -13,13 +13,21 @@ data:
         Log_Level    info
         HTTP_Server  Off
         Parsers_File /bdba-fluentbit/parsers.conf
+        storage.path /app-log/buffer/
+        storage.sync normal
+        storage.backlog.mem_limit 50M
 
     [INPUT]
         Name         tail
         Tag          webapp
-        Path         /app-log/app.log
+        Path         /app-log/app.log*
         Parser       json
         DB           /app-log/app.db
+        Rotate_Wait       60
+        Refresh_Interval  5
+        Skip_Long_Lines   On
+        storage.type      filesystem
+        Buffer_Max_Size   256k
 
     [FILTER]
         Name record_modifier
@@ -31,13 +39,15 @@ data:
         Match        *
         Host         {{ template "bdba.fluentd.fullname" . }}
         Retain_Metadata_In_Forward_Mode Off
+        Retry_Limit  False
+        storage.total_limit_size 256M
 
   parsers.conf: |
     [PARSER]
         Name        json
         Format      json
         Time_Key    timestamp
-        Time_Format %Y-%m-%dT%H:%M:%S.%f%z
+        Time_Format %Y-%m-%dT%H:%M:%S.%L%z
         Time_Keep   On
 
 ---
@@ -57,26 +67,36 @@ data:
         Log_Level    info
         HTTP_Server  Off
         Parsers_File /bdba-fluentbit/parsers.conf
+        storage.path /app-log/buffer/
+        storage.sync normal
+        storage.backlog.mem_limit 50M
 
     [INPUT]
         Name         tail
         Tag          tasks
-        Path         /app-log/app.log
+        Path         /app-log/app.log*
         Parser       json
         DB           /app-log/app.db
+        Rotate_Wait       60
+        Refresh_Interval  5
+        Skip_Long_Lines   On
+        storage.type      filesystem
+        Buffer_Max_Size   256k
 
     [OUTPUT]
         Name         forward
         Match        *
         Host         {{ template "bdba.fluentd.fullname" . }}
         Retain_Metadata_In_Forward_Mode Off
+        Retry_Limit  False
+        storage.total_limit_size 256M
 
   parsers.conf: |
     [PARSER]
         Name        json
         Format      json
         Time_Key    timestamp
-        Time_Format %Y-%m-%dT%H:%M:%S.%f%z
+        Time_Format %Y-%m-%dT%H:%M:%S.%L%z
         Time_Keep   On
 
 ---
@@ -96,26 +116,36 @@ data:
         Log_Level    info
         HTTP_Server  Off
         Parsers_File /bdba-fluentbit/parsers.conf
+        storage.path /app-log/buffer/
+        storage.sync normal
+        storage.backlog.mem_limit 50M
 
     [INPUT]
         Name         tail
         Tag          longjobs
-        Path         /app-log/app.log
+        Path         /app-log/app.log*
         Parser       json
         DB           /app-log/app.db
+        Rotate_Wait       60
+        Refresh_Interval  5
+        Skip_Long_Lines   On
+        storage.type      filesystem
+        Buffer_Max_Size   256k
 
     [OUTPUT]
         Name         forward
         Match        *
         Host         {{ template "bdba.fluentd.fullname" . }}
         Retain_Metadata_In_Forward_Mode Off
+        Retry_Limit  False
+        storage.total_limit_size 256M
 
   parsers.conf: |
     [PARSER]
         Name        json
         Format      json
         Time_Key    timestamp
-        Time_Format %Y-%m-%dT%H:%M:%S.%f%z
+        Time_Format %Y-%m-%dT%H:%M:%S.%L%z
         Time_Keep   On
 
 ---
@@ -135,26 +165,36 @@ data:
         Log_Level    info
         HTTP_Server  Off
         Parsers_File /bdba-fluentbit/parsers.conf
+        storage.path /app-log/buffer/
+        storage.sync normal
+        storage.backlog.mem_limit 50M
 
     [INPUT]
         Name         tail
         Tag          updater
-        Path         /app-log/app.log
+        Path         /app-log/app.log*
         Parser       json
         DB           /app-log/app.db
+        Rotate_Wait       60
+        Refresh_Interval  5
+        Skip_Long_Lines   On
+        storage.type      filesystem
+        Buffer_Max_Size   256k
 
     [OUTPUT]
         Name         forward
         Match        *
         Host         {{ template "bdba.fluentd.fullname" . }}
         Retain_Metadata_In_Forward_Mode Off
+        Retry_Limit  False
+        storage.total_limit_size 256M
 
   parsers.conf: |
     [PARSER]
         Name        json
         Format      json
         Time_Key    timestamp
-        Time_Format %Y-%m-%dT%H:%M:%S.%f%z
+        Time_Format %Y-%m-%dT%H:%M:%S.%L%z
         Time_Keep   On
 
 ---
@@ -174,13 +214,21 @@ data:
         Log_Level    info
         HTTP_Server  Off
         Parsers_File /bdba-fluentbit/parsers.conf
+        storage.path /app-log/buffer/
+        storage.sync normal
+        storage.backlog.mem_limit 50M
 
     [INPUT]
         Name         tail
         Tag          worker
-        Path         /app-log/celery.log
+        Path         /app-log/celery.log*
         Parser       json
         DB           /app-log/celery.db
+        Rotate_Wait       60
+        Refresh_Interval  5
+        Skip_Long_Lines   On
+        storage.type      filesystem
+        Buffer_Max_Size   256k
 
     [FILTER]
         Name record_modifier
@@ -192,13 +240,15 @@ data:
         Match        *
         Host         {{ template "bdba.fluentd.fullname" . }}
         Retain_Metadata_In_Forward_Mode Off
+        Retry_Limit  False
+        storage.total_limit_size 256M
 
   parsers.conf: |
     [PARSER]
         Name        json
         Format      json
         Time_Key    timestamp
-        Time_Format %Y-%m-%dT%H:%M:%S.%f%z
+        Time_Format %Y-%m-%dT%H:%M:%S.%L%z
         Time_Keep   On
 
 ---
